@@ -1,20 +1,11 @@
-
-import {BrowserRouter,Routes,Route} from 'react-router-dom'
-import AdminDesh from './components/AdminDesh';
-import NotFound from './NotFound';
+// import logo from './logo.svg';
+import './App.css';
 
 function App() {
   return (
-    <>
-    <BrowserRouter>
-    <Routes>
-        <Route>
-          <Route path='/' Component={AdminDesh} />
-          <Route path="*" Component={NotFound}/>
-        </Route>
-      </Routes>
-    </BrowserRouter>
-   </>
+    <div className="flex flex-col justify-center align-middle items-center">
+      <h1 className='font-bold text-violet-600 text-4xl '>Hello From admin side</h1>
+    </div>
   );
 }
 
