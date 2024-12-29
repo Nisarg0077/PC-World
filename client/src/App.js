@@ -1,18 +1,11 @@
-import {BrowserRouter,Routes,Route} from 'react-router-dom'
-import Home from './components/Home';
-import NotFound from './NotFound';
+// import logo from './logo.svg';
+import './App.css';
+
 function App() {
   return (
-   <>
-    <BrowserRouter>
-    <Routes>
-        <Route>
-          <Route path='/' Component={Home} />
-          <Route path="*" Component={NotFound}/>
-        </Route>
-      </Routes>
-    </BrowserRouter>
-   </>
+    <div className="flex flex-col items-center justify-center align-middle">
+      <h1 className="font-bold text-blue-500 text-4xl ">Hello from client</h1>
+    </div>
   );
 }
 
