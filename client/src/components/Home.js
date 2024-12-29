@@ -2,7 +2,7 @@ import React from 'react'
 
 const Home = () => {
   return (
-    <div>Home Page for PC WORLD</div>
+    <div classname="font-bold">Home Page for PC WORLD rushabh</div>
   )
 }
 

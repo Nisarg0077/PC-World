@@ -2,7 +2,7 @@ import React from 'react'
 
 const AdminDesh = () => {
   return (
-    <div>AdminDesh</div>
+    <div classname='font-bold'>AdminDesh</div>
   )
 }
 
