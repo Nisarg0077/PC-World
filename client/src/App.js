@@ -1,11 +1,19 @@
 import './App.css';
-
+import {BrowserRouter,Routes,Route} from 'react-router-dom'
+import Home from './components/Home';
+import NotFound from './NotFound';
 function App() {
   return (
-    <div className='flex flex-col justify-center align-middle items-center'>
-      <h1 className='text-violet-500 text-4xl font-bold'>This is an Sample page............</h1>
-      <h1 className='text-violet-500 text-4xl font-bold'>This is an Sample page............</h1>
-    </div>
+   <>
+    <BrowserRouter>
+    <Routes>
+        <Route>
+          <Route path='/' Component={Home} />
+          <Route path="*" Component={NotFound}/>
+        </Route>
+      </Routes>
+    </BrowserRouter>
+   </>
   );
 }
 
