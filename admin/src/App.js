@@ -1,11 +1,21 @@
-// import logo from './logo.svg';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
+import Dashboard from './components/Dashboard';
+import Login from './components/Login';
+import Register from './components/Register';
+import NotFound from './components/NotFound';
 
 function App() {
   return (
-    <div className="flex flex-col justify-center align-middle items-center">
-      <h1 className='font-bold text-violet-600 text-4xl '>Hello From admin side</h1>
-    </div>
+    
+    <BrowserRouter>
+      <Routes>
+      <Route path='/' Component={Dashboard} />
+      <Route path='/login' Component={Login} />
+      <Route path='/register' Component={Register} />
+      <Route path="*" Component={NotFound}/>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
