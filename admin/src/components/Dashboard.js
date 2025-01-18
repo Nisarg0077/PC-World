@@ -12,7 +12,7 @@ const Dashboard = () => {
     const AdminUser = sessionStorage.getItem("AdminUser");
 
     if (!AdminUser) {
-      navigate("/login");
+      // navigate("/login");
     } else {
       const { firstName = "First Name", lastName = "Last Name" } = JSON.parse(AdminUser);
       setFirstName(firstName);
