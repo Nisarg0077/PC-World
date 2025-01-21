@@ -9,6 +9,8 @@ const cors = require('cors');
 const ProductType = require('./models/ProductType');
 const app = express();
 const port = 5000;
+const productMigation = require('./migration/product-migration');
+
 
 process.setMaxListeners(15);
 
@@ -146,7 +148,13 @@ app.post('/api/admin/login', async (req, res) => {
   }
 });
 
-
+app.get('/mgrt/prod', (req, res) => {
+  // const data =  
+  productMigation();
+    // console.log(data);
+    // res.json(data)
+    // productMigation();
+});
 
 
 app.listen(port, () => {
