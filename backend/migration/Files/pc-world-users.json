@@ -1,0 +1,54 @@
+[{
+  "_id": "64c91706c681852b41000001",
+  "username": "john_doe",
+  "password": "john_doe",
+  "role": "client",
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "phone": "+1 555 123 4567",
+  "address": {
+    "street": "123 Main St",
+    "city": "Anytown",
+    "state": "CA",
+    "zip": "12345"
+  },
+  "createdAt": "2024-07-27T10:30:00Z",
+  "updatedAt": "2024-07-27T10:30:00Z"
+},
+{
+  "_id": "64c91706c681852b41000002",
+  "username": "jane_smith",
+  "password": "jane_smith",
+  "role": "seller",
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "email": "jane.smith@example.com",
+  "phone": "+1 555 987 6543",
+  "address": {
+    "street": "456 Oak Ave",
+    "city": "Othertown",
+    "state": "NY",
+    "zip": "56789"
+  },
+  "createdAt": "2024-07-28T15:15:00Z",
+  "updatedAt": "2024-07-28T15:15:00Z"
+},
+{
+  "_id": "64c91706c681852b41000003",
+  "username": "admin_user",
+  "password": "admin_user",
+  "role": "admin",
+  "firstName": "Admin",
+  "lastName": "User",
+  "email": "admin@example.com",
+  "phone": "+1 555 555 5555",
+  "address": {
+    "street": "789 Elm St",
+    "city": "Bigtown",
+    "state": "TX",
+    "zip": "98765"
+  },
+  "createdAt": "2024-07-25T09:00:00Z",
+  "updatedAt": "2024-07-25T09:00:00Z"
+}]
