@@ -10,7 +10,9 @@ const ProductType = require('./models/ProductType');
 const app = express();
 const port = 5000;
 const productMigation = require('./migration/product-migration');
-
+const userMaigration = require('./migration/user-migration');
+const brandMaigration = require('./migration/brands-migration');
+const prodTypMigration = require('./migration/prodTyp-migration');
 
 process.setMaxListeners(15);
 
@@ -116,7 +118,7 @@ app.get('/api/login', async (req, res) => {
 
 app.post('/api/admin/login', async (req, res) => {
   const { username, password } = req.body;
-  console.log(username)
+  // console.log(username)
   try {
     const user = await User.findOne({ 
       username: username, 
@@ -149,11 +151,21 @@ app.post('/api/admin/login', async (req, res) => {
 });
 
 app.get('/mgrt/prod', (req, res) => {
-  // const data =  
   productMigation();
-    // console.log(data);
-    // res.json(data)
-    // productMigation();
+});
+
+
+
+app.get('/mgrt/user', (req, res) => {
+    userMaigration();
+});
+
+app.get('/mgrt/brands', (req, res) => {
+  brandMaigration()
+});
+
+app.get('/mgrt/prodType', (req, res) => {
+  prodTypMigration()
 });
 
 
