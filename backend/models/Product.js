@@ -52,7 +52,7 @@ const specificationSchema = new mongoose.Schema({
     formFactor: String,
     material: String,
   },
-}, { _id: false });
+}, { _id: false});
 
 
   

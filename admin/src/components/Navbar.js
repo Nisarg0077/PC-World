@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [firstName, setFirstname] = useState('');
-  const [lastName, setLastname] = useState('');
+  const [user, setUser] = useState(null); // Default to null instead of undefined
 
   const navigate = useNavigate();
 
@@ -18,11 +17,13 @@ const Navbar = () => {
     if (!AdminUser) {
       navigate("/login");
     } else {
-      const parsedData = JSON.parse(AdminUser);
-      setFirstname(parsedData.firstName || "First Name");
-      setLastname(parsedData.lastName || "Last Name");
+      setUser(JSON.parse(AdminUser)); // Parse the session data into an object
     }
   }, [navigate]);
+
+  if (!user) {
+    return null; // Or you can show a loading spinner or placeholder while waiting for user data
+  }
 
   return (
     <nav className="bg-blue-900 text-white p-2 shadow-md">
@@ -35,15 +36,15 @@ const Navbar = () => {
         </div>
 
         {/* Desktop Links */}
-        <div className=" sm:flex sm:space-x-6">
+        <div className="sm:flex sm:space-x-6">
           <div className="relative flex items-center">
-            <h1 className="text-lg text-gray-200">Hello, {firstName} {lastName}!</h1>
+            <h1 className="text-lg text-gray-200">Hello, {user.firstName} {user.lastName}!</h1>
             <button
-        onClick={toggleDropdown}
-        className="ml-2 p-3 w-12  rounded-full bg-gray-800 hover:bg-gray-700 focus:outline-none"
-      >
-        <i className="fa-solid fa-user text-md"></i>
-      </button>
+              onClick={toggleDropdown}
+              className="ml-2 p-3 w-12 rounded-full bg-gray-800 hover:bg-gray-700 focus:outline-none"
+            >
+              <i className="fa-solid fa-user text-md"></i>
+            </button>
             {/* Dropdown Menu */}
             {isDropdownOpen && (
               <div className="absolute right-0 mt-32 bg-white text-gray-800 rounded-md shadow-lg w-48 z-10">

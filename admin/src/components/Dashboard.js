@@ -4,21 +4,24 @@ import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 
 const Dashboard = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [user, setUser] = useState(null); // Start with null, because it's an object
   const navigate = useNavigate();
 
   useEffect(() => {
     const AdminUser = sessionStorage.getItem("AdminUser");
 
     if (!AdminUser) {
-      // navigate("/login");
+      navigate("/login");
     } else {
-      const { firstName = "First Name", lastName = "Last Name" } = JSON.parse(AdminUser);
-      setFirstName(firstName);
-      setLastName(lastName);
+      // Parse the AdminUser string into an object
+      setUser(JSON.parse(AdminUser)); // Assuming the session data is a JSON string
     }
   }, [navigate]);
+
+  // Conditional rendering in case the user is not available yet
+  if (!user) {
+    return <p>Loading...</p>; // Show loading state while user data is fetched
+  }
 
   return (
     <div className="h-screen flex flex-col">
@@ -36,7 +39,7 @@ const Dashboard = () => {
         {/* Main Content */}
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
           <h1 className="text-xl font-bold">Admin Dashboard</h1>
-          <p>Welcome, {firstName} {lastName}!</p>
+          <p>Welcome, {user.firstName} {user.lastName}!</p>
           {/* Your content goes here */}
         </main>
       </div>

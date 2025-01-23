@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
 import Sidebar from '../Sidebar';
 import axios from 'axios';
@@ -60,6 +60,9 @@ const Products = () => {
     navigate('/add-cpu');
   };
 
+  const handleAddGPUProduct = () => {
+    navigate('/add-gpu');
+  }
   // Handle Search
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -107,12 +110,21 @@ const Products = () => {
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl font-bold">Product Management System</h1>
+            <div className='p-1'>
             <button
               onClick={handleAddCPUProduct}
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-green-600"
             >
               Add CPU
             </button>
+
+            <button
+              onClick={handleAddGPUProduct}
+              className="bg-green-500 text-white px-2 py-2 rounded hover:bg-green-600"
+            >
+              Add GPU
+            </button>
+            </div>
           </div>
 
           {/* Search and Sort */}
@@ -158,7 +170,7 @@ const Products = () => {
               <tbody>
                 {filteredData.map((product, index) => (
                   <tr key={product._id} className="text-center">
-                    <td className="border px-4 py-2">{product._id}</td>
+                    <td className="border px-4 py-2"><Link to={{pathname: "/product-info",search: `?pid=${product._id}`}}>view</Link></td>
                     <td className="border px-4 py-2">{product.name}</td>
                     <td className="border px-4 py-2">{product.category}</td>
                     <td className="border px-4 py-2">${product.price}</td>
