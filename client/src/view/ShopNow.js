@@ -40,12 +40,12 @@ const ShopNow = () => {
             products.map((product) => (
               <div 
                 key={product.id} 
-                className="bg-white shadow-md rounded-lg p-4 text-center flex flex-col items-center justify-between "
+                className="bg-white shadow-md rounded-lg p-4 text-center flex flex-col items-center justify-between"
               >
                 <img 
                   src={product.imageUrl} 
                   alt={product.name} 
-                  className="w-full h-52 object-contain rounded-md"
+                  className="w-full h-40 object-contain rounded-md"
                 />
                 <h3 className="mt-2 text-xl font-semibold">{product.name}</h3>
                 <p className="text-gray-600">{product.price}</p>
