@@ -43,55 +43,33 @@ app.get('/', (req, res) => {
   res.send("Hello");
 });
 
+// app.post('/api/products', async (req, res) => {
+//   try {
+//     const products = await Product.find(); 
+//     res.json(products); 
+//   } catch (error) {
+//     console.error('Error fetching products:', error);
+//     res.status(500).json({ error: 'Failed to fetch products' });
+//   }
+// });
 app.post('/api/products', async (req, res) => {
   try {
     const products = await Product.find(); 
-    res.json(products); 
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+    // Ensure each product gets a full image URL
+    const updatedProducts = products.map(product => ({
+      ...product._doc,
+      imageUrl: `${baseUrl}/images/${product.imageUrl}`
+    }));
+
+    res.json(updatedProducts); 
   } catch (error) {
     console.error('Error fetching products:', error);
     res.status(500).json({ error: 'Failed to fetch products' });
   }
 });
 
-// app.post('/api/productInfo/', async (req, res) => {
-//   try {
-//     const pid = new Product(req.body);
-//     console.log(pid);
-
-//     const objectId = new ObjectId(pid);
-    
-//     const product = await Product.find({_id: objectId}); 
-
-//     res.json(product); 
-//     console.log(product); 
-//   } catch (error) {
-//     console.error('Error fetching product:', error);
-//     res.status(500).json({ error: 'Failed to fetch product' });
-//   }
-// });
-
-// app.post('/api/productInfo', async (req, res) => {
-//   try {
-//     const { pid } = req.body; // Extract pid from request body
-//     console.log('Received pid:', pid);
-
-//     if (!ObjectId.isValid(pid)) {
-//       return res.status(400).json({ error: 'Invalid Product ID' });
-//     }
-
-//     const product = await Product.findOne({ _id: new ObjectId(pid) }); // Query for the product
-
-//     if (!product) {
-//       return res.status(404).json({ error: 'Product not found' });
-//     }
-
-//     res.json(product); // Send product info as response
-//     // console.log('Product fetched:', product);
-//   } catch (error) {
-//     // console.error('Error fetching product:', error);
-//     res.status(500).json({ error: 'Failed to fetch product' });
-//   }
-// });
 
 app.post('/api/productInfo', async (req, res) => {
   try {
