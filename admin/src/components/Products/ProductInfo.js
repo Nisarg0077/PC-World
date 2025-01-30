@@ -18,8 +18,10 @@ const ProductInfo = () => {
     } else {
       const params = new URLSearchParams(window.location.search);
       const paramsArray = Array.from(params.entries()); // Convert query parameters to an array
+      console.log(paramsArray)
       setQueryParams(paramsArray); // Store them for mapping
       const pid = params.get('pid'); // Extract specific key if needed
+      console.log(pid)
       if (pid) fetchProductInfo(pid);
     }
   }, [navigate]);

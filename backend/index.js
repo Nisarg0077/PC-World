@@ -74,7 +74,7 @@ app.post('/api/products', async (req, res) => {
 app.post('/api/productInfo', async (req, res) => {
   try {
     const { pid } = req.body;
-
+    console.log(pid)
     if (!ObjectId.isValid(pid)) {
       return res.status(400).json({ error: 'Invalid Product ID' });
     }
@@ -87,8 +87,9 @@ app.post('/api/productInfo', async (req, res) => {
 
     // Add the full image URL to the product data
     const baseUrl = `${req.protocol}://${req.get('host')}`;
+    
     product.imageUrl = `${baseUrl}/images/${product.imageUrl}`; // Assuming `imageFilename` stores the image file name in the database
-
+    console.log(product.imageUrl)
     res.json(product);
   } catch (error) {
     console.error('Error fetching product:', error);
@@ -225,7 +226,6 @@ app.get('/mgrt/prod', (req, res) => {
 app.get('/mgrt/user', (req, res) => {
     userMaigration();
 });
-
 app.get('/mgrt/brands', (req, res) => {
   brandMaigration()
 });
