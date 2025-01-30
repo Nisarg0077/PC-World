@@ -10,6 +10,7 @@ import Products from './components/Products/Products';
 import AddCPUProduct from './components/Products/AddCPUProduct';
 import AddGPUProduct from './components/Products/AddGPUProduct';
 import ProductInfo from './components/Products/ProductInfo';
+import AdminProfile from './components/AdminProfile';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
       <Route path='/login' Component={Login} />
       <Route path='/logout' Component={Logout} />
       <Route path='/register' Component={Register} />
+      <Route path='/adminProfile' Component={AdminProfile} />
       <Route path='/products' Component={Products} />
       <Route path='/add-cpu' Component={AddCPUProduct} />
       <Route path='/add-gpu' Component={AddGPUProduct} />
