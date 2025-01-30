@@ -1,7 +1,5 @@
 [{
-  "_id": {
-    "$oid": "64c91706c681852b41000001"
-  },
+  "_id":"64c91706c681852b41000001",
   "username": "john_doe",
   "password": "john_doe",
   "role": "client",
@@ -14,22 +12,14 @@
     "city": "Anytown",
     "state": "CA",
     "zip": "12345",
-    "_id": {
-      "$oid": "678fa35f00f0319a1336f4a9"
-    }
+    "_id":"678fa35f00f0319a1336f4a9"
   },
-  "createdAt": {
-    "$date": "2024-07-27T10:30:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2024-07-27T10:30:00.000Z"
-  },
+  "createdAt":"2024-07-27T10:30:00.000Z",
+  "updatedAt":"2024-07-27T10:30:00.000Z",
   "__v": 0
 },
 {
-  "_id": {
-    "$oid": "64c91706c681852b41000002"
-  },
+  "_id": "64c91706c681852b41000002",
   "username": "nisarg",
   "password": "123",
   "role": "admin",
@@ -42,22 +32,14 @@
     "city": "Othertown",
     "state": "NY",
     "zip": "56789",
-    "_id": {
-      "$oid": "678fa35f00f0319a1336f4ab"
-    }
+    "_id":"678fa35f00f0319a1336f4ab"
   },
-  "createdAt": {
-    "$date": "2024-07-28T15:15:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2024-07-28T15:15:00.000Z"
-  },
+  "createdAt":"2024-07-28T15:15:00.000Z",
+  "updatedAt":"2024-07-28T15:15:00.000Z",
   "__v": 0
 },
 {
-  "_id": {
-    "$oid": "64c91706c681852b41000003"
-  },
+  "_id": "64c91706c681852b41000003",
   "username": "admin_user",
   "password": "admin_user",
   "role": "admin",
@@ -70,15 +52,9 @@
     "city": "Bigtown",
     "state": "TX",
     "zip": "98765",
-    "_id": {
-      "$oid": "678fa35f00f0319a1336f4ad"
-    }
+    "_id":"678fa35f00f0319a1336f4ad"
   },
-  "createdAt": {
-    "$date": "2024-07-25T09:00:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2024-07-25T09:00:00.000Z"
-  },
+  "createdAt": "2024-07-25T09:00:00.000Z",
+  "updatedAt":"2024-07-25T09:00:00.000Z",
   "__v": 0
 }]
