@@ -1,0 +1,45 @@
+[{
+  "_id": "6789109e121ba18f894e6567",
+  "name": "Intel",
+  "description": "Leading manufacturer of CPUs and semiconductor chips.",
+  "country": "USA",
+  "logoUrl": "https://example.com/logos/intel.png",
+  "createdAt": "2023-01-01T00:00:00Z",
+  "updatedAt": "2023-01-01T00:00:00Z"
+},
+{
+  "_id": "6789109e121ba18f894e6568",
+  "name": "AMD",
+  "description": "Renowned for CPUs and GPUs for gaming and professional use.",
+  "country": "USA",
+  "logoUrl": "https://example.com/logos/amd.png",
+  "createdAt": "2023-01-01T00:00:00Z",
+  "updatedAt": "2023-01-01T00:00:00Z"
+},
+{
+  "_id": "6789109e121ba18f894e6569",
+  "name": "NVIDIA",
+  "description": "Global leader in graphics processing units (GPUs).",
+  "country": "USA",
+  "logoUrl": "https://example.com/logos/nvidia.png",
+  "createdAt": "2023-01-01T00:00:00Z",
+  "updatedAt": "2023-01-01T00:00:00Z"
+},
+{
+  "_id": "6789109e121ba18f894e656a",
+  "name": "Corsair",
+  "description": "Manufacturer of high-performance gaming peripherals and PC components.",
+  "country": "USA",
+  "logoUrl": "https://example.com/logos/corsair.png",
+  "createdAt": "2023-01-01T00:00:00Z",
+  "updatedAt": "2023-01-01T00:00:00Z"
+},
+{
+  "_id": "6789109e121ba18f894e656b",
+  "name": "Samsung",
+  "description": "Leader in electronics, including SSDs and memory solutions.",
+  "country": "South Korea",
+  "logoUrl": "https://example.com/logos/samsung.png",
+  "createdAt": "2023-01-01T00:00:00Z",
+  "updatedAt": "2023-01-01T00:00:00Z"
+}]
