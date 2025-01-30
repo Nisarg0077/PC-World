@@ -41,15 +41,19 @@ const Navbar = () => {
             <h1 className="text-lg text-gray-200">Hello, {user.firstName} {user.lastName}!</h1>
             <button
               onClick={toggleDropdown}
-              className="ml-2 p-3 w-12 rounded-full bg-gray-800 hover:bg-gray-700 focus:outline-none"
+              className="ml-2 "
             >
-              <i className="fa-solid fa-user text-md"></i>
+              <div className="w-10 h-10 rounded-full border-4 border-blue-500 flex items-center justify-center bg-gray-200">
+                <span className="text-md font-bold text-gray-600">
+                  {user?.firstName?.charAt(0).toUpperCase()}
+                </span>
+              </div>
             </button>
             {/* Dropdown Menu */}
             {isDropdownOpen && (
               <div className="absolute right-0 mt-32 bg-white text-gray-800 rounded-md shadow-lg w-48 z-10">
                 <a
-                  href="/profile"
+                  href="/adminProfile"
                   className="block px-4 py-2 hover:bg-gray-100 transition duration-200"
                 >
                   Profile

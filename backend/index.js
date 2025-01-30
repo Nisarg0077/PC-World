@@ -19,7 +19,7 @@ process.setMaxListeners(15);
 
 const uri = 'mongodb://127.0.0.1:27017/pc-world'; 
 
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
 
@@ -157,18 +157,18 @@ app.get('/api/login', async (req, res) => {
 
 app.post('/api/admin/login', async (req, res) => {
   const { username, password } = req.body;
-  // console.log(username)
+
   try {
     const user = await User.findOne({ 
       username: username, 
       role: 'admin' 
     });
-    
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-
+    // Directly comparing passwords (no hashing)
     if (password !== user.password) {
       return res.status(401).json({ message: 'Invalid password' });
     }
@@ -177,6 +177,7 @@ app.post('/api/admin/login', async (req, res) => {
       message: 'Login successful',
       user: {
         id: user._id,
+        username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
@@ -188,6 +189,32 @@ app.post('/api/admin/login', async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
+
+
+app.post('/api/admin/user', async (req, res) => {
+  try {
+    const { username } = req.body;
+
+    if (!username) {
+      return res.status(400).json({ error: "Username is required" });
+    }
+
+    const user = await User.findOne({ username, role: 'admin' });
+
+    if (!user) {
+      return res.status(404).json({ error: "Admin user not found" });
+    }
+
+    res.json(user);
+    console.log(user);
+  } catch (error) {
+    console.error("Error fetching AdminUser:", error);
+    res.status(500).json({ error: "Failed to fetch AdminUser" });
+  }
+});
+
 
 app.get('/mgrt/prod', (req, res) => {
   productMigation();

@@ -173,7 +173,7 @@ const Products = () => {
                     <td className="border px-4 py-2"><Link to={{pathname: "/product-info",search: `?pid=${product._id}`}}>view</Link></td>
                     <td className="border px-4 py-2">{product.name}</td>
                     <td className="border px-4 py-2">{product.category}</td>
-                    <td className="border px-4 py-2">${product.price}</td>
+                    <td className="border px-4 py-2">₹{product.price}</td>
                     <td className="border px-4 py-2">{product.stock}</td>
                     <td className="border px-4 py-2 space-x-2">
                       <button

@@ -1,5 +1,7 @@
 [{
-  "_id": "64c91706c681852b41000001",
+  "_id": {
+    "$oid": "64c91706c681852b41000001"
+  },
   "username": "john_doe",
   "password": "john_doe",
   "role": "client",
@@ -11,31 +13,51 @@
     "street": "123 Main St",
     "city": "Anytown",
     "state": "CA",
-    "zip": "12345"
+    "zip": "12345",
+    "_id": {
+      "$oid": "678fa35f00f0319a1336f4a9"
+    }
   },
-  "createdAt": "2024-07-27T10:30:00Z",
-  "updatedAt": "2024-07-27T10:30:00Z"
+  "createdAt": {
+    "$date": "2024-07-27T10:30:00.000Z"
+  },
+  "updatedAt": {
+    "$date": "2024-07-27T10:30:00.000Z"
+  },
+  "__v": 0
 },
 {
-  "_id": "64c91706c681852b41000002",
-  "username": "jane_smith",
-  "password": "jane_smith",
-  "role": "seller",
-  "firstName": "Jane",
-  "lastName": "Smith",
-  "email": "jane.smith@example.com",
+  "_id": {
+    "$oid": "64c91706c681852b41000002"
+  },
+  "username": "nisarg",
+  "password": "123",
+  "role": "admin",
+  "firstName": "Nisarg",
+  "lastName": "Limbachiya",
+  "email": "nisarg@example.com",
   "phone": "+1 555 987 6543",
   "address": {
     "street": "456 Oak Ave",
     "city": "Othertown",
     "state": "NY",
-    "zip": "56789"
+    "zip": "56789",
+    "_id": {
+      "$oid": "678fa35f00f0319a1336f4ab"
+    }
   },
-  "createdAt": "2024-07-28T15:15:00Z",
-  "updatedAt": "2024-07-28T15:15:00Z"
+  "createdAt": {
+    "$date": "2024-07-28T15:15:00.000Z"
+  },
+  "updatedAt": {
+    "$date": "2024-07-28T15:15:00.000Z"
+  },
+  "__v": 0
 },
 {
-  "_id": "64c91706c681852b41000003",
+  "_id": {
+    "$oid": "64c91706c681852b41000003"
+  },
   "username": "admin_user",
   "password": "admin_user",
   "role": "admin",
@@ -47,8 +69,16 @@
     "street": "789 Elm St",
     "city": "Bigtown",
     "state": "TX",
-    "zip": "98765"
+    "zip": "98765",
+    "_id": {
+      "$oid": "678fa35f00f0319a1336f4ad"
+    }
   },
-  "createdAt": "2024-07-25T09:00:00Z",
-  "updatedAt": "2024-07-25T09:00:00Z"
+  "createdAt": {
+    "$date": "2024-07-25T09:00:00.000Z"
+  },
+  "updatedAt": {
+    "$date": "2024-07-25T09:00:00.000Z"
+  },
+  "__v": 0
 }]
