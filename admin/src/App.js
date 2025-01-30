@@ -1,11 +1,39 @@
-// import logo from './logo.svg';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
+import Dashboard from './components/Dashboard';
+import Login from './components/Login';
+import Register from './components/Register';
+import NotFound from './components/NotFound';
+// import Navbar from './components/Navbar';
+import Logout from './components/Logout';
+import Products from './components/Products/Products';
+import AddCPUProduct from './components/Products/AddCPUProduct';
+import AddGPUProduct from './components/Products/AddGPUProduct';
+import ProductInfo from './components/Products/ProductInfo';
+import AdminProfile from './components/AdminProfile';
 
 function App() {
   return (
-    <div className="flex flex-col justify-center align-middle items-center">
-      <h1 className='font-bold text-violet-600 text-4xl '>Hello From admin side</h1>
-    </div>
+    <>
+    <BrowserRouter>
+
+      <Routes>
+       
+      <Route path='/' Component={Dashboard} />
+      <Route path='/login' Component={Login} />
+      <Route path='/logout' Component={Logout} />
+      <Route path='/register' Component={Register} />
+      <Route path='/adminProfile' Component={AdminProfile} />
+      <Route path='/products' Component={Products} />
+      <Route path='/add-cpu' Component={AddCPUProduct} />
+      <Route path='/add-gpu' Component={AddGPUProduct} />
+      <Route path='/add-ram' Component={AddCPUProduct} />
+      <Route path='/add-storage' Component={AddCPUProduct} />
+      <Route path='/product-info' Component={ProductInfo} />
+      <Route path="*" Component={NotFound}/>
+      </Routes>
+    </BrowserRouter>
+    </>
   );
 }
 

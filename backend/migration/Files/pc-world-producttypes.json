@@ -1,0 +1,30 @@
+[{
+  "_id": "678118a9ba56bcfd89f14f0a",
+  "name": "CPU",
+  "description": "Central Processing Units for computers.",
+  "createdAt": "2024-01-01T00:00:00Z"
+},
+{
+  "_id": "678118a9ba56bcfd89f14f0b",
+  "name": "GPU",
+  "description": "Graphics Processing Units for high-performance graphics.",
+  "createdAt": "2024-01-02T00:00:00Z"
+},
+{
+  "_id": "678118a9ba56bcfd89f14f0c",
+  "name": "RAM",
+  "description": "Random Access Memory modules for systems.",
+  "createdAt": "2024-01-03T00:00:00Z"
+},
+{
+  "_id": "678118a9ba56bcfd89f14f0d",
+  "name": "Storage",
+  "description": "Solid State Drives (SSD) and Hard Disk Drives (HDD).",
+  "createdAt": "2024-01-04T00:00:00Z"
+},
+{
+  "_id": "678118a9ba56bcfd89f14f0e",
+  "name": "Motherboard",
+  "description": "Main circuit boards for computers.",
+  "createdAt": "2024-01-05T00:00:00Z"
+}]
