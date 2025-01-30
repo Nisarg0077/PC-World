@@ -8,7 +8,7 @@
     "description": "High-end desktop processor with excellent gaming and content creation performance.",
     "price": 599.99,
     "stock": 15,
-    "imageUrl": "https://example.com/images/cpu_i9-13900k.jpg",
+    "imageUrl": "cpu_i9-13900k.jpg",
     "specifications": {
       "cpu": {
         "manufacturer": "Intel",
@@ -33,7 +33,7 @@
     "description": "High-end gaming graphics card with powerful performance for 4K gaming.",
     "price": 1599.99,
     "stock": 8,
-    "imageUrl": "https://example.com/images/gpu_rtx4090.jpg",
+    "imageUrl": "gpu_rtx4090.jpg",
     "specifications": {
       "gpu": {
         "manufacturer": "NVIDIA",
@@ -57,7 +57,7 @@
     "description": "High-performance DDR5 RAM for gaming and overclocking.",
     "price": 199.99,
     "stock": 25,
-    "imageUrl": "https://example.com/images/ram_corsair.jpg",
+    "imageUrl": "ram_corsair.jpg",
     "specifications": {
       "ram": {
         "type": "DDR5",
@@ -79,7 +79,7 @@
     "description": "High-end Z790 motherboard with advanced features and overclocking capabilities.",
     "price": 699.99,
     "stock": 10,
-    "imageUrl": "https://example.com/images/motherboard_asus.jpg",
+    "imageUrl": "motherboard_asus.jpg",
     "specifications": {
       "motherboard": {
         "manufacturer": "ASUS",
@@ -103,7 +103,7 @@
     "description": "High-performance NVMe SSD with fast read/write speeds.",
     "price": 179.99,
     "stock": 30,
-    "imageUrl": "https://example.com/images/ssd_samsung.jpg",
+    "imageUrl": "ssd_samsung.jpg",
     "specifications": {
       "storage": {
         "type": "SSD",

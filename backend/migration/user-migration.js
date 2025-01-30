@@ -10,7 +10,7 @@ const userMaigration = async() => {
         if(user.length === 0){
             console.log('No Users found in the database. Starting migration...');
        
-            const data = await fs.readFile('D:/PROG/React/PC-World/backend/migration/Files/pc-world-users.json', 'utf8');
+            const data = await fs.readFile('D:\\PC-World\\backend\\migration\\Files\\pc-world-users.json', 'utf8');
             const userData = JSON.parse(data);
 
             const result = await User.insertMany(userData);
