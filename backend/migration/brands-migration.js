@@ -9,7 +9,8 @@ const brandMigration = async () => {
             if(brands.length === 0){
                 console.log('No Brands found in the database. Starting migration...');
            
-                const data = await fs.readFile('D:/PROG/React/PC-World/backend/migration/Files/pc-world-brands.json', 'utf8');
+                const data = await fs.readFile('D:\\PC-World\\backend\\migration\\Files\\pc-world-brands.json', 'utf8');
+   
                 const brandsData = JSON.parse(data);
     
                 const result = await Brand.insertMany(brandsData);

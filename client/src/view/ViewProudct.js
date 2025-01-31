@@ -1,66 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import Navbar from '../Navbar';
-import Sidebar from '../Sidebar';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useEffect, useState } from 'react'
+import Navbar from './Navbar'
+import fetchProductInfo from '../components/Back_ViewProduct'
 
-const ProductInfo = () => {
-  const [product, setProduct] = useState([]);
-  const [queryParams, setQueryParams] = useState([]);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const AdminUser = sessionStorage.getItem('AdminUser');
-    if (!AdminUser) {
-      navigate('/login');
-    } else {
-      const params = new URLSearchParams(window.location.search);
+export const ViewProudct = () => {
+    const [product, setProduct] = useState([]);
+    const [query, setQuery] = useState([]);
+    const [pid, setPid] = useState([]);
+    useEffect(()=> {
+        const getinfo = async () => {
+            const params = new URLSearchParams(window.location.search);
       const paramsArray = Array.from(params.entries()); // Convert query parameters to an array
-      console.log(paramsArray)
-      setQueryParams(paramsArray); // Store them for mapping
+      setQuery(paramsArray); // Store them for mapping
       const pid = params.get('pid'); // Extract specific key if needed
-      console.log(pid)
-      if (pid) fetchProductInfo(pid);
-    }
-  }, [navigate]);
+      if (pid){
+        const info = await fetchProductInfo(pid);
+            setProduct(info);
+      } 
+            
 
-  const fetchProductInfo = async (pid) => {
-    try {
-      const response = await axios.post('http://localhost:5000/api/productInfo', { pid });
-      setProduct(response.data);
-    } catch (error) {
-      toast.error('Failed to fetch product info');
-    }
-  };
-
+        }
+        getinfo();
+        
+    },[])
   return (
-    <div className="h-screen flex flex-col">
-      <header className="sticky top-0 z-50">
-        <Navbar />
-      </header>
-      <div className="flex flex-1 overflow-hidden">
-        <aside className="sticky top-0 h-full">
-          <Sidebar />
-        </aside>
-        <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
-          <ToastContainer />
-
-          {/* Map through all query parameters */}
-          <div className="mb-6">
-            {/*<h2 className="text-xl font-bold text-gray-800">Query Parameters:</h2>
-             <ul className="list-disc list-inside">
-              {queryParams.map(([key, value]) => (
-                <li key={key}>
-                  <span className="font-medium text-gray-700">{key}:</span> {value}
-                </li>
-              ))}
-            </ul> */}
-          </div>
-
-          {/* Display product information */}
-          {product ? (
+    <div>
+        <Navbar/>
+        <section>
+        {product ? (
             <div className="bg-white shadow-md rounded-lg p-6">
               <div className="flex flex-col md:flex-row gap-6">
                 {/* Product Image */}
@@ -86,6 +52,8 @@ const ProductInfo = () => {
                   <p className="text-gray-500 mb-4">
                     <span className="font-medium">Stock Available:</span> {product.stock}
                   </p>
+                  <button className='border border-yellow-600 bg-yellow-400 p-2 text-black rounded font-semibold'>Add To Cart</button>
+                  <button  className='border border-yellow-600 bg-yellow-500 p-2 ml-2 text-black rounded font-semibold'>Buy Now</button>
                 </div>
               </div>
 
@@ -188,10 +156,7 @@ const ProductInfo = () => {
           ) : (
             <p>Loading product info...</p>
           )}
-        </main>
-      </div>
+        </section>
     </div>
-  );
-};
-
-export default ProductInfo;
+  )
+}
