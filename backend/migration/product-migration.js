@@ -10,7 +10,11 @@ const productMigration = async () => {
         if (products.length === 0) {
             console.log('No products found in the database. Starting migration...');
 
-            const data = await fs.readFile('D:/PC-World/backend/migration/Files/productDummy.json', 'utf8');
+
+            const data = await fs.readFile('D:\\PC-World\\backend\\migration\\Files\\productDummy.json', 'utf8');
+
+           
+
             const prodData = JSON.parse(data);
 
             const result = await Product.insertMany(prodData);
