@@ -1,0 +1,118 @@
+[
+  {
+    "_id": "64c91706c681852b41000004",
+    "name": "Intel Core i9-13900K",
+    "category": "cpu",
+    "brand": "Intel",
+    "model": "i9-13900K",
+    "description": "High-end desktop processor with excellent gaming and content creation performance.",
+    "price": 599.99,
+    "stock": 15,
+    "imageUrl": "cpu_i9-13900k.jpg",
+    "specifications": {
+      "cpu": {
+        "manufacturer": "Intel",
+        "model": "i9-13900K",
+        "cores": 24,
+        "threads": 32,
+        "baseClock": 3.0,
+        "boostClock": 5.8,
+        "socket": "LGA 1700",
+        "cache": "36MB"
+      }
+    },
+    "createdAt": "2024-07-27T10:30:00Z",
+    "updatedAt": "2024-07-27T10:30:00Z"
+  },
+  {
+    "_id": "64c91706c681852b41000005",
+    "name": "NVIDIA GeForce RTX 4090",
+    "category": "gpu",
+    "brand": "NVIDIA",
+    "model": "RTX 4090",
+    "description": "High-end gaming graphics card with powerful performance for 4K gaming.",
+    "price": 1599.99,
+    "stock": 8,
+    "imageUrl": "gpu_rtx4090.jpg",
+    "specifications": {
+      "gpu": {
+        "manufacturer": "NVIDIA",
+        "model": "RTX 4090",
+        "vram": 24,
+        "vramType": "GDDR6X",
+        "coreClock": 2520,
+        "memoryClock": 21000,
+        "interface": "PCIe 4.0 x16"
+      }
+    },
+    "createdAt": "2024-07-28T15:15:00Z",
+    "updatedAt": "2024-07-28T15:15:00Z"
+  },
+  {
+    "_id": "64c91706c681852b41000006",
+    "name": "Corsair Vengeance LPX 32GB (2x16GB) DDR5 5200MHz",
+    "category": "ram",
+    "brand": "Corsair",
+    "model": "Vengeance LPX",
+    "description": "High-performance DDR5 RAM for gaming and overclocking.",
+    "price": 199.99,
+    "stock": 25,
+    "imageUrl": "ram_corsair.jpg",
+    "specifications": {
+      "ram": {
+        "type": "DDR5",
+        "speed": "5200MHz",
+        "capacity": 32,
+        "modules": 2,
+        "casLatency": "36"
+      }
+    },
+    "createdAt": "2024-07-25T09:00:00Z",
+    "updatedAt": "2024-07-25T09:00:00Z"
+  },
+  {
+    "_id": "64c91706c681852b41000007",
+    "name": "ASUS ROG Maximus Z790 Hero",
+    "category": "motherboard",
+    "brand": "ASUS",
+    "model": "ROG Maximus Z790 Hero",
+    "description": "High-end Z790 motherboard with advanced features and overclocking capabilities.",
+    "price": 699.99,
+    "stock": 10,
+    "imageUrl": "motherboard_asus.jpg",
+    "specifications": {
+      "motherboard": {
+        "manufacturer": "ASUS",
+        "model": "ROG Maximus Z790 Hero",
+        "socket": "LGA 1700",
+        "chipset": "Z790",
+        "formFactor": "ATX",
+        "memorySlots": 4,
+        "storageInterfaces": "M.2, SATA"
+      }
+    },
+    "createdAt": "2024-07-26T12:00:00Z",
+    "updatedAt": "2024-07-26T12:00:00Z"
+  },
+  {
+    "_id": "64c91706c681852b41000008",
+    "name": "Samsung 990 Pro 2TB NVMe M.2 SSD",
+    "category": "storage",
+    "brand": "Samsung",
+    "model": "990 Pro",
+    "description": "High-performance NVMe SSD with fast read/write speeds.",
+    "price": 179.99,
+    "stock": 30,
+    "imageUrl": "ssd_samsung.jpg",
+    "specifications": {
+      "storage": {
+        "type": "SSD",
+        "interface": "NVMe",
+        "capacity": 2000,
+        "rpm": null
+      }
+    },
+    "createdAt": "2024-07-29T08:00:00Z",
+    "updatedAt": "2024-07-29T08:00:00Z"
+  }
+]

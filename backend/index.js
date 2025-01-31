@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Product = require('./models/Product');
+const { ObjectId } = require('mongodb');
 // const bcrypt = require('bcrypt');
 // const jwt = require('jsonwebtoken');
 const User = require('./models/User');
@@ -9,13 +10,19 @@ const cors = require('cors');
 const ProductType = require('./models/ProductType');
 const app = express();
 const port = 5000;
+const productMigation = require('./migration/product-migration');
+const userMaigration = require('./migration/user-migration');
+const brandMaigration = require('./migration/brands-migration');
+const prodTypMigration = require('./migration/prodTyp-migration');
 
 process.setMaxListeners(15);
 
 const uri = 'mongodb://127.0.0.1:27017/pc-world'; 
 
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use(express.json());
+
+
 
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))
@@ -24,19 +31,76 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
     process.exit(1);
   });
 
+
+
+  const path = require('path');
+  app.use('/images', express.static(path.join(__dirname, 'images')));
+  
+
+
+
 app.get('/', (req, res) => {
   res.send("Hello");
 });
 
+// app.post('/api/products', async (req, res) => {
+//   try {
+//     const products = await Product.find(); 
+//     res.json(products); 
+//   } catch (error) {
+//     console.error('Error fetching products:', error);
+//     res.status(500).json({ error: 'Failed to fetch products' });
+//   }
+// });
 app.post('/api/products', async (req, res) => {
   try {
     const products = await Product.find(); 
-    res.json(products); 
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+    // Ensure each product gets a full image URL
+    const updatedProducts = products.map(product => ({
+      ...product._doc,
+      imageUrl: `${baseUrl}/images/${product.imageUrl}`
+    }));
+
+    res.json(updatedProducts); 
   } catch (error) {
     console.error('Error fetching products:', error);
     res.status(500).json({ error: 'Failed to fetch products' });
   }
 });
+
+
+app.post('/api/productInfo', async (req, res) => {
+  try {
+    const { pid } = req.body;
+    console.log(pid)
+    if (!ObjectId.isValid(pid)) {
+      return res.status(400).json({ error: 'Invalid Product ID' });
+    }
+
+    const product = await Product.findOne({ _id: new ObjectId(pid) });
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    // Add the full image URL to the product data
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    
+    product.imageUrl = `${baseUrl}/images/${product.imageUrl}`; // Assuming `imageFilename` stores the image file name in the database
+    console.log(product.imageUrl)
+    res.json(product);
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    res.status(500).json({ error: 'Failed to fetch product' });
+  }
+});
+
+
+
+
+
 // app.post('/api/productsin', async (req, res) => {
 //   try {
 //     const cpuData = req.body;
@@ -48,37 +112,17 @@ app.post('/api/products', async (req, res) => {
 //   }
 // });
 
+
+
 app.post('/api/productsin', async (req, res) => {
   try {
-    const { 
-      name, 
-      category, 
-      brand, 
-      model, 
-      description, 
-      price, 
-      stock, 
-      imageUrl, 
-      specifications: { cpu } 
-    } = req.body; 
-
-    const newProduct = new Product({ 
-      name, 
-      category, 
-      brand, 
-      model, 
-      description, 
-      price, 
-      stock, 
-      imageUrl, 
-      specifications: { cpu } 
-    });
-
-    const savedProduct = await newProduct.save();
-    res.json(savedProduct);
+    console.log('Received Data:', req.body); // Log the received data
+    const product = new Product(req.body);
+    await product.save();
+    res.status(201).json({ message: 'Product added successfully', product });
   } catch (error) {
-    console.error('Error inserting product:', error);
-    res.status(500).json({ error: 'Failed to insert product' });
+    console.error('Error adding product:', error);
+    res.status(500).json({ message: 'Failed to add product', error });
   }
 });
 
@@ -114,18 +158,18 @@ app.get('/api/login', async (req, res) => {
 
 app.post('/api/admin/login', async (req, res) => {
   const { username, password } = req.body;
-  console.log(username)
+
   try {
     const user = await User.findOne({ 
       username: username, 
       role: 'admin' 
     });
-    
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-
+    // Directly comparing passwords (no hashing)
     if (password !== user.password) {
       return res.status(401).json({ message: 'Invalid password' });
     }
@@ -134,6 +178,7 @@ app.post('/api/admin/login', async (req, res) => {
       message: 'Login successful',
       user: {
         id: user._id,
+        username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
@@ -147,6 +192,47 @@ app.post('/api/admin/login', async (req, res) => {
 });
 
 
+
+
+app.post('/api/admin/user', async (req, res) => {
+  try {
+    const { username } = req.body;
+
+    if (!username) {
+      return res.status(400).json({ error: "Username is required" });
+    }
+
+    const user = await User.findOne({ username, role: 'admin' });
+
+    if (!user) {
+      return res.status(404).json({ error: "Admin user not found" });
+    }
+
+    res.json(user);
+    console.log(user);
+  } catch (error) {
+    console.error("Error fetching AdminUser:", error);
+    res.status(500).json({ error: "Failed to fetch AdminUser" });
+  }
+});
+
+
+app.get('/mgrt/prod', (req, res) => {
+  productMigation();
+});
+
+
+
+app.get('/mgrt/user', (req, res) => {
+    userMaigration();
+});
+app.get('/mgrt/brands', (req, res) => {
+  brandMaigration()
+});
+
+app.get('/mgrt/prodType', (req, res) => {
+  prodTypMigration()
+});
 
 
 app.listen(port, () => {

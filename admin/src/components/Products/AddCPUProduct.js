@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
 import Sidebar from '../Sidebar';
 import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify'; // Import toast
+import 'react-toastify/dist/ReactToastify.css'; // Import toastify styles
 
 const AddCPUProduct = () => {
   const navigate = useNavigate();
@@ -16,23 +18,25 @@ const AddCPUProduct = () => {
     stock: '',
     imageUrl: '',
     specifications: {
-      manufacturer: '',
-      model: '',
-      cores: '',
-      threads: '',
-      baseClock: '',
-      boostClock: '',
-      socket: '',
-      cache: ''
-    }
+      cpu: {
+        manufacturer: '',
+        model: '',
+        cores: '',
+        threads: '',
+        baseClock: '',
+        boostClock: '',
+        socket: '',
+        cache: '',
+      },
+    },
   });
 
   const [brands, setBrands] = useState([]);
 
   useEffect(() => {
-    const AdminUser = sessionStorage.getItem("AdminUser");
+    const AdminUser = sessionStorage.getItem('AdminUser');
     if (!AdminUser) {
-      navigate("/login");
+      navigate('/login');
     }
     fetchBrands();
   }, [navigate]);
@@ -43,30 +47,37 @@ const AddCPUProduct = () => {
       setBrands(response.data);
     } catch (error) {
       console.error('Error fetching brands:', error);
+      toast.error('Failed to fetch brands');
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCpuData({ ...cpuData, [name]: value });
+    setCpuData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleSpecificationChange = (e) => {
     const { name, value } = e.target;
-    setCpuData({
-      ...cpuData,
+    setCpuData((prevData) => ({
+      ...prevData,
       specifications: {
-        ...cpuData.specifications,
-        [name]: value
-      }
-    });
+        ...prevData.specifications,
+        cpu: {
+          ...prevData.specifications.cpu,
+          [name]: value,
+        },
+      },
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await axios.post('http://localhost:5000/api/productsin', cpuData);
-      alert('CPU Product added successfully!');
+      toast.success('CPU Product added successfully!');
       setCpuData({
         name: '',
         category: 'cpu',
@@ -77,26 +88,27 @@ const AddCPUProduct = () => {
         stock: '',
         imageUrl: '',
         specifications: {
-          manufacturer: '',
-          model: '',
-          cores: '',
-          threads: '',
-          baseClock: '',
-          boostClock: '',
-          socket: '',
-          cache: ''
-        }
+          cpu: {
+            manufacturer: '',
+            model: '',
+            cores: '',
+            threads: '',
+            baseClock: '',
+            boostClock: '',
+            socket: '',
+            cache: '',
+          },
+        },
       });
-
-      console.log(cpuData);
     } catch (error) {
       console.error('Error adding CPU product:', error);
-      alert('Failed to add CPU product.');
+      toast.error('Failed to add CPU product.');
     }
   };
 
   return (
     <div className="h-screen flex flex-col">
+      <ToastContainer /> {/* Add the ToastContainer */}
       <header className="sticky top-0 z-50">
         <Navbar />
       </header>
@@ -137,7 +149,7 @@ const AddCPUProduct = () => {
                 ))}
               </select>
             </div>
-            {['manufacturer', 'cores', 'threads', 'baseClock', 'boostClock', 'socket', 'cache'].map((spec) => (
+            {['manufacturer', 'model', 'cores', 'threads', 'baseClock', 'boostClock', 'socket', 'cache'].map((spec) => (
               <div key={spec}>
                 <label htmlFor={spec} className="block font-medium mb-2">
                   {spec.charAt(0).toUpperCase() + spec.slice(1)}

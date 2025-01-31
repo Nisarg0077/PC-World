@@ -14,6 +14,11 @@ const Login = () => {
     e.preventDefault(); // Prevent default form submission behavior
 
     try {
+      // const response = await axios.post("http://localhost:5000/api/admin/login", {
+      //   username,
+      //   password,
+      // });
+
       const response = await axios.post("http://localhost:5000/api/admin/login", {
         username,
         password,
