@@ -10,6 +10,9 @@ const prodTypMigration = async () => {
                 console.log('No Product Type found in the database. Starting migration...');
            
                 const data = await fs.readFile('D:\\PC-World\\backend\\migration\\Files\\pc-world-producttypes.json', 'utf8');
+
+               
+
                 const productType = JSON.parse(data);
     
                 const result = await ProductType.insertMany(productType);
