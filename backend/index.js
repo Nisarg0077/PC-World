@@ -191,7 +191,40 @@ app.post('/api/admin/login', async (req, res) => {
   }
 });
 
+app.post('/api/user/login', async (req, res) => {
+  const { username, password } = req.body;
 
+  try {
+    const user = await User.findOne({ 
+      username: username, 
+      role: 'client' 
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Directly comparing passwords (no hashing)
+    if (password !== user.password) {
+      return res.status(401).json({ message: 'Invalid password' });
+    }
+
+    return res.status(200).json({
+      message: 'Login successful',
+      user: {
+        id: user._id,
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error('Error during login:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 app.post('/api/admin/user', async (req, res) => {
