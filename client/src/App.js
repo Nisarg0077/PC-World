@@ -6,6 +6,7 @@ import NotFound from './view/NotFound';
 import Home from './view/Home';
 import ShopNow from './view/ShopNow';
 import { ViewProudct } from './view/ViewProudct';
+import { Login } from './view/Login';
 
 
 function App() {
@@ -15,8 +16,8 @@ function App() {
     <BrowserRouter>
       <Routes>
       <Route path='/' Component={Home} />
-      {/* <Route path='/login' Component={Login} />
-      <Route path='/logout' Component={Logout} />
+       <Route path='/login' Component={Login} />
+      {/*<Route path='/logout' Component={Logout} />
       <Route path='/register' Component={Register} /> */}
       <Route path="/shopnow" Component={ShopNow}/>
       <Route path='/viewProduct' Component={ViewProudct}/>
