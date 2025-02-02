@@ -31,7 +31,7 @@ const Navbar = () => {
         <div className="flex items-center">
           {/* Admin Title */}
           <a href="/" className="text-2xl font-semibold tracking-wider hover:text-gray-300">
-            Admin Panel
+            Admin Panel | PC-World
           </a>
         </div>
 

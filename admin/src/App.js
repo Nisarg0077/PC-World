@@ -11,6 +11,13 @@ import AddCPUProduct from './components/Products/AddCPUProduct';
 import AddGPUProduct from './components/Products/AddGPUProduct';
 import ProductInfo from './components/Products/ProductInfo';
 import AdminProfile from './components/AdminProfile';
+import AddMotherboardProduct from './components/Products/AddMotherboardProduct';
+import AddRAMProduct from './components/Products/AddRAMProduct';
+import AddStorageProduct from './components/Products/AddStorageProduct';
+import EditProductPage from './components/Products/EditProductPage';
+import categoriesMgmt from './components/categories/categoriesMgmt';
+import AddCategoryPage from './components/categories/AddCategoryPage';
+import EditCategoryPage from './components/categories/EditCategoryPage';
 
 function App() {
   return (
@@ -27,9 +34,14 @@ function App() {
       <Route path='/products' Component={Products} />
       <Route path='/add-cpu' Component={AddCPUProduct} />
       <Route path='/add-gpu' Component={AddGPUProduct} />
-      <Route path='/add-ram' Component={AddCPUProduct} />
-      <Route path='/add-storage' Component={AddCPUProduct} />
+      <Route path='/add-motherboard' Component={AddMotherboardProduct} />
+      <Route path='/add-ram' Component={AddRAMProduct} />
+      <Route path='/add-storage' Component={AddStorageProduct} />
       <Route path='/product-info' Component={ProductInfo} />
+      <Route path='/edit-product' Component={EditProductPage} />
+      <Route path='/categories' Component={categoriesMgmt} />
+      <Route path='/add-category' Component={AddCategoryPage} />
+      <Route path='/edit-category' Component={EditCategoryPage} />
       <Route path="*" Component={NotFound}/>
       </Routes>
     </BrowserRouter>

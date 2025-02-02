@@ -3,74 +3,69 @@ import { Menu, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // Mobile menu toggle state
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // User dropdown toggle state
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const clientUser = sessionStorage.getItem("ClientUser");
 
-    // if (!clientUser) {
-    //   navigate("/login");
-    //   return;
-    // }
-
     try {
-      setUser(JSON.parse(clientUser)); // Parse session data
+      setUser(JSON.parse(clientUser)); // Parse session data into user object
     } catch (error) {
       console.error("Error parsing user data:", error);
     }
   }, []);
 
   const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+    setIsDropdownOpen(!isDropdownOpen); // Toggle user dropdown visibility
   };
 
   return (
     <nav className="bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg sticky top-0 z-50">
       <div className="container mx-auto flex items-center justify-between p-4">
-        <Link to="/" className="text-2xl font-bold text-white">
-          PC-World 
+        <Link to="/" className="text-2xl font-bold text-white tracking-wide hover:opacity-80 transition">
+          PC-World
         </Link>
 
         {/* Desktop Menu */}
-        <ul className="hidden md:flex space-x-6 text-white">
+        <ul className="hidden md:flex space-x-8 text-white text-lg">
           <li>
-            <Link to="/" className="hover:text-yellow-300 transition">
+            <Link to="/" className="hover:text-yellow-300 transition duration-200">
               Home
             </Link>
           </li>
           <li>
-            <Link to="#" className="hover:text-yellow-300 transition">
+            <Link to="#" className="hover:text-yellow-300 transition duration-200">
               About
             </Link>
           </li>
           <li>
-            <Link to="#" className="hover:text-yellow-300 transition">
+            <Link to="#" className="hover:text-yellow-300 transition duration-200">
               Services
             </Link>
           </li>
           <li>
-            <Link to="#" className="hover:text-yellow-300 transition">
+            <Link to="#" className="hover:text-yellow-300 transition duration-200">
               Contact
             </Link>
           </li>
 
           {/* User Dropdown */}
           {user ? (
-            <div className="sm:flex sm:space-x-6 relative">
-              <button onClick={toggleDropdown} className="ml-2">
-                <div className="w-8 h-8 rounded-full border-2 border-blue-500 flex items-center justify-center bg-gray-200">
-                  <span className="text-md font-bold text-gray-600">
+            <div className="relative">
+              <button onClick={toggleDropdown} className="ml-4">
+                <div className="w-9 h-9 rounded-full border-2 border-blue-500 flex items-center justify-center bg-gray-200">
+                  <span className="text-lg font-bold text-gray-600">
                     {user.firstName.charAt(0).toUpperCase()}
                   </span>
                 </div>
               </button>
 
-              {/* Dropdown Menu */}
+              {/* User Dropdown Menu */}
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-10 bg-white text-gray-800 rounded-md shadow-lg w-48 z-10">
+                <div className="absolute right-0 mt-3 bg-white text-gray-800 rounded-md shadow-xl w-48 z-10">
                   <Link
                     to="/adminProfile"
                     className="block px-4 py-2 hover:bg-gray-100 transition duration-200"
@@ -93,7 +88,7 @@ export default function Navbar() {
             <li>
               <Link
                 to="/login"
-                className="bg-green-500 p-2 rounded font-bold hover:text-green-500 hover:font-bold hover:bg-white transition"
+                className="bg-green-500 text-white px-4 py-2 rounded font-bold hover:bg-white hover:text-green-500 transition duration-200"
               >
                 Login
               </Link>
@@ -118,41 +113,43 @@ export default function Navbar() {
       >
         <ul className="md:hidden text-center py-4 space-y-3 bg-gradient-to-r from-blue-600 to-purple-600">
           <li>
-            <Link to="/" className="block py-2 text-white hover:text-gray-200 transition">
+            <Link
+              to="/"
+              className="block py-2 text-white hover:text-gray-200 transition duration-200"
+            >
               Home
             </Link>
           </li>
           <li>
-            <Link to="#" className="block py-2 text-white hover:text-gray-200 transition">
+            <Link
+              to="#"
+              className="block py-2 text-white hover:text-gray-200 transition duration-200"
+            >
               About
             </Link>
           </li>
           <li>
-            <Link to="#" className="block py-2 text-white hover:text-gray-200 transition">
+            <Link
+              to="#"
+              className="block py-2 text-white hover:text-gray-200 transition duration-200"
+            >
               Services
             </Link>
           </li>
           <li>
-            <Link to="#" className="block py-2 text-white hover:text-gray-200 transition">
+            <Link
+              to="#"
+              className="block py-2 text-white hover:text-gray-200 transition duration-200"
+            >
               Contact
             </Link>
           </li>
-
           {user ? (
-            <div className="relative flex flex-col items-center">
-              <button onClick={toggleDropdown}>
-                <div className="w-8 h-8 rounded-full border-2 border-blue-500 flex items-center justify-center bg-gray-200">
-                  <span className="text-md font-bold text-gray-600">
-                    {user.firstName.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-              </button>
-
-              {isDropdownOpen && (
-                <div className="absolute mt-2 bg-white text-gray-800 rounded-md shadow-lg w-48 z-10">
+            <div className="relative">
+              
                   <Link
                     to="/adminProfile"
-                    className="block px-4 py-2 hover:bg-gray-100 transition duration-200"
+                    className="block px-4 py-2 text-white hover:text-gray-200 transition duration-200"
                   >
                     Profile
                   </Link>
@@ -165,14 +162,13 @@ export default function Navbar() {
                   >
                     Logout
                   </button>
-                </div>
-              )}
+                
             </div>
           ) : (
             <li>
               <Link
                 to="/login"
-                className="bg-green-500 p-2 rounded font-bold hover:text-green-500 hover:font-bold hover:bg-white transition"
+                className="bg-green-500 text-white px-4 py-2 rounded font-bold hover:bg-white hover:text-green-500 transition duration-200"
               >
                 Login
               </Link>
