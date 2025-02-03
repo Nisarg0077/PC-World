@@ -7,6 +7,9 @@ import Home from './view/Home';
 import ShopNow from './view/ShopNow';
 import { ViewProudct } from './view/ViewProudct';
 import { Login } from './view/Login';
+import Register from './view/Register';
+import ClinetProfile from './view/ClientProfile';
+
 
 
 function App() {
@@ -17,8 +20,9 @@ function App() {
       <Routes>
       <Route path='/' Component={Home} />
        <Route path='/login' Component={Login} />
-      {/*<Route path='/logout' Component={Logout} />
-      <Route path='/register' Component={Register} /> */}
+      {/* <Route path='/logout' Component={Logout} /> */}
+      <Route path='/register' Component={Register} /> 
+      <Route path='/userProfile' Component={ClinetProfile}/>
       <Route path="/shopnow" Component={ShopNow}/>
       <Route path='/viewProduct' Component={ViewProudct}/>
       <Route path="*" Component={NotFound}/>

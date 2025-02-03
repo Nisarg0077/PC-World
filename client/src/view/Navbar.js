@@ -67,7 +67,7 @@ export default function Navbar() {
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-3 bg-white text-gray-800 rounded-md shadow-xl w-48 z-10">
                   <Link
-                    to="/adminProfile"
+                    to="/userProfile"
                     className="block px-4 py-2 hover:bg-gray-100 transition duration-200"
                   >
                     Profile
@@ -108,7 +108,7 @@ export default function Navbar() {
       {/* Mobile Menu */}
       <div
         className={`absolute top-14 left-0 w-full bg-white transition-all ${
-          isOpen ? "max-h-72 opacity-100" : "max-h-0 opacity-0"
+          isOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0"
         } overflow-hidden`}
       >
         <ul className="md:hidden text-center py-4 space-y-3 bg-gradient-to-r from-blue-600 to-purple-600">
@@ -148,7 +148,7 @@ export default function Navbar() {
             <div className="relative">
               
                   <Link
-                    to="/adminProfile"
+                    to="/userProfile"
                     className="block px-4 py-2 text-white hover:text-gray-200 transition duration-200"
                   >
                     Profile
@@ -158,7 +158,7 @@ export default function Navbar() {
                       sessionStorage.removeItem("ClientUser");
                       navigate("/login");
                     }}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition duration-200"
+                    className="block w-full text-white bg-red-600 text-center px-4 py-2 hover:bg-red-100 hover:text-red-600 transition duration-200"
                   >
                     Logout
                   </button>
