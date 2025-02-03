@@ -416,7 +416,29 @@ app.post('/api/user/login', async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
+app.post("/api/register", async (req, res) => {
+  try {
+    const newUser = new User({
+      username: req.body.username,
+      password: req.body.password,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      phone: req.body.phone,
+      address: {
+        street: req.body.street,
+        city: req.body.city,
+        state: req.body.state,
+        zip: req.body.zip,
+      },
+    });
 
+    await newUser.save();
+    res.status(201).json({ message: "User registered successfully!" });
+  } catch (error) {
+    res.status(500).json({ error: "Error registering user" });
+  }
+});
 
 app.post('/api/admin/user', async (req, res) => {
   try {
@@ -437,6 +459,27 @@ app.post('/api/admin/user', async (req, res) => {
   } catch (error) {
     console.error("Error fetching AdminUser:", error);
     res.status(500).json({ error: "Failed to fetch AdminUser" });
+  }
+});
+app.post('/api/client/user', async (req, res) => {
+  try {
+    const { username } = req.body;
+
+    if (!username) {
+      return res.status(400).json({ error: "Username is required" });
+    }
+
+    const user = await User.findOne({ username, role: 'client' });
+
+    if (!user) {
+      return res.status(404).json({ error: "user not found" });
+    }
+
+    res.json(user);
+    console.log(user);
+  } catch (error) {
+    console.error("Error fetching User:", error);
+    res.status(500).json({ error: "Failed to fetch User" });
   }
 });
 

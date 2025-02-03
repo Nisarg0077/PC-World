@@ -90,6 +90,9 @@ export const Login = () => {
           )}
         </div>
       )}
+      <div>
+      If not already user?<a href='/register' className='text-blue-600'> Register here.</a>
+      </div>
     </div>
   </div>
   )
