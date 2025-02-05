@@ -62,6 +62,9 @@ const ProductInfo = () => {
                     <span className="font-medium">Brand:</span> {product.brand}
                   </p>
                   <p className="text-gray-500 mb-2">
+                    <span className="font-medium">model:</span> {product.model}
+                  </p>
+                  <p className="text-gray-500 mb-2">
                     <span className="font-medium">Category:</span> {product.category}
                   </p>
                   <p className="text-gray-500 mb-4">
@@ -150,6 +153,45 @@ const ProductInfo = () => {
                   </div>
                 </div>
               )}
+
+
+              {/* {product.specifications && product.specifications.psu && (
+                <div className="mt-6">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Specifications</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(product.specifications.psu).map(([key, value]) => (
+                      <div key={key} className="bg-gray-50 p-4 rounded shadow border border-gray-200">
+                        <span className="block font-medium text-gray-700 capitalize">
+                          {key.replace(/([A-Z])/g, ' $1')}:
+                        </span>
+                        <span className="text-gray-900">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )} */}
+
+
+{product.specifications && product.specifications.psu && (
+  <div className="mt-6">
+    <h2 className="text-2xl font-bold text-gray-800 mb-4">Specifications</h2>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {Object.entries(product.specifications.psu).map(([key, value]) => (
+        <div key={key} className="bg-gray-50 p-4 rounded shadow border border-gray-200">
+          <span className="block font-medium text-gray-700 capitalize">
+            {key.replace(/([A-Z])/g, ' $1')}:
+          </span>
+          
+          {/* Check for modular, and display "Yes" or "No" */}
+          <span className="text-gray-900">
+            {key === "modular" ? (value ? "Yes" : "No") : value}
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
             </div>
           ) : (
             <p>Loading product info...</p>

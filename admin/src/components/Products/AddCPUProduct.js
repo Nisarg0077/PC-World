@@ -20,7 +20,6 @@ const AddCPUProduct = () => {
     specifications: {
       cpu: {
         manufacturer: '',
-        model: '',
         cores: '',
         threads: '',
         baseClock: '',

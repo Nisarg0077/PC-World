@@ -1,55 +1,73 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
-import Navbar from '../Navbar';
-import Sidebar from '../Sidebar';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+import Navbar from "../Navbar";
+import Sidebar from "../Sidebar";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const EditProductPage = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Get the current location object
+  const location = useLocation();
+   const [brands, setBrands] = useState([]);
   const [productData, setProductData] = useState({
-    name: '',
-    category: '',
-    brand: '',
-    model: '',
-    description: '',
-    price: '',
-    stock: '',
-    imageUrl: '',
+    name: "",
+    category: "",
+    brand: "",
+    model: "",
+    description: "",
+    price: "",
+    stock: "",
+    imageUrl: "",
     specifications: {},
   });
 
-  const [image, setImage] = useState(null); // Store selected image file
+  const [image, setImage] = useState(null);
 
-  // Extract product ID (pid) from query params
   const queryParams = new URLSearchParams(location.search);
-  const pid = queryParams.get('pid');
-
+  const pid = queryParams.get("pid");
+ 
   useEffect(() => {
     if (!pid) {
-      toast.error('Product ID is missing');
-      navigate('/products');
+      toast.error("Product ID is missing");
+      navigate("/products");
+      return;
     }
-
-    // Check if the admin is logged in
-    const AdminUser = sessionStorage.getItem('AdminUser');
+  
+    const AdminUser = sessionStorage.getItem("AdminUser");
     if (!AdminUser) {
-      navigate('/login');
+      navigate("/login");
+      return;
     }
-
-    // Fetch product details by product ID
+  
     axios
       .get(`http://localhost:5000/api/product/${pid}`)
       .then((res) => {
-        setProductData(res.data); // Set product data for editing
+        const fetchedData = res.data;
+  
+        // Ensure powerSupply exists in specifications
+        if (!fetchedData.specifications.psu) {
+          fetchedData.specifications.psu = {};
+        }
+  
+        setProductData(fetchedData);
       })
       .catch((error) => {
-        console.error('Error fetching product data:', error);
-        toast.error('Failed to fetch product data');
+        console.error("Error fetching product data:", error);
+        toast.error("Failed to fetch product data");
       });
+  
+    const fetchBrands = async () => {
+      try {
+        const response = await axios.post("http://localhost:5000/api/brands");
+        setBrands(response.data);
+      } catch (error) {
+        toast.error("Failed to fetch brands");
+      }
+    };
+    fetchBrands();
   }, [pid, navigate]);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -74,6 +92,20 @@ const EditProductPage = () => {
     }));
   };
 
+  const handleConnectorChange = (e) => {
+    const options = [...e.target.selectedOptions].map((option) => option.value);
+    setProductData((prevData) => ({
+      ...prevData,
+      specifications: {
+        ...prevData.specifications,
+        psu: {
+          ...prevData.specifications.psu,
+          connectors: options,
+        },
+      },
+    }));
+  };
+
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
   };
@@ -85,10 +117,10 @@ const EditProductPage = () => {
 
       if (image) {
         const formData = new FormData();
-        formData.append('image', image);
+        formData.append("image", image);
 
-        const uploadResponse = await axios.post('http://localhost:5000/api/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
+        const uploadResponse = await axios.post("http://localhost:5000/api/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
         });
 
         imageUrl = uploadResponse.data.imageUrl;
@@ -97,141 +129,196 @@ const EditProductPage = () => {
       const finalProductData = { ...productData, imageUrl };
 
       await axios.post(`http://localhost:5000/api/product/${pid}`, finalProductData);
-    //   toast.success('Product updated successfully!');
-      alert('Product updated successfully!');
-      navigate('/products');
+      console.log("Data", finalProductData);
+      alert("Product updated successfully!");
+      navigate("/products");
     } catch (error) {
-      toast.error('Failed to update product.');
+      toast.error("Failed to update product.");
     }
   };
 
   const renderSpecificationFields = () => {
     const { category, specifications } = productData;
-
+    if (!specifications[category]) return null;
+    console.log(category);
+    console.log(specifications);
+    
     switch (category) {
-      case 'cpu':
+      case "cpu":
         return (
           <>
-            <div>
-              <label htmlFor="manufacturer" className="block font-medium mb-2">Manufacturer</label>
-              <input
-                type="text"
-                id="manufacturer"
-                name="manufacturer"
-                value={specifications.cpu.manufacturer}
-                onChange={handleSpecificationChange}
-                placeholder="Enter Manufacturer"
-                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label htmlFor="model" className="block font-medium mb-2">Model</label>
-              <input
-                type="text"
-                id="model"
-                name="model"
-                value={specifications.cpu.model}
-                onChange={handleSpecificationChange}
-                placeholder="Enter Model"
-                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            {/* Add more fields for CPU specifications */}
+            {["manufacturer", "model", "cores", "threads", "baseClock", "boostClock", "socket", "cache"].map((field) => (
+              <div key={field}>
+                <label htmlFor={field} className="block font-medium mb-2">
+                  {field.charAt(0).toUpperCase() + field.slice(1)}
+                </label>
+                <input type="text" id={field} name={field} value={specifications.cpu?.[field] || ""} onChange={handleSpecificationChange} className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+            ))}
           </>
         );
 
-      case 'gpu':
+      case "gpu":
         return (
           <>
-            <div>
-              <label htmlFor="manufacturer" className="block font-medium mb-2">Manufacturer</label>
-              <input
-                type="text"
-                id="manufacturer"
-                name="manufacturer"
-                value={specifications.gpu.manufacturer}
-                onChange={handleSpecificationChange}
-                placeholder="Enter Manufacturer"
-                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label htmlFor="vram" className="block font-medium mb-2">VRAM</label>
-              <input
-                type="text"
-                id="vram"
-                name="vram"
-                value={specifications.gpu.vram}
-                onChange={handleSpecificationChange}
-                placeholder="Enter VRAM"
-                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            {/* Add more fields for GPU specifications */}
+            {["manufacturer", "model", "vram", "vramType", "coreClock", "memoryClock", "interface"].map((field) => (
+              <div key={field}>
+                <label htmlFor={field} className="block font-medium mb-2">
+                  {field.charAt(0).toUpperCase() + field.slice(1)}
+                </label>
+                <input type="text" id={field} name={field} value={specifications.gpu?.[field] || ""} onChange={handleSpecificationChange} className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+            ))}
           </>
         );
 
-      case 'ram':
+      case "ram":
         return (
           <>
-            <div>
-              <label htmlFor="type" className="block font-medium mb-2">Type</label>
-              <input
-                type="text"
-                id="type"
-                name="type"
-                value={specifications.ram.type}
-                onChange={handleSpecificationChange}
-                placeholder="Enter RAM Type"
-                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label htmlFor="capacity" className="block font-medium mb-2">Capacity</label>
-              <input
-                type="number"
-                id="capacity"
-                name="capacity"
-                value={specifications.ram.capacity}
-                onChange={handleSpecificationChange}
-                placeholder="Enter Capacity"
-                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            {/* Add more fields for RAM specifications */}
+            {["type", "speed", "capacity", "modules", "casLatency"].map((field) => (
+              <div key={field}>
+                <label htmlFor={field} className="block font-medium mb-2">
+                  {field.charAt(0).toUpperCase() + field.slice(1)}
+                </label>
+                <input type="text" id={field} name={field} value={specifications.ram?.[field] || ""} onChange={handleSpecificationChange} className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+            ))}
           </>
         );
 
-      case 'storage':
+      case "storage":
         return (
           <>
-            <div>
-              <label htmlFor="type" className="block font-medium mb-2">Type</label>
-              <input
-                type="text"
-                id="type"
-                name="type"
-                value={specifications.storage.type}
-                onChange={handleSpecificationChange}
-                placeholder="Enter Storage Type"
-                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label htmlFor="capacity" className="block font-medium mb-2">Capacity</label>
-              <input
-                type="number"
-                id="capacity"
-                name="capacity"
-                value={specifications.storage.capacity}
-                onChange={handleSpecificationChange}
-                placeholder="Enter Capacity"
-                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            {/* Add more fields for Storage specifications */}
+            {["type", "interface", "capacity", "rpm"].map((field) => (
+              <div key={field}>
+                <label htmlFor={field} className="block font-medium mb-2">
+                  {field.charAt(0).toUpperCase() + field.slice(1)}
+                </label>
+                <input type="text" id={field} name={field} value={specifications.storage?.[field] || ""} onChange={handleSpecificationChange} className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+            ))}
           </>
         );
+      case "motherboard":
+        return (
+          <>
+            {/* {["type", "interface", "capacity", "rpm"].map((field) => (
+              <div key={field}>
+                <label htmlFor={field} className="block font-medium mb-2">
+                  {field.charAt(0).toUpperCase() + field.slice(1)}
+                </label>
+                <input type="text" id={field} name={field} value={specifications.storage?.[field] || ""} onChange={handleSpecificationChange} className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+            ))} */}
+            {['manufacturer', 'socket', 'chipset', 'formFactor', 'memorySlots', 'storageInterfaces'].map((spec) => (
+              <div key={spec}>
+                <label htmlFor={spec} className="block font-medium mb-2">
+                  {spec.charAt(0).toUpperCase() + spec.slice(1)}
+                </label>
+                <input
+                  type="text"
+                  id={spec}
+                  name={spec}
+                  value={specifications.motherboard[spec]}
+                  onChange={handleSpecificationChange}
+                  placeholder={`Enter ${spec}`}
+                  required
+                  className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            ))}
+          </>
+        );
+        case "psu":
+  return (
+    <>
+      <div>
+        <label htmlFor="brand" className="block font-medium mb-2">Brand</label>
+        <select
+          id="brand"
+          name="brand"
+          value={productData.brand || ""}
+          onChange={handleChange}
+          required
+          className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Select Brand</option>
+          {brands.map((brand) => (
+            <option key={brand._id} value={brand.name}>{brand.name}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Ensure powerSupply exists before accessing */}
+      {["wattage", "efficiencyRating"].map((spec) => (
+        <div key={spec}>
+          <label htmlFor={spec} className="block font-medium mb-2">
+            {spec.charAt(0).toUpperCase() + spec.slice(1)}
+          </label>
+          <input
+            type="text"
+            id={spec}
+            name={spec}
+            value={specifications?.psu?.[spec] || ""}
+            onChange={handleSpecificationChange}
+            placeholder={`Enter ${spec}`}
+            required
+            className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      ))}
+
+      {/* Modular PSU */}
+      <div className="flex items-center">
+        <input
+          type="checkbox"
+          id="modular"
+          name="modular"
+          checked={!!specifications?.psu?.modular} // Ensure it's always a boolean
+          onChange={(e) =>
+            handleSpecificationChange({
+              target: { name: "modular", value: e.target.checked },
+            })
+          }
+          className="mr-2"
+        />
+        <label htmlFor="modular" className="font-medium">Modular PSU</label>
+      </div>
+
+      {/* Connectors */}
+      <div>
+        <label className="block font-medium mb-2">Connectors</label>
+        <select multiple onChange={handleConnectorChange} className="border rounded px-4 py-2 w-full">
+          {["24-pin ATX", "8-pin CPU", "6+2-pin PCIe", "SATA", "Molex"].map((conn) => (
+            <option key={conn} value={conn}>
+              {conn}
+            </option>
+          ))}
+        </select>
+      </div>
+    </>
+  );
+
+  // case "psu": // Ensure powerSupply is handled correctly
+  //     return Object.keys(specifications[category]).map((field) => (
+  //       <div key={field}>
+  //         <label htmlFor={field} className="block font-medium mb-2">
+  //           {field.charAt(0).toUpperCase() + field.slice(1)}
+  //         </label>
+  //         <input
+  //           type="text"
+  //           id={field}
+  //           name={field}
+  //           value={specifications[category]?.[field] || ""}
+  //           onChange={handleSpecificationChange}
+  //           placeholder={`Enter ${field}`}
+  //           className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+  //         />
+  //       </div>
+  //     ));
+
+
+        
 
       default:
         return null;
@@ -240,18 +327,18 @@ const EditProductPage = () => {
 
   return (
     <div className="h-screen flex flex-col">
-      <ToastContainer />
-      <header className="sticky top-0 z-50">
-        <Navbar />
-      </header>
-      <div className="flex flex-1 overflow-hidden">
-        <aside className="sticky top-0 h-full">
-          <Sidebar />
-        </aside>
-        <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
-          <h1 className="text-2xl font-bold mb-4">Edit Product</h1>
-          <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4">
-            {['name', 'model', 'description', 'price', 'stock'].map((field) => (
+       <ToastContainer />
+    <header className="sticky top-0 z-50">
+         <Navbar />
+       </header>
+       <div className="flex flex-1 overflow-hidden">
+         <aside className="sticky top-0 h-full">
+           <Sidebar />
+         </aside>
+         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
+           <h1 className="text-2xl font-bold mb-4">Edit Product</h1>
+           <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4">
+             {['name', 'model', 'description', 'price', 'stock'].map((field) => (
               <div key={field}>
                 <label htmlFor={field} className="block font-medium mb-2">
                   {field.charAt(0).toUpperCase() + field.slice(1)}

@@ -38,7 +38,7 @@ const Navbar = () => {
         {/* Desktop Links */}
         <div className="sm:flex sm:space-x-6">
           <div className="relative flex items-center">
-            <h1 className="text-lg text-gray-200">Hello, {user.firstName} {user.lastName}!</h1>
+            <h1 className="text-lg text-gray-200">Hello, {user.firstName} {user.lastName}</h1>
             <button
               onClick={toggleDropdown}
               className="ml-2 "

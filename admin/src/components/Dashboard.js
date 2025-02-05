@@ -39,7 +39,7 @@ const Dashboard = () => {
         {/* Main Content */}
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
           <h1 className="text-xl font-bold">Admin Dashboard</h1>
-          <p>Welcome, {user.firstName} {user.lastName}!</p>
+          <p>Welcome, {user.firstName} {user.lastName}</p>
           {/* Your content goes here */}
         </main>
       </div>
