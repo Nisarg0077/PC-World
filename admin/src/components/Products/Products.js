@@ -72,6 +72,9 @@ const Products = () => {
   const handleAddStorageProduct = () => {
     navigate('/add-storage');
   }
+  const handleAddPSUProduct = () => {
+    navigate('/add-psu');
+  }
   // Handle Search
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -150,6 +153,13 @@ const Products = () => {
               className="bg-green-500 ml-2 text-white px-2 py-2 rounded hover:bg-green-600"
             >
               Add Storage
+            </button>
+           
+            <button
+              onClick={handleAddPSUProduct}
+              className="bg-green-500 ml-2 text-white px-2 py-2 rounded hover:bg-green-600"
+            >
+              Add PSU
             </button>
             </div>
           </div>

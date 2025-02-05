@@ -18,6 +18,7 @@ import EditProductPage from './components/Products/EditProductPage';
 import categoriesMgmt from './components/categories/categoriesMgmt';
 import AddCategoryPage from './components/categories/AddCategoryPage';
 import EditCategoryPage from './components/categories/EditCategoryPage';
+import AddPSUProduct from './components/Products/AddPSUProduct';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
       <Route path='/add-motherboard' Component={AddMotherboardProduct} />
       <Route path='/add-ram' Component={AddRAMProduct} />
       <Route path='/add-storage' Component={AddStorageProduct} />
+      <Route path='/add-psu' Component={AddPSUProduct} />
       <Route path='/product-info' Component={ProductInfo} />
       <Route path='/edit-product' Component={EditProductPage} />
       <Route path='/categories' Component={categoriesMgmt} />

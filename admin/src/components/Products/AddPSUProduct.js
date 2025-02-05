@@ -1,57 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Navbar from '../Navbar';
-import Sidebar from '../Sidebar';
-import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Navbar from "../Navbar";
+import Sidebar from "../Sidebar";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const AddMotherboardProduct = () => {
+const AddPSUProduct = () => {
   const navigate = useNavigate();
-  const [motherboardData, setMotherboardData] = useState({
-    name: '',
-    category: 'motherboard',
-    brand: '',
-    model: '',
-    description: '',
-    price: '',
-    stock: '',
-    imageUrl: '',
+  const [psuData, setPSUData] = useState({
+    name: "",
+    category: "psu",
+    brand: "",
+    model: "",
+    description: "",
+    price: "",
+    stock: "",
+    imageUrl: "",
     specifications: {
-      motherboard: {
-        manufacturer: '',
-        socket: '',
-        chipset: '',
-        formFactor: '',
-        memorySlots: '',
-        storageInterfaces: '',
+      psu: {
+        brand: "",
+        model: "",
+        wattage: "",
+        efficiencyRating: "",
+        modular: false,
+        connectors: [],
       },
     },
   });
 
   const [brands, setBrands] = useState([]);
-  const [image, setImage] = useState(null); // Store selected image file
+  const [image, setImage] = useState(null); // Image file state
 
   useEffect(() => {
-    const AdminUser = sessionStorage.getItem('AdminUser');
+    const AdminUser = sessionStorage.getItem("AdminUser");
     if (!AdminUser) {
-      navigate('/login');
+      navigate("/login");
     }
     fetchBrands();
   }, [navigate]);
 
   const fetchBrands = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/brands');
+      const response = await axios.post("http://localhost:5000/api/brands");
       setBrands(response.data);
     } catch (error) {
-      toast.error('Failed to fetch brands');
+      toast.error("Failed to fetch brands");
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setMotherboardData((prevData) => ({
+    setPSUData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
@@ -59,13 +59,27 @@ const AddMotherboardProduct = () => {
 
   const handleSpecificationChange = (e) => {
     const { name, value } = e.target;
-    setMotherboardData((prevData) => ({
+    setPSUData((prevData) => ({
       ...prevData,
       specifications: {
         ...prevData.specifications,
-        motherboard: {
-          ...prevData.specifications.motherboard,
+        psu: {
+          ...prevData.specifications.psu,
           [name]: value,
+        },
+      },
+    }));
+  };
+
+  const handleConnectorChange = (e) => {
+    const options = [...e.target.selectedOptions].map((option) => option.value);
+    setPSUData((prevData) => ({
+      ...prevData,
+      specifications: {
+        ...prevData.specifications,
+        psu: {
+          ...prevData.specifications.psu,
+          connectors: options,
         },
       },
     }));
@@ -79,52 +93,50 @@ const AddMotherboardProduct = () => {
     e.preventDefault();
 
     try {
-      let imageUrl = '';
+      let imageUrl = "";
 
       // Upload image if a file is selected
       if (image) {
         const formData = new FormData();
-        formData.append('image', image);
+        formData.append("image", image);
 
-        const uploadResponse = await axios.post('http://localhost:5000/api/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
+        const uploadResponse = await axios.post("http://localhost:5000/api/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
         });
 
-        imageUrl = uploadResponse.data.imageUrl; // Get the image URL after upload
+        imageUrl = uploadResponse.data.imageUrl; // Get image URL from backend
       }
 
-      // Add the image URL to the product data
-      const finalMotherboardData = { ...motherboardData, imageUrl };
+      // Add image URL to the product data
+      const finalPSUData = { ...psuData, imageUrl };
 
-      // Send the product data to the backend
-      await axios.post('http://localhost:5000/api/productsin', finalMotherboardData);
-      toast.success('Motherboard Product added successfully!');
+      // Send the PSU data to the backend
+      await axios.post("http://localhost:5000/api/productsin", finalPSUData);
+      toast.success("PSU Product added successfully!");
 
       // Reset the form
-      setMotherboardData({
-        name: '',
-        category: 'motherboard',
-        brand: '',
-        model: '',
-        description: '',
-        price: '',
-        stock: '',
-        imageUrl: '',
+      setPSUData({
+        name: "",
+        category: "psu",
+        brand: "",
+        model: "",
+        description: "",
+        price: "",
+        stock: "",
+        imageUrl: "",
         specifications: {
-          motherboard: {
-            manufacturer: '',
-            model: '',
-            socket: '',
-            chipset: '',
-            formFactor: '',
-            memorySlots: '',
-            storageInterfaces: '',
+          psu: {
+            model: "",
+            wattage: "",
+            efficiencyRating: "",
+            modular: false,
+            connectors: [],
           },
         },
       });
-      setImage(null); // Reset image input
+      setImage(null);
     } catch (error) {
-      toast.error('Failed to add motherboard product.');
+      toast.error("Failed to add PSU product.");
     }
   };
 
@@ -139,9 +151,9 @@ const AddMotherboardProduct = () => {
           <Sidebar />
         </aside>
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
-          <h1 className="text-2xl font-bold mb-4">Add Motherboard Product</h1>
+          <h1 className="text-2xl font-bold mb-4">Add PSU Product</h1>
           <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4">
-            {['name', 'model', 'description', 'price', 'stock'].map((field) => (
+            {["name", "model", "description", "price", "stock"].map((field) => (
               <div key={field}>
                 <label htmlFor={field} className="block font-medium mb-2">
                   {field.charAt(0).toUpperCase() + field.slice(1)}
@@ -150,7 +162,7 @@ const AddMotherboardProduct = () => {
                   type="text"
                   id={field}
                   name={field}
-                  value={motherboardData[field]}
+                  value={psuData[field]}
                   onChange={handleChange}
                   placeholder={`Enter ${field}`}
                   required
@@ -164,7 +176,7 @@ const AddMotherboardProduct = () => {
               <select
                 id="brand"
                 name="brand"
-                value={motherboardData.brand}
+                value={psuData.brand}
                 onChange={handleChange}
                 required
                 className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -175,7 +187,7 @@ const AddMotherboardProduct = () => {
               </select>
             </div>
 
-            {['manufacturer', 'socket', 'chipset', 'formFactor', 'memorySlots', 'storageInterfaces'].map((spec) => (
+            {["wattage", "efficiencyRating"].map((spec) => (
               <div key={spec}>
                 <label htmlFor={spec} className="block font-medium mb-2">
                   {spec.charAt(0).toUpperCase() + spec.slice(1)}
@@ -184,7 +196,7 @@ const AddMotherboardProduct = () => {
                   type="text"
                   id={spec}
                   name={spec}
-                  value={motherboardData.specifications.motherboard[spec]}
+                  value={psuData.specifications.psu[spec]}
                   onChange={handleSpecificationChange}
                   placeholder={`Enter ${spec}`}
                   required
@@ -192,6 +204,35 @@ const AddMotherboardProduct = () => {
                 />
               </div>
             ))}
+
+            {/* Modular PSU */}
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="modular"
+                name="modular"
+                checked={psuData.specifications.psu.modular}
+                onChange={(e) =>
+                  handleSpecificationChange({
+                    target: { name: "modular", value: e.target.checked },
+                  })
+                }
+                className="mr-2"
+              />
+              <label htmlFor="modular" className="font-medium">Modular PSU</label>
+            </div>
+
+
+            <div>
+              <label className="block font-medium mb-2">Connectors</label>
+              <select multiple onChange={handleConnectorChange} className="border rounded px-4 py-2 w-full">
+                {["24-pin ATX", "8-pin CPU", "6+2-pin PCIe", "SATA", "Molex"].map((conn) => (
+                  <option key={conn} value={conn}>
+                    {conn}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             {/* Image Upload */}
             <div>
@@ -207,7 +248,7 @@ const AddMotherboardProduct = () => {
             </div>
 
             <button type="submit" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
-              Add Motherboard Product
+              Add PSU Product
             </button>
           </form>
         </main>
@@ -216,4 +257,4 @@ const AddMotherboardProduct = () => {
   );
 };
 
-export default AddMotherboardProduct;
+export default AddPSUProduct;
