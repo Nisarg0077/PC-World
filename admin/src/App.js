@@ -19,6 +19,9 @@ import categoriesMgmt from './components/categories/categoriesMgmt';
 import AddCategoryPage from './components/categories/AddCategoryPage';
 import EditCategoryPage from './components/categories/EditCategoryPage';
 import AddPSUProduct from './components/Products/AddPSUProduct';
+import BrandsManagement from './components/Brands/BrandsManagement';
+import AddBrandForm from './components/Brands/AddBrandForm';
+import EditBrandPage from './components/Brands/EditBrandPage';
 
 function App() {
   return (
@@ -44,6 +47,9 @@ function App() {
       <Route path='/categories' Component={categoriesMgmt} />
       <Route path='/add-category' Component={AddCategoryPage} />
       <Route path='/edit-category' Component={EditCategoryPage} />
+      <Route path='/brands' Component={BrandsManagement} />
+      <Route path='/add-brands' Component={AddBrandForm} />
+      <Route path='/edit-brand' Component={EditBrandPage} />
       <Route path="*" Component={NotFound}/>
       </Routes>
     </BrowserRouter>

@@ -222,13 +222,61 @@ app.post('/api/productsin', upload.single('image'), async (req, res) => {
   }
 });
 
-app.post('/api/brands', async (req, res) => {
+app.get('/api/brands', async (req, res) => {
   try {
     const brand = await Brand.find(); 
     res.json(brand); 
   } catch (error) {
     console.error('Error fetching brands:', error);
     res.status(500).json({ error: 'Failed to fetch brands' });
+  }
+});
+
+app.post("/api/brands", async (req, res) => {
+  try {
+    const { name, country, foundedYear, logoUrl, description } = req.body;
+
+    if (!name || !country) {
+      return res.status(400).json({ message: "Name and Country are required" });
+    }
+
+    const newBrand = new Brand({
+      name,
+      country,
+      foundedYear,
+      logoUrl,
+      description,
+    });
+
+    await newBrand.save();
+
+    res.status(201).json({ message: "Brand added successfully", brand: newBrand });
+  } catch (error) {
+    console.error("Error adding brand:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+app.post("/api/brands/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate brand ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid Brand ID" });
+    }
+
+    // Find brand by ID
+    const brand = await Brand.findById(id);
+
+    if (!brand) {
+      return res.status(404).json({ error: "Brand not found" });
+    }
+
+    res.json(brand);
+  } catch (error) {
+    console.error("Error fetching brand:", error);
+    res.status(500).json({ error: "Failed to load brand" });
   }
 });
 
