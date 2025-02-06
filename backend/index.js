@@ -39,11 +39,19 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   const path = require('path');
   // app.use('/images', express.static(path.join(__dirname, 'images')));
   app.use('/images', express.static('images'));
+  // const storage = multer.diskStorage({
+  //   destination: 'images/', // Folder where images will be stored
+  //   filename: (req, file, cb) => {
+  //     cb(null, Date.now() + path.extname(file.originalname)); // Store filename with timestamp
+  //   }
+  // });
+
+
   const storage = multer.diskStorage({
-    destination: 'images/', // Folder where images will be stored
+    destination: "./images/",
     filename: (req, file, cb) => {
-      cb(null, Date.now() + path.extname(file.originalname)); // Store filename with timestamp
-    }
+      cb(null, Date.now() + path.extname(file.originalname));
+    },
   });
   
   const upload = multer({ storage });
@@ -222,13 +230,20 @@ app.post('/api/productsin', upload.single('image'), async (req, res) => {
   }
 });
 
-app.get('/api/brands', async (req, res) => {
+app.get("/api/brands", async (req, res) => {
   try {
-    const brand = await Brand.find(); 
-    res.json(brand); 
+    const brands = await Brand.find();
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+
+    const updatedBrands = brands.map((brand) => ({
+      ...brand._doc,
+      logoUrl: brand.logoUrl ? `${baseUrl}/images/${brand.logoUrl}` : null,
+    }));
+
+    res.json(updatedBrands);
   } catch (error) {
-    console.error('Error fetching brands:', error);
-    res.status(500).json({ error: 'Failed to fetch brands' });
+    console.error("Error fetching brands:", error);
+    res.status(500).json({ error: "Failed to fetch brands" });
   }
 });
 
@@ -257,26 +272,130 @@ app.post("/api/brands", async (req, res) => {
   }
 });
 
-app.post("/api/brands/:id", async (req, res) => {
+// app.get("/api/brands/:id", async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return res.status(400).json({ error: "Invalid Brand ID" });
+//     }
+
+//     const brand = await Brand.findById(id);
+//     if (!brand) {
+//       return res.status(404).json({ error: "Brand not found" });
+//     }
+
+//     res.json(brand);
+//   } catch (error) {
+//     console.error("Error fetching brand:", error);
+//     res.status(500).json({ error: "Failed to load brand" });
+//   }
+// });
+
+
+app.get("/api/brands/:id", async (req, res) => {
   try {
     const { id } = req.params;
-
-    // Validate brand ID
+    
+    // Validate the brand ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: "Invalid Brand ID" });
     }
 
-    // Find brand by ID
+    // Find the brand by ID
     const brand = await Brand.findById(id);
-
     if (!brand) {
       return res.status(404).json({ error: "Brand not found" });
     }
 
-    res.json(brand);
+    // Generate full image URL if logo exists
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const updatedBrand = {
+      ...brand._doc,
+      logoUrl: brand.logoUrl ? `${baseUrl}/images/${brand.logoUrl}` : null,
+    };
+
+    res.json(updatedBrand);
   } catch (error) {
     console.error("Error fetching brand:", error);
     res.status(500).json({ error: "Failed to load brand" });
+  }
+});
+
+
+// app.post("/api/brands/update/:id", upload.single("image"), async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     // Validate brand ID
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return res.status(400).json({ error: "Invalid Brand ID" });
+//     }
+
+//     // Extract data from request body
+//     const { name, country, foundedYear, description } = req.body;
+
+//     let updatedData = { name, country, foundedYear, description };
+
+//     // If an image was uploaded, update the logoUrl
+//     if (req.file) {
+//       updatedData.logoUrl = `/images/${req.file.filename}`;
+//     }
+
+//     // Find and update the brand
+//     const updatedBrand = await Brand.findByIdAndUpdate(id, updatedData, { new: true });
+
+//     if (!updatedBrand) {
+//       return res.status(404).json({ error: "Brand not found" });
+//     }
+
+//     res.json({ message: "Brand updated successfully!", brand: updatedBrand });
+//   } catch (error) {
+//     console.error("Error updating brand:", error);
+//     res.status(500).json({ error: "Failed to update brand" });
+//   }
+// });
+
+app.put("/api/brands/update/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedData = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid Brand ID" });
+    }
+
+    const updatedBrand = await Brand.findByIdAndUpdate(id, updatedData, { new: true });
+
+    if (!updatedBrand) {
+      return res.status(404).json({ error: "Brand not found" });
+    }
+
+    res.json(updatedBrand);
+  } catch (error) {
+    console.error("Error updating brand:", error);
+    res.status(500).json({ error: "Failed to update brand" });
+  }
+});
+
+app.delete("/api/brands/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate MongoDB ObjectId
+    if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ error: "Invalid Brand ID" });
+    }
+
+    const deletedBrand = await Brand.findByIdAndDelete(id);
+
+    if (!deletedBrand) {
+      return res.status(404).json({ error: "Brand not found" });
+    }
+
+    res.json({ message: "Brand deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting brand:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -534,15 +653,15 @@ app.post('/api/client/user', async (req, res) => {
 
 
 
-// Image upload API
-app.post('/api/upload', upload.single('image'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-  res.json({ imageUrl: `${req.file.filename}` });
+
+app.post("/api/upload", upload.single("image"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded" });
+  }
+
+  const imageUrl = req.file.filename; // Store only filename
+  res.json({ imageUrl });
 });
-
-// Serve uploaded images
-
-
 
 
 
