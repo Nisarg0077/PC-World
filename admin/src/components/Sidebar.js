@@ -40,6 +40,14 @@ const Sidebar = () => {
             {isSidebarOpen && <span className="ml-3">Users</span>}
           </a>
           <a
+            href="/categories"
+            className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
+          >
+            <i className={`fs ${isSidebarOpen ? "fa-solid fa-layer-group" : "fa-solid fa-layer-group"}`}></i>
+            {/* <i class="fa-brands fa-product-hunt"></i> */}
+            {isSidebarOpen && <span className="ml-3">Category Management</span>}
+          </a>
+          <a
             href="/products"
             className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
           >
@@ -54,7 +62,7 @@ const Sidebar = () => {
             <i className={`fas ${isSidebarOpen ? "fa-cogs" : "fa-cog"}`}></i>
             {isSidebarOpen && <span className="ml-3">Settings</span>}
           </a>
-          <a
+          {/* <a
             href="/reports"
             className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
           >
@@ -68,7 +76,7 @@ const Sidebar = () => {
           >
             <i className={`fas ${isSidebarOpen ? "fa-sign-out-alt" : "fa-door-open"}`}></i>
             {isSidebarOpen && <span className="ml-3">Logout</span>}
-          </a>
+          </a> */}
         </nav>
       </div>
     </div>

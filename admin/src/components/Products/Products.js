@@ -52,7 +52,7 @@ const Products = () => {
 
   // Handle Edit
   const handleEdit = (id) => {
-    navigate(`/edit-product/${id}`);
+    navigate(`/edit-product?pid=${id}`);
   };
 
   // Handle Add Product
@@ -62,6 +62,18 @@ const Products = () => {
 
   const handleAddGPUProduct = () => {
     navigate('/add-gpu');
+  }
+  const handleAddMotherboardProduct = () => {
+    navigate('/add-motherboard');
+  }
+  const handleAddRamProduct = () => {
+    navigate('/add-ram');
+  }
+  const handleAddStorageProduct = () => {
+    navigate('/add-storage');
+  }
+  const handleAddPSUProduct = () => {
+    navigate('/add-psu');
   }
   // Handle Search
   const handleSearch = (e) => {
@@ -124,6 +136,31 @@ const Products = () => {
             >
               Add GPU
             </button>
+            <button
+              onClick={handleAddMotherboardProduct}
+              className="bg-green-500 ml-2 text-white px-2 py-2 rounded hover:bg-green-600"
+            >
+              Add Motherboard
+            </button>
+            <button
+              onClick={handleAddRamProduct}
+              className="bg-green-500 ml-2 text-white px-2 py-2 rounded hover:bg-green-600"
+            >
+              Add RAM
+            </button>
+            <button
+              onClick={handleAddStorageProduct}
+              className="bg-green-500 ml-2 text-white px-2 py-2 rounded hover:bg-green-600"
+            >
+              Add Storage
+            </button>
+           
+            <button
+              onClick={handleAddPSUProduct}
+              className="bg-green-500 ml-2 text-white px-2 py-2 rounded hover:bg-green-600"
+            >
+              Add PSU
+            </button>
             </div>
           </div>
 
@@ -171,7 +208,7 @@ const Products = () => {
                 {filteredData.map((product, index) => (
                   <tr key={product._id} className="text-center">
                     <td className="border px-4 py-2"><Link to={{pathname: "/product-info",search: `?pid=${product._id}`}}>view</Link></td>
-                    <td className="border px-4 py-2">{product.name}</td>
+                    <td className="border px-4 py-2 w-5/12">{product.name}</td>
                     <td className="border px-4 py-2">{product.category}</td>
                     <td className="border px-4 py-2">₹{product.price}</td>
                     <td className="border px-4 py-2">{product.stock}</td>

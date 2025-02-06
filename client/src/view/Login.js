@@ -50,7 +50,7 @@ export const Login = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            placeholder="Enter your email"
+            placeholder="Enter your username"
             required
           />
         </div>
@@ -90,6 +90,9 @@ export const Login = () => {
           )}
         </div>
       )}
+      <div>
+      If not already user?<a href='/register' className='text-blue-600'> Register here.</a>
+      </div>
     </div>
   </div>
   )

@@ -31,14 +31,14 @@ const Navbar = () => {
         <div className="flex items-center">
           {/* Admin Title */}
           <a href="/" className="text-2xl font-semibold tracking-wider hover:text-gray-300">
-            Admin Panel
+            Admin Panel | PC-World
           </a>
         </div>
 
         {/* Desktop Links */}
         <div className="sm:flex sm:space-x-6">
           <div className="relative flex items-center">
-            <h1 className="text-lg text-gray-200">Hello, {user.firstName} {user.lastName}!</h1>
+            <h1 className="text-lg text-gray-200">Hello, {user.firstName} {user.lastName}</h1>
             <button
               onClick={toggleDropdown}
               className="ml-2 "

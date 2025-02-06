@@ -7,8 +7,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const ProductInfo = () => {
-  const [product, setProduct] = useState([]);
-  const [queryParams, setQueryParams] = useState([]);
+  const [product, setProduct] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,11 +16,7 @@ const ProductInfo = () => {
       navigate('/login');
     } else {
       const params = new URLSearchParams(window.location.search);
-      const paramsArray = Array.from(params.entries()); // Convert query parameters to an array
-      console.log(paramsArray)
-      setQueryParams(paramsArray); // Store them for mapping
-      const pid = params.get('pid'); // Extract specific key if needed
-      console.log(pid)
+      const pid = params.get('pid');
       if (pid) fetchProductInfo(pid);
     }
   }, [navigate]);
@@ -37,6 +32,7 @@ const ProductInfo = () => {
 
   return (
     <div className="h-screen flex flex-col">
+      <ToastContainer />
       <header className="sticky top-0 z-50">
         <Navbar />
       </header>
@@ -45,28 +41,13 @@ const ProductInfo = () => {
           <Sidebar />
         </aside>
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
-          <ToastContainer />
-
-          {/* Map through all query parameters */}
-          <div className="mb-6">
-            {/*<h2 className="text-xl font-bold text-gray-800">Query Parameters:</h2>
-             <ul className="list-disc list-inside">
-              {queryParams.map(([key, value]) => (
-                <li key={key}>
-                  <span className="font-medium text-gray-700">{key}:</span> {value}
-                </li>
-              ))}
-            </ul> */}
-          </div>
-
-          {/* Display product information */}
           {product ? (
             <div className="bg-white shadow-md rounded-lg p-6">
               <div className="flex flex-col md:flex-row gap-6">
                 {/* Product Image */}
                 <div className="flex-shrink-0">
                   <img
-                    src={product.imageUrl}
+                    src={product.imageUrl}  // Display full image URL
                     alt={product.name}
                     className="w-full md:w-64 h-auto rounded-md shadow"
                   />
@@ -81,6 +62,9 @@ const ProductInfo = () => {
                     <span className="font-medium">Brand:</span> {product.brand}
                   </p>
                   <p className="text-gray-500 mb-2">
+                    <span className="font-medium">model:</span> {product.model}
+                  </p>
+                  <p className="text-gray-500 mb-2">
                     <span className="font-medium">Category:</span> {product.category}
                   </p>
                   <p className="text-gray-500 mb-4">
@@ -89,15 +73,13 @@ const ProductInfo = () => {
                 </div>
               </div>
 
-              {product.specifications && product.specifications.cpu &&  (
+              {/* Specifications */}
+              {product.specifications && product.specifications.cpu && (
                 <div className="mt-6">
                   <h2 className="text-2xl font-bold text-gray-800 mb-4">Specifications</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {Object.entries(product.specifications.cpu).map(([key, value]) => (
-                      <div
-                        key={key}
-                        className="bg-gray-50 p-4 rounded shadow border border-gray-200"
-                      >
+                      <div key={key} className="bg-gray-50 p-4 rounded shadow border border-gray-200">
                         <span className="block font-medium text-gray-700 capitalize">
                           {key.replace(/([A-Z])/g, ' $1')}:
                         </span>
@@ -108,15 +90,12 @@ const ProductInfo = () => {
                 </div>
               )}
 
-              {product.specifications && product.specifications.gpu &&  (
+              {product.specifications && product.specifications.gpu && (
                 <div className="mt-6">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4">GPU Specifications</h2>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Specifications</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {Object.entries(product.specifications.gpu).map(([key, value]) => (
-                      <div
-                        key={key}
-                        className="bg-gray-50 p-4 rounded shadow border border-gray-200"
-                      >
+                      <div key={key} className="bg-gray-50 p-4 rounded shadow border border-gray-200">
                         <span className="block font-medium text-gray-700 capitalize">
                           {key.replace(/([A-Z])/g, ' $1')}:
                         </span>
@@ -126,17 +105,13 @@ const ProductInfo = () => {
                   </div>
                 </div>
               )}
-
 
               {product.specifications && product.specifications.ram && (
                 <div className="mt-6">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4">RAM Specifications</h2>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Specifications</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {Object.entries(product.specifications.ram).map(([key, value]) => (
-                      <div
-                        key={key}
-                        className="bg-gray-50 p-4 rounded shadow border border-gray-200"
-                      >
+                      <div key={key} className="bg-gray-50 p-4 rounded shadow border border-gray-200">
                         <span className="block font-medium text-gray-700 capitalize">
                           {key.replace(/([A-Z])/g, ' $1')}:
                         </span>
@@ -147,16 +122,28 @@ const ProductInfo = () => {
                 </div>
               )}
 
+              {product.specifications && product.specifications.storage && (
+                <div className="mt-6">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Specifications</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(product.specifications.storage).map(([key, value]) => (
+                      <div key={key} className="bg-gray-50 p-4 rounded shadow border border-gray-200">
+                        <span className="block font-medium text-gray-700 capitalize">
+                          {key.replace(/([A-Z])/g, ' $1')}:
+                        </span>
+                        <span className="text-gray-900">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {product.specifications && product.specifications.motherboard && (
                 <div className="mt-6">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Motherboard Specifications</h2>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Specifications</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {Object.entries(product.specifications.motherboard).map(([key, value]) => (
-                      <div
-                        key={key}
-                        className="bg-gray-50 p-4 rounded shadow border border-gray-200"
-                      >
+                      <div key={key} className="bg-gray-50 p-4 rounded shadow border border-gray-200">
                         <span className="block font-medium text-gray-700 capitalize">
                           {key.replace(/([A-Z])/g, ' $1')}:
                         </span>
@@ -166,15 +153,14 @@ const ProductInfo = () => {
                   </div>
                 </div>
               )}
-              {product.specifications && product.specifications.storage && (
+
+
+              {/* {product.specifications && product.specifications.psu && (
                 <div className="mt-6">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Storage Specifications</h2>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Specifications</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Object.entries(product.specifications.storage).map(([key, value]) => (
-                      <div
-                        key={key}
-                        className="bg-gray-50 p-4 rounded shadow border border-gray-200"
-                      >
+                    {Object.entries(product.specifications.psu).map(([key, value]) => (
+                      <div key={key} className="bg-gray-50 p-4 rounded shadow border border-gray-200">
                         <span className="block font-medium text-gray-700 capitalize">
                           {key.replace(/([A-Z])/g, ' $1')}:
                         </span>
@@ -183,7 +169,29 @@ const ProductInfo = () => {
                     ))}
                   </div>
                 </div>
-              )}
+              )} */}
+
+
+{product.specifications && product.specifications.psu && (
+  <div className="mt-6">
+    <h2 className="text-2xl font-bold text-gray-800 mb-4">Specifications</h2>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {Object.entries(product.specifications.psu).map(([key, value]) => (
+        <div key={key} className="bg-gray-50 p-4 rounded shadow border border-gray-200">
+          <span className="block font-medium text-gray-700 capitalize">
+            {key.replace(/([A-Z])/g, ' $1')}:
+          </span>
+          
+          {/* Check for modular, and display "Yes" or "No" */}
+          <span className="text-gray-900">
+            {key === "modular" ? (value ? "Yes" : "No") : value}
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
             </div>
           ) : (
             <p>Loading product info...</p>

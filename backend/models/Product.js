@@ -1,74 +1,92 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const ramSchema = new mongoose.Schema({
-  type: String,
-  speed: String,
-  capacity: Number,
-  modules: Number,
-  casLatency: String,
-}, { _id: false });
-
-const storageSchema = new mongoose.Schema({
-  type: String,
-  interface: String,
-  capacity: Number,
-  rpm: Number,
-}, { _id: false });
-
-const specificationSchema = new mongoose.Schema({
-  cpu: {
-    manufacturer: String,
-    model: String,
-    cores: Number,
-    threads: Number,
-    baseClock: Number,
-    boostClock: Number,
-    socket: String,
-    cache: String,
+// RAM Schema
+const ramSchema = new mongoose.Schema(
+  {
+    type: String,
+    speed: String,
+    capacity: Number,
+    modules: Number,
+    casLatency: String,
   },
-  gpu: {
-    manufacturer: String,
-    model: String,
-    vram: Number,
-    vramType: String,
-    coreClock: Number,
-    memoryClock: Number,
+  { _id: false }
+);
+
+// Storage Schema
+const storageSchema = new mongoose.Schema(
+  {
+    type: String,
     interface: String,
+    capacity: String,
+    rpm: Number,
   },
-  ram: ramSchema, // Use sub-schema here
-  motherboard: {
-    manufacturer: String,
-    model: String,
-    socket: String,
-    chipset: String,
-    formFactor: String,
-    memorySlots: Number,
-    storageInterfaces: String,
+  { _id: false }
+);
+
+// Power Supply Schema (PSU)
+const powerSupplySchema = new mongoose.Schema(
+  {
+    wattage: Number,
+    efficiencyRating: String,
+    modular: { type: Boolean, default: false }, // True for modular PSUs
+    connectors: [String], // List of available connectors
   },
-  storage: storageSchema, // Use sub-schema here
-  desktopCase: {
-    brand: String,
-    model: String,
-    formFactor: String,
-    material: String,
+  { _id: false }
+);
+
+// Specification Schema
+const specificationSchema = new mongoose.Schema(
+  {
+    cpu: {
+      manufacturer: String,
+      cores: Number,
+      threads: Number,
+      baseClock: Number,
+      boostClock: Number,
+      socket: String,
+      cache: String,
+    },
+    gpu: {
+      manufacturer: String,
+      vram: Number,
+      vramType: String,
+      coreClock: Number,
+      memoryClock: Number,
+      interface: String,
+    },
+    ram: ramSchema, // Embedded RAM schema
+    motherboard: {
+      manufacturer: String,
+      socket: String,
+      chipset: String,
+      formFactor: String,
+      memorySlots: Number,
+      storageInterfaces: String,
+    },
+    storage: storageSchema, // Embedded Storage schema
+    desktopCase: {
+      brand: String,
+      formFactor: String,
+      material: String,
+    },
+    psu: powerSupplySchema, // Embedded Power Supply schema
   },
-}, { _id: false});
+  { _id: false }
+);
 
-
-  
-
+// Product Schema
 const productSchema = new mongoose.Schema({
-  name: String,
-  category: { type: String, enum: ['cpu', 'gpu', 'ram', 'motherboard', 'storage'] },
-  brand: String,
-  model: String,
+  name: { type: String, required: true },
+  category: { type: String, enum: ["cpu", "gpu", "ram", "motherboard", "storage", "psu"] },
+  brand: { type: String, required: true },
+  model: { type: String, required: true },
   description: String,
-  price: Number,
-  stock: Number,
+  price: { type: Number, required: true },
+  stock: { type: Number, default: 0 },
   imageUrl: String,
-  specifications: specificationSchema,
+  specifications: specificationSchema, // Embedding specifications
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model('Product', productSchema);
+module.exports = mongoose.model("Product", productSchema);
