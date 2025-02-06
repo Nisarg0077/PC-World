@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
 import Sidebar from '../Sidebar';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const BrandsManagement = () => {
     const [data, setData] = useState([]);
@@ -26,6 +27,8 @@ const BrandsManagement = () => {
         const brands = res.data.brands || res.data;
         setData(brands);
         setFilteredData(brands);
+        console.log(brands);
+        
       })
       .catch((error) => {
         console.error('Error fetching brands:', error);
@@ -33,21 +36,29 @@ const BrandsManagement = () => {
   }, []);
 
   // Handle Delete Category
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this brands?')) {
-      axios
-        .delete(`http://localhost:5000/api/brands/${id}`) // Update your API endpoint
-        .then(() => {
-          const updatedData = data.filter((brands) => brands._id !== id);
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this brand?")) {
+      try {
+        await axios.delete(`http://localhost:5000/api/brands/${id}`);
+        console.log(id);
+        
+        // Ensure data exists before filtering
+        if (data) {
+          const updatedData = data.filter((brand) => brand._id !== id);
           setData(updatedData);
           setFilteredData(updatedData);
-        })
-        .catch((error) => {
-          console.error('Error deleting brands:', error);
-        });
+          console.log();
+          
+        }
+  
+        toast.success("Brand deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting brand:", error);
+        toast.error("Failed to delete brand.");
+      }
     }
   };
-
+  
   // Handle Edit Category
   const handleEdit = (id) => {
     navigate(`/edit-brand?bid=${id}`); // Navigate to the Edit page for categories
@@ -124,7 +135,7 @@ const BrandsManagement = () => {
           <td className="border px-4 py-2">{index + 1}</td>
           <td className="border px-4 py-2">
             {brand.logoUrl ? (
-              <img src={brand.logoUrl} alt={brand.name} className="h-10 w-10 object-cover mx-auto" />
+              <img src={brand.logoUrl} alt={brand.name} className="h-15 w-15 object-cover mx-auto" />
             ) : (
               "N/A"
             )}
