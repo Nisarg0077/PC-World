@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from './Navbar'
 import fetchProductInfo from '../components/Back_ViewProduct'
+import axios from 'axios'
 
 export const ViewProudct = () => {
     const [product, setProduct] = useState([]);
     const [query, setQuery] = useState([]);
     const [pid, setPid] = useState([]);
+    const [user, setUser] = useState(null);
     useEffect(()=> {
+
+      const storedUser = sessionStorage.getItem("ClientUser");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
         const getinfo = async () => {
             const params = new URLSearchParams(window.location.search);
       const paramsArray = Array.from(params.entries()); // Convert query parameters to an array
@@ -22,6 +29,33 @@ export const ViewProudct = () => {
         getinfo();
         
     },[])
+
+
+    const handleAddToCart = async (product) => {
+      if (!user) {
+        alert("Please log in to add items to the cart.");
+        return;
+      }
+  
+      const cartData = {
+        customer: user.id,  // Ensure this is `user.id`
+        product: product._id, // Directly passing product ID
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+      };
+  
+      console.log("Adding to cart:", cartData); // Debugging request data
+  
+      try {
+        const response = await axios.post("http://localhost:5000/api/cart/add", cartData);
+        console.log("Cart response:", response.data);
+        alert("Product added to cart successfully!");
+      } catch (error) {
+        console.error("Error adding product to cart:", error.response?.data || error);
+        alert("Failed to add product to cart.");
+      }
+    };
   return (
     <div>
         <Navbar/>
@@ -52,7 +86,7 @@ export const ViewProudct = () => {
                   <p className="text-gray-500 mb-4">
                     <span className="font-medium">Stock Available:</span> {product.stock}
                   </p>
-                  <button className='border border-yellow-600 bg-yellow-400 p-2 text-black rounded font-semibold'>Add To Cart</button>
+                  <button className='border border-yellow-600 bg-yellow-400 p-2 text-black rounded font-semibold' onClick={() => handleAddToCart(product)}>Add To Cart</button>
                   <button  className='border border-yellow-600 bg-yellow-500 p-2 ml-2 text-black rounded font-semibold'>Buy Now</button>
                 </div>
               </div>

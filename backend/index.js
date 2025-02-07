@@ -16,6 +16,7 @@ const userMaigration = require('./migration/user-migration');
 const brandMaigration = require('./migration/brands-migration');
 const prodTypMigration = require('./migration/prodTyp-migration');
 const multer = require('multer');
+const Cart = require('./models/Cart')
 // const path = require('path');
 
 process.setMaxListeners(15);
@@ -650,6 +651,167 @@ app.post('/api/client/user', async (req, res) => {
   }
 });
 
+
+// app.post("/api/cart/add", async (req, res) => {
+//   try {
+//     const { userId, productId, name, price, quantity } = req.body;
+
+//     let cart = await Cart.findOne({ customer: userId });
+
+//     if (!cart) {
+//       cart = new Cart({ customer: userId, cartItems: [] });
+//     }
+
+//     const existingItem = cart.cartItems.find((item) => item.product.toString() === productId);
+
+//     if (existingItem) {
+//       existingItem.quantity += quantity;
+//     } else {
+//       cart.cartItems.push({ product: productId, name, price, quantity });
+//     }
+
+//     await cart.save();
+//     res.json({ message: "Product added to cart", cart });
+//   } catch (error) {
+//     console.error("Error adding to cart:", error);
+//     res.status(500).json({ message: "Failed to add product to cart" });
+//   }
+// });
+
+
+app.post("/api/cart/add", async (req, res) => {
+  try {
+    const { customer, product, name, price, quantity } = req.body;
+
+    // Ensure all required fields are provided
+    if (!customer || !product || !name || !price || !quantity) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Find the existing cart for the user
+    let cart = await Cart.findOne({ customer });
+
+    if (!cart) {
+      // Create a new cart if none exists
+      cart = new Cart({ customer, cartItems: [] });
+    }
+
+    // Ensure cartItems is always an array
+    if (!cart.cartItems) {
+      cart.cartItems = [];
+    }
+
+    // Check if the product already exists in the cart
+    const existingItem = cart.cartItems.find((item) => item.product.toString() === product);
+
+    if (existingItem) {
+      existingItem.quantity += quantity; // Update quantity
+    } else {
+      cart.cartItems.push({ product, name, price, quantity }); // Add new item
+    }
+
+    // Save the updated cart
+    await cart.save();
+    res.json({ message: "Product added to cart", cart });
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    res.status(500).json({ message: "Failed to add product to cart", error });
+  }
+});
+
+
+
+// Fetch Cart by User ID
+app.get("/api/cart/:userId", async (req, res) => {
+  try {
+    const cart = await Cart.findOne({ customer: req.params.userId });
+    res.json(cart ?? { cartItems: [] });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching cart", error });
+  }
+});
+
+// Add item to cart
+app.post("/api/cart/add", async (req, res) => {
+  try {
+    const { customerId, productId, name, price, quantity } = req.body;
+
+    let cart = await Cart.findOne({ customer: customerId });
+
+    if (!cart) {
+      cart = new Cart({ customer: customerId, cartItems: [] });
+    }
+
+    const existingItem = cart.cartItems.find((item) => item.product.toString() === productId);
+
+    if (existingItem) {
+      existingItem.quantity += quantity;
+    } else {
+      cart.cartItems.push({ product: productId, name, price, quantity });
+    }
+
+    await cart.save();
+    res.json(cart);
+  } catch (error) {
+    res.status(500).json({ message: "Error adding item to cart", error });
+  }
+});
+
+// Update Item Quantity
+app.put("/api/cart/update/:userId/:productId", async (req, res) => {
+  try {
+    const { userId, productId } = req.params;
+    const { quantity } = req.body;
+
+    const cart = await Cart.findOneAndUpdate(
+      { customer: userId, "cartItems.product": productId },
+      { $set: { "cartItems.$.quantity": quantity } },
+      { new: true }
+    );
+
+    if (!cart) return res.status(404).json({ message: "Cart or product not found" });
+
+    res.json(cart);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating item", error });
+  }
+});
+
+// Remove Item
+app.delete("/api/cart/remove/:userId/:productId", async (req, res) => {
+  try {
+    const { userId, productId } = req.params;
+
+    const cart = await Cart.findOneAndUpdate(
+      { customer: userId },
+      { $pull: { cartItems: { product: productId } } },
+      { new: true }
+    );
+
+    if (!cart) return res.status(404).json({ message: "Cart or product not found" });
+
+    res.json(cart);
+  } catch (error) {
+    res.status(500).json({ message: "Error removing item", error });
+  }
+});
+
+// Clear Cart
+app.delete("/api/cart/clear/:userId", async (req, res) => {
+  try {
+    const cart = await Cart.findOneAndUpdate(
+      { customer: req.params.userId },
+      { $set: { cartItems: [] } },
+      { new: true }
+    );
+
+    if (!cart) return res.status(404).json({ message: "Cart not found" });
+
+    res.json({ message: "Cart cleared", cart });
+  } catch (error) {
+    res.status(500).json({ message: "Error clearing cart", error });
+  }
+});
 
 
 
