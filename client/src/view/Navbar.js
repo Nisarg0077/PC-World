@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import 'font-awesome/css/font-awesome.min.css';
+// import "@fortawesome/fontawesome-free/css/all.min.css";
+import accessoriesImage from "../images/sc.svg";
+
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false); // Mobile menu toggle state
@@ -8,6 +12,8 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
+
+  
   useEffect(() => {
     const clientUser = sessionStorage.getItem("ClientUser");
 
@@ -30,7 +36,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Menu */}
-        <ul className="hidden md:flex space-x-8 text-white text-lg">
+        <ul className="hidden md:flex space-x-8 items-center text-white text-lg">
           <li>
             <Link to="/" className="hover:text-yellow-300 transition duration-200">
               Home
@@ -51,6 +57,20 @@ export default function Navbar() {
               Contact
             </Link>
           </li>
+          <li className="flex">
+
+          <Link to="/cart" className="hover:text-yellow-300 transition duration-200 ">
+            
+              <i className="fa fa-shopping-cart fa-lg text-white hover:text-yellow-300 transition duration-200"></i>
+          </Link>
+
+
+          </li>
+
+
+
+  
+
 
           {/* User Dropdown */}
           {user ? (
@@ -96,7 +116,11 @@ export default function Navbar() {
           )}
         </ul>
 
+        
+
         {/* Mobile Menu Button */}
+        
+        
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="md:hidden text-white focus:outline-none"
@@ -104,14 +128,15 @@ export default function Navbar() {
           {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
+        
 
       {/* Mobile Menu */}
       <div
         className={`absolute top-14 left-0 w-full bg-white transition-all ${
-          isOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0"
+          isOpen ? " opacity-100" : "max-h-0 opacity-0"
         } overflow-hidden`}
       >
-        <ul className="md:hidden text-center py-4 space-y-3 bg-gradient-to-r from-blue-600 to-purple-600">
+        <ul className="md:hidden text-center flex-row items-start justify-center align-middle py-4 space-y-3 bg-gradient-to-r from-blue-600 to-purple-600">
           <li>
             <Link
               to="/"
@@ -144,8 +169,14 @@ export default function Navbar() {
               Contact
             </Link>
           </li>
+          <li>
+          <Link to="/cart" className="hover:text-yellow-300 transition duration-200 ">
+            
+            <i className="fa fa-shopping-cart fa-lg text-white hover:text-yellow-300 transition duration-200"></i>
+        </Link>
+          </li>
           {user ? (
-            <div className="relative">
+            <div className="relative px-5">
               
                   <Link
                     to="/userProfile"
@@ -158,7 +189,7 @@ export default function Navbar() {
                       sessionStorage.removeItem("ClientUser");
                       navigate("/login");
                     }}
-                    className="block w-full text-white bg-red-600 text-center px-4 py-2 hover:bg-red-100 hover:text-red-600 transition duration-200"
+                    className="block rounded w-full text-white bg-red-600 text-center px-4 py-2 hover:bg-red-100 hover:text-red-600 transition duration-200"
                   >
                     Logout
                   </button>

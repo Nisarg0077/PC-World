@@ -9,6 +9,7 @@ import { ViewProudct } from './view/ViewProudct';
 import { Login } from './view/Login';
 import Register from './view/Register';
 import ClinetProfile from './view/ClientProfile';
+import Cart from './view/Cart';
 
 
 
@@ -25,6 +26,7 @@ function App() {
       <Route path='/userProfile' Component={ClinetProfile}/>
       <Route path="/shopnow" Component={ShopNow}/>
       <Route path='/viewProduct' Component={ViewProudct}/>
+      <Route path='/cart' Component={Cart}/>
       <Route path="*" Component={NotFound}/>
       </Routes>
     </BrowserRouter>
