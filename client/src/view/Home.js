@@ -9,7 +9,6 @@ import { Link } from "react-router-dom";
 const Home = () => {
   return (
     <div className="bg-gray-100">
-      <Navbar />
 
       {/* Hero Section */}
       <section className="relative flex items-center justify-center h-screen bg-gradient-to-r from-blue-600 to-purple-600 text-white text-center px-6">

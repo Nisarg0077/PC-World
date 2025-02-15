@@ -47,7 +47,7 @@ const ClinetProfile = () => {
     <div className="h-screen flex flex-col bg-gray-100">
       {/* Navbar */}
       <header className="sticky top-0 z-50 bg-white shadow-md">
-        <Navbar />
+       
       </header>
 
       <div className="flex flex-1 overflow-hidden">
