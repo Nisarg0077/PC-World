@@ -680,48 +680,6 @@ app.post("/api/cart/add", async (req, res) => {
 });
 
 
-// app.post("/api/cart/add", async (req, res) => {
-//   try {
-//     const { customer, product, name, price, quantity } = req.body;
-
-//     // Ensure all required fields are provided
-//     if (!customer || !product || !name || !price || !quantity) {
-//       return res.status(400).json({ message: "Missing required fields" });
-//     }
-
-//     // Find the existing cart for the user
-//     let cart = await Cart.findOne({ customer });
-
-//     if (!cart) {
-//       // Create a new cart if none exists
-//       cart = new Cart({ customer, cartItems: [] });
-//     }
-
-//     // Ensure cartItems is always an array
-//     if (!cart.cartItems) {
-//       cart.cartItems = [];
-//     }
-
-//     // Check if the product already exists in the cart
-//     const existingItem = cart.cartItems.find((item) => item.product.toString() === product);
-
-//     if (existingItem) {
-//       existingItem.quantity += quantity; // Update quantity
-//     } else {
-//       cart.cartItems.push({ product, name, price, quantity }); // Add new item
-//     }
-
-//     // Save the updated cart
-//     await cart.save();
-//     res.json({ message: "Product added to cart", cart });
-//   } catch (error) {
-//     console.error("Error adding to cart:", error);
-//     res.status(500).json({ message: "Failed to add product to cart", error });
-//   }
-// });
-
-
-
 // Fetch Cart by User ID
 app.get("/api/cart/:userId", async (req, res) => {
   try {
@@ -748,73 +706,6 @@ app.get("/api/cart/:userId", async (req, res) => {
     res.status(500).json({ message: "Error fetching cart", error });
   }
 });
-
-
-// Add item to cart
-// app.post("/api/cart/add", async (req, res) => {
-//   try {
-//     const { customerId, productId, name, price, quantity, imageUrl } = req.body; // Accept imageUrl
-
-//     let cart = await Cart.findOne({ customer: customerId });
-
-//     if (!cart) {
-//       cart = new Cart({ customer: customerId, cartItems: [] });
-//     }
-
-//     const existingItem = cart.cartItems.find((item) => item.product.toString() === productId);
-
-//     if (existingItem) {
-//       existingItem.quantity += quantity;
-//     } else {
-//       cart.cartItems.push({ product: productId, name, price, quantity, imageUrl }); // Store imageUrl
-//     }
-
-//     await cart.save();
-//     res.json(cart);
-//   } catch (error) {
-//     res.status(500).json({ message: "Error adding item to cart", error });
-//   }
-// });
-
-// app.post("/api/cart/add", async (req, res) => {
-//   try {
-//     const { customer, productId, name, price, quantity, imageUrl } = req.body;
-
-//     if (!customerId || !productId) {
-//       return res.status(400).json({ message: "Customer ID and Product ID are required." });
-//     }
-
-//     let cart = await Cart.findOne({ customer: customer });
-
-//     if (!cart) {
-//       cart = new Cart({ customer: customerId, cartItems: [] });
-//     }
-
-//     const existingItem = cart.cartItems.find(item => item.product.toString() === productId);
-
-//     if (existingItem) {
-//       existingItem.quantity += parseInt(quantity, 10) || 1;  // Ensure quantity is a number
-//     } else {
-//       cart.cartItems.push({ 
-//         product: productId, 
-//         name, 
-//         price, 
-//         quantity: parseInt(quantity, 10) || 1, 
-//         imageUrl 
-//       });
-//     }
-
-//     console.log("Cart before saving:", cart); // Debugging log
-//     await cart.save();
-
-//     res.status(200).json({ message: "Product added to cart successfully!", cart });
-
-//   } catch (error) {
-//     console.error("Error adding item to cart:", error);
-//     res.status(500).json({ message: "Error adding item to cart", error });
-//   }
-// });
-
 
 
 // Update Item Quantity
