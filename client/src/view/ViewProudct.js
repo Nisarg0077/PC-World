@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import Navbar from './Navbar'
 import fetchProductInfo from '../components/Back_ViewProduct'
 import axios from 'axios'
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const ViewProudct = () => {
     const [product, setProduct] = useState([]);
@@ -36,29 +38,29 @@ export const ViewProudct = () => {
         alert("Please log in to add items to the cart.");
         return;
       }
-  
+    
       const cartData = {
-        customer: user.id,  // Ensure this is `user.id`
-        product: product._id, // Directly passing product ID
-        name: product.name,
-        price: product.price,
-        quantity: 1,
+        customerId: user.id,
+      productId: product._id,
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+      imageUrl: product.image || product.imageUrl.replace("http://localhost:5000/images/", ""),
       };
-  
-      console.log("Adding to cart:", cartData); // Debugging request data
-  
+    
+      console.log("Adding to cart:", cartData);
+    
       try {
         const response = await axios.post("http://localhost:5000/api/cart/add", cartData);
-        console.log("Cart response:", response.data);
-        alert("Product added to cart successfully!");
+        toast.success("Product added to cart successfully!");
       } catch (error) {
-        console.error("Error adding product to cart:", error.response?.data || error);
-        alert("Failed to add product to cart.");
+        toast.error("Failed to add product to cart.");
       }
     };
+    
   return (
     <div>
-        <Navbar/>
+        <ToastContainer position="top-right" autoClose={2000} /> 
         <section>
         {product ? (
             <div className="bg-white shadow-md rounded-lg p-6">
