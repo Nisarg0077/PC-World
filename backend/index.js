@@ -38,14 +38,7 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
 
 
   const path = require('path');
-  // app.use('/images', express.static(path.join(__dirname, 'images')));
   app.use('/images', express.static('images'));
-  // const storage = multer.diskStorage({
-  //   destination: 'images/', // Folder where images will be stored
-  //   filename: (req, file, cb) => {
-  //     cb(null, Date.now() + path.extname(file.originalname)); // Store filename with timestamp
-  //   }
-  // });
 
 
   const storage = multer.diskStorage({
@@ -61,15 +54,6 @@ app.get('/', (req, res) => {
   res.send("Hello");
 });
 
-// app.post('/api/products', async (req, res) => {
-//   try {
-//     const products = await Product.find(); 
-//     res.json(products); 
-//   } catch (error) {
-//     console.error('Error fetching products:', error);
-//     res.status(500).json({ error: 'Failed to fetch products' });
-//   }
-// });
 app.post('/api/products', async (req, res) => {
   try {
     const products = await Product.find(); 
@@ -89,31 +73,6 @@ app.post('/api/products', async (req, res) => {
 });
 
 
-// app.post('/api/productInfo', async (req, res) => {
-//   try {
-//     const { pid } = req.body;
-//     console.log(pid)
-//     if (!ObjectId.isValid(pid)) {
-//       return res.status(400).json({ error: 'Invalid Product ID' });
-//     }
-
-//     const product = await Product.findOne({ _id: new ObjectId(pid) });
-
-//     if (!product) {
-//       return res.status(404).json({ error: 'Product not found' });
-//     }
-
-//     // Add the full image URL to the product data
-//     const baseUrl = `${req.protocol}://${req.get('host')}`;
-    
-//     product.imageUrl = `${baseUrl}/images/${product.imageUrl}`; // Assuming `imageFilename` stores the image file name in the database
-//     console.log(product.imageUrl)
-//     res.json(product);
-//   } catch (error) {
-//     console.error('Error fetching product:', error);
-//     res.status(500).json({ error: 'Failed to fetch product' });
-//   }
-// });
 
 app.post('/api/productInfo', async (req, res) => {
   try {
@@ -195,24 +154,6 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
-
-
-
-
-
-// app.post('/api/productsin', async (req, res) => {
-//   try {
-//     const cpuData = req.body;
-//     const data = await Product.save(cpuData); 
-//     res.json(data); 
-//   } catch (error) {
-//     console.error('Error inserting products:', error);
-//     res.status(500).json({ error: 'Failed to insert products' });
-//   }
-// });
-
-
-
 app.post('/api/productsin', upload.single('image'), async (req, res) => {
   try {
     const formData = req.body;
@@ -273,26 +214,6 @@ app.post("/api/brands", async (req, res) => {
   }
 });
 
-// app.get("/api/brands/:id", async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     if (!mongoose.Types.ObjectId.isValid(id)) {
-//       return res.status(400).json({ error: "Invalid Brand ID" });
-//     }
-
-//     const brand = await Brand.findById(id);
-//     if (!brand) {
-//       return res.status(404).json({ error: "Brand not found" });
-//     }
-
-//     res.json(brand);
-//   } catch (error) {
-//     console.error("Error fetching brand:", error);
-//     res.status(500).json({ error: "Failed to load brand" });
-//   }
-// });
-
-
 app.get("/api/brands/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -323,38 +244,6 @@ app.get("/api/brands/:id", async (req, res) => {
 });
 
 
-// app.post("/api/brands/update/:id", upload.single("image"), async (req, res) => {
-//   try {
-//     const { id } = req.params;
-
-//     // Validate brand ID
-//     if (!mongoose.Types.ObjectId.isValid(id)) {
-//       return res.status(400).json({ error: "Invalid Brand ID" });
-//     }
-
-//     // Extract data from request body
-//     const { name, country, foundedYear, description } = req.body;
-
-//     let updatedData = { name, country, foundedYear, description };
-
-//     // If an image was uploaded, update the logoUrl
-//     if (req.file) {
-//       updatedData.logoUrl = `/images/${req.file.filename}`;
-//     }
-
-//     // Find and update the brand
-//     const updatedBrand = await Brand.findByIdAndUpdate(id, updatedData, { new: true });
-
-//     if (!updatedBrand) {
-//       return res.status(404).json({ error: "Brand not found" });
-//     }
-
-//     res.json({ message: "Brand updated successfully!", brand: updatedBrand });
-//   } catch (error) {
-//     console.error("Error updating brand:", error);
-//     res.status(500).json({ error: "Failed to update brand" });
-//   }
-// });
 
 app.put("/api/brands/update/:id", async (req, res) => {
   try {
@@ -764,6 +653,106 @@ app.delete("/api/cart/clear/:userId", async (req, res) => {
   }
 });
 
+app.get('/api/users', async (req, res) => {
+  try {
+    const users = await User.find();
+    return res.json(users);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+// DELETE user by ID
+// app.delete('/api/users/:id', async (req, res) => {
+//   try {
+//     const {id} = req.params;
+//     console.log("params",req.params);
+//     console.log('Received userId:', id);  // Log received ID
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return res.status(400).json({ error: 'Invalid user ID' });
+//     }
+
+//     const deletedUser = await User.findByIdAndDelete(id);
+//     // const deletedUser = await User.deleteOne({_id: id});
+    
+//     if (!deletedUser) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+    
+//     res.status(200).json({ message: 'User deleted successfully' });
+//   } catch (error) {
+//     console.error('Error deleting user:', error);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// });
+
+// DELETE API to delete a user by ID
+app.delete('/api/users/:id', async (req, res) => {
+  console.log("Deleting user with ID:", req.params.id);  // Log user ID
+  try {
+    const userId = req.params.id;
+    const deletedUser = await User.findByIdAndDelete(userId );
+    if (deletedUser.deletedCount === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+
+
+
+
+app.get('/api/users/:id', async (req, res) => {
+  try {
+    const {id} = req.params;
+    // console.log("Deleting user with ID:", req.params.id);
+    
+    // Find user by ID
+    const user = await User.findById(id);
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+app.put('/api/users/:userId', async (req, res) => {
+  const { userId } = req.params;
+  const { firstName, lastName, email, department, isActive, role } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Only allow updates to certain fields based on role
+    if (role) user.role = role;
+    if (firstName) user.firstName = firstName;
+    if (lastName) user.lastName = lastName;
+    if (email) user.email = email;
+    if (department && user.role === 'admin') user.department = department; // Admins can have departments
+    if (isActive !== undefined) user.isActive = isActive;
+
+    await user.save();
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Error updating user data', error: err });
+  }
+});
 
 
 

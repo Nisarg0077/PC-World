@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Navbar from '../Navbar';
 import Sidebar from '../Sidebar';
 
 const AddCategoryPage = () => {
@@ -49,9 +48,6 @@ const AddCategoryPage = () => {
   return (
     <div className="h-screen flex flex-col">
       <ToastContainer />
-      <header className="sticky top-0 z-50">
-        <Navbar/>
-      </header>
       <div className="flex flex-1 overflow-hidden">
         <aside className="sticky top-0 h-full">
             <Sidebar/>

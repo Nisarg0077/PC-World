@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import Navbar from "../Navbar";
 import Sidebar from "../Sidebar";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -59,7 +58,7 @@ const EditProductPage = () => {
   
     const fetchBrands = async () => {
       try {
-        const response = await axios.post("http://localhost:5000/api/brands");
+        const response = await axios.get("http://localhost:5000/api/brands");
         setBrands(response.data);
       } catch (error) {
         toast.error("Failed to fetch brands");
@@ -328,9 +327,7 @@ const EditProductPage = () => {
   return (
     <div className="h-screen flex flex-col">
        <ToastContainer />
-    <header className="sticky top-0 z-50">
-         <Navbar />
-       </header>
+ 
        <div className="flex flex-1 overflow-hidden">
          <aside className="sticky top-0 h-full">
            <Sidebar />

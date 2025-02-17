@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Navbar from '../Navbar';
+
 import Sidebar from '../Sidebar';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -80,10 +80,7 @@ const BrandsManagement = () => {
   };
     return (
         <div className="h-screen flex flex-col">
-          {/* Sticky Navbar */}
-          <header className="sticky top-0 z-50">
-            <Navbar />
-          </header>
+
     
           <div className="flex flex-1 overflow-hidden">
             {/* Sticky Sidebar */}

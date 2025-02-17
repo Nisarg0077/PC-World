@@ -146,14 +146,14 @@ const Cart = () => {
                       <td className="border px-4 py-2">
                         <button
                           onClick={() => handleUpdateQuantity(item.product._id, item.quantity - 1)}
-                          className="px-2 py-1 bg-gray-300 rounded-md mx-1"
+                          className="px-1 py-1 bg-gray-300 rounded-md mx-1"
                         >
                           -
                         </button>
                         {item.quantity}
                         <button
                           onClick={() => handleUpdateQuantity(item.product._id, item.quantity + 1)}
-                          className="px-2 py-1 bg-gray-300 rounded-md mx-1"
+                          className="px-1 py-1 bg-gray-300 rounded-md mx-1"
                         >
                           +
                         </button>
