@@ -37,7 +37,7 @@ const Sidebar = () => {
             className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
           >
             <i className={`fas ${isSidebarOpen ? "fa-users" : "fa-user-friends"}`}></i>
-            {isSidebarOpen && <span className="ml-3">Users</span>}
+            {isSidebarOpen && <span className="ml-3">Users Management</span>}
           </a>
           <a
             href="/categories"
