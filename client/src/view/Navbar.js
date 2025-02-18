@@ -61,9 +61,21 @@ export default function Navbar() {
           {user ? (
             <div className="relative">
               <button onClick={toggleDropdown} className="ml-4 focus:outline-none">
-                <div className="w-9 h-9 rounded-full border-4 border-green-400 flex items-center justify-center bg-gray-200">
-                  <span className="text-lg font-bold text-gray-600">{user.firstName?.charAt(0).toUpperCase()}</span>
-                </div>
+              {user.profilePicture ? (
+              <div className="w-10 h-10 rounded-full border-2 border-blue-500 flex items-center justify-center bg-gray-200">
+                  <img
+                    src={`http://localhost:5000/images/${user.profilePicture}`} // Ensure the correct path
+                    alt="Profile"
+                    className="w-10 h-10 object-contain rounded-full"
+                  />
+              </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-full border-4 border-blue-500 flex items-center justify-center bg-gray-200">
+                  <span className="text-md font-bold text-gray-600">
+                    {user?.firstName?.charAt(0).toUpperCase()}
+                  </span>
+                  </div>
+                )}
               </button>
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-3 bg-white text-gray-800 rounded-md shadow-xl w-48 z-10">

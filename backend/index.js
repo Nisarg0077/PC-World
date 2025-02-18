@@ -39,6 +39,7 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
 
   const path = require('path');
   app.use('/images', express.static('images'));
+  app.use('/images', express.static(path.join(__dirname, 'images')));
 
 
   const storage = multer.diskStorage({
@@ -431,6 +432,7 @@ app.post('/api/admin/login', async (req, res) => {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        profilePicture: user.profilePicture,
       },
     });
   } catch (error) {
@@ -466,6 +468,7 @@ app.post('/api/user/login', async (req, res) => {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        profilePicture: user.profilePicture,
       },
     });
   } catch (error) {
@@ -664,29 +667,6 @@ app.get('/api/users', async (req, res) => {
 });
 
 
-// DELETE user by ID
-// app.delete('/api/users/:id', async (req, res) => {
-//   try {
-//     const {id} = req.params;
-//     console.log("params",req.params);
-//     console.log('Received userId:', id);  // Log received ID
-//     if (!mongoose.Types.ObjectId.isValid(id)) {
-//       return res.status(400).json({ error: 'Invalid user ID' });
-//     }
-
-//     const deletedUser = await User.findByIdAndDelete(id);
-//     // const deletedUser = await User.deleteOne({_id: id});
-    
-//     if (!deletedUser) {
-//       return res.status(404).json({ message: 'User not found' });
-//     }
-    
-//     res.status(200).json({ message: 'User deleted successfully' });
-//   } catch (error) {
-//     console.error('Error deleting user:', error);
-//     res.status(500).json({ message: 'Server error' });
-//   }
-// });
 
 // DELETE API to delete a user by ID
 app.delete('/api/users/:id', async (req, res) => {
@@ -728,42 +708,97 @@ app.get('/api/users/:id', async (req, res) => {
   }
 });
 
-app.put('/api/users/:userId', async (req, res) => {
+
+
+app.put('/api/users/:userId', upload.single('image'), async (req, res) => {
   const { userId } = req.params;
-  const { firstName, lastName, email, department, isActive, role } = req.body;
+  const { firstName, lastName, email, phone, department, gender, dateOfBirth, isActive, isDeleted, role } = req.body;
+  const profilePicture = req.file ? `${req.file.filename}` : null;
 
+  
   try {
-    const user = await User.findById(userId);
+      const user = await User.findById(userId);
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Validation: Ensure required fields are provided
+      if (!firstName || !lastName || !email) {
+          return res.status(400).json({ message: 'First name, last name, and email are required' });
+      }
+
+      user.firstName = firstName || user.firstName;
+      user.lastName = lastName || user.lastName;
+      user.email = email || user.email;
+      user.phone = phone || user.phone;
+      user.department = department || user.department;
+      user.role = role || user.role;
+      user.gender = gender || user.gender;
+      user.dateOfBirth = dateOfBirth || user.dateOfBirth;
+      user.isActive = isActive !== undefined ? isActive : user.isActive;
+      user.isDeleted = isDeleted !== undefined ? isDeleted : user.isDeleted;
+
+    
+      if (role === 'admin') {
+          user.department = department || "";
+      } else {
+          user.department = ""; 
+      }
+
+      if (profilePicture) {
+          user.profilePicture = profilePicture;
+      }
+
+      await user.save();
+      res.status(200).json(user);
+  } catch (err) {
+      console.error("Error updating user:", err);
+      res.status(500).json({ message: 'Error updating user data', error: err.message });
+  }
+});
+
+
+
+app.post("/api/upload-profile", upload.single("profilePicture"), async (req, res) => {
+  try {
+    // Check if the file was uploaded
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
     }
 
-    // Only allow updates to certain fields based on role
-    if (role) user.role = role;
-    if (firstName) user.firstName = firstName;
-    if (lastName) user.lastName = lastName;
-    if (email) user.email = email;
-    if (department && user.role === 'admin') user.department = department; // Admins can have departments
-    if (isActive !== undefined) user.isActive = isActive;
+    // Get the filename of the uploaded file
+    const profilePicture = req.file.filename;
 
-    await user.save();
-    res.status(200).json(user);
-  } catch (err) {
-    res.status(500).json({ message: 'Error updating user data', error: err });
+    // Assuming you have user authentication and the user is in the session
+    const userId = req.body.userId; // You can get this from session or token
+
+    // Update the user profile with the new image
+    const user = await User.findByIdAndUpdate(userId, { profilePicture }, { new: true });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "Profile image uploaded successfully", user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error uploading profile image", error });
   }
 });
 
-
-
-app.post("/api/upload", upload.single("image"), (req, res) => {
+app.post('/api/upload', upload.single('image'), (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ error: "No file uploaded" });
-  }
+    return res.status(400).json({ error: 'No file uploaded' });
 
-  const imageUrl = req.file.filename; // Store only filename
+    
+  }
+  console.log('File:', req.file); // Check the file
+  console.log('Body:', req.body); // Check other form data
+  const imageUrl = req.file.filename; // The filename is stored in `req.file.filename`
   res.json({ imageUrl });
 });
+;
 
 
 

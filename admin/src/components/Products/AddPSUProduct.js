@@ -144,9 +144,7 @@ const AddPSUProduct = () => {
       <ToastContainer />
 
       <div className="flex flex-1 overflow-hidden">
-        <aside className="sticky top-0 h-full">
-          <Sidebar />
-        </aside>
+        <Sidebar />
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
           <h1 className="text-2xl font-bold mb-4">Add PSU Product</h1>
           <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4">

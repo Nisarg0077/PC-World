@@ -34,9 +34,7 @@ const ProductInfo = () => {
       <ToastContainer />
 
       <div className="flex flex-1 overflow-hidden">
-        <aside className="sticky top-0 h-full">
-          <Sidebar />
-        </aside>
+        <Sidebar />
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
           {product ? (
             <div className="bg-white shadow-md rounded-lg p-6">

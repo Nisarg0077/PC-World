@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "./Navbar";
+
 import axios from "axios";
 
 const ClinetProfile = () => {
@@ -60,12 +60,25 @@ const ClinetProfile = () => {
 
             <div className="flex items-center space-x-6">
               {/* Profile Image Placeholder */}
-              <div className="w-24 h-24 rounded-full border-4 border-blue-500 flex items-center justify-center bg-gray-200">
-                <span className="text-3xl font-bold text-gray-600">
-                  {user?.firstName?.charAt(0).toUpperCase()}
-                </span>
-              </div>
+              <div>
 
+                <div className="w-24 h-24 rounded-full border-2 border-blue-500 flex items-center justify-center bg-gray-200">
+              {user.profilePicture ? (
+                  <img
+                    src={`http://localhost:5000/images/${user.profilePicture}`} // Ensure the correct path
+                    alt="Profile"
+                    className="w-24 h-24 object-cover rounded-full"
+                    />
+              
+                ) : (
+                 
+                  <span className="text-md font-bold text-gray-600">
+                    {user?.firstName?.charAt(0).toUpperCase()}
+                  </span>
+                )}
+                </div>
+
+                </div>
               {/* Profile Details */}
               <div className="flex-1">
                 <p className="text-lg text-gray-700">

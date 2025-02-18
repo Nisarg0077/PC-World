@@ -49,9 +49,8 @@ const AddCategoryPage = () => {
     <div className="h-screen flex flex-col">
       <ToastContainer />
       <div className="flex flex-1 overflow-hidden">
-        <aside className="sticky top-0 h-full">
+        
             <Sidebar/>
-        </aside>
 
         {/* Main Content */}
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">

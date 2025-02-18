@@ -11,25 +11,21 @@ const Login = () => {
   const navigate = useNavigate(); // Hook to handle navigation after successful login
 
   const handleLogin = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
-
+    e.preventDefault();
+  
     try {
-      // const response = await axios.post("http://localhost:5000/api/admin/login", {
-      //   username,
-      //   password,
-      // });
-
       const response = await axios.post("http://localhost:5000/api/admin/login", {
         username,
         password,
       });
-
-      // Store user info in sessionStorage (or localStorage if you want it to persist across sessions)
-      sessionStorage.setItem("AdminUser", JSON.stringify(response.data.user)); // Store the user data in session
-
+  
+      // Store user info in sessionStorage, including profile picture
+      const userData = response.data.user;
+      sessionStorage.setItem("AdminUser", JSON.stringify(userData)); // Store the user data in session
+  
       // Set a success message
-      setMessage({ success: `Welcome, ${response.data.user.firstName || "User"}!` });
-
+      setMessage({ success: `Welcome, ${userData.firstName || "User"}!` });
+  
       // Redirect to dashboard
       navigate("/"); // Redirect to the dashboard page
     } catch (error) {
@@ -37,6 +33,7 @@ const Login = () => {
       setMessage({ error: "Login failed! Please check your credentials." });
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
