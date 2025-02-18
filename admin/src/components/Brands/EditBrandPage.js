@@ -130,12 +130,10 @@ const EditBrandPage = () => {
     <div className="h-screen flex flex-col">
 
 
-      <div className="flex flex-1 overflow-hidden">
-        <aside className="sticky top-0 h-full">
-          <Sidebar />
-        </aside>
+      <div className="flex flex-1">
+        <Sidebar />
 
-        <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
+        <main className="flex-grow bg-gray-100 p-6 overflow-y-auto ">
           <ToastContainer />
           <h1 className="text-xl font-bold mb-4">Edit Brand</h1>
 

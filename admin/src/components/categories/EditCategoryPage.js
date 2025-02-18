@@ -61,9 +61,7 @@ const EditCategoryPage = () => {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sticky Sidebar */}
-        <aside className="sticky top-0 h-full">
-          <Sidebar />
-        </aside>
+        <Sidebar />
 
         {/* Main Content */}
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">

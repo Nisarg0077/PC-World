@@ -9,9 +9,9 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex bg-gray-900 sticky left-0 z-40 ">
       <div
-        className={`bg-gray-900 h-screen text-white transition-all duration-300 ${isSidebarOpen ? "w-64" : "w-16"}`}
+        className={`bg-gray-900 sticky h-full text-white transition-all duration-300 ${isSidebarOpen ? "w-64" : "w-16"}`}
       >
         <button
           onClick={toggleSidebar}
@@ -63,13 +63,13 @@ const Sidebar = () => {
             {/* <i class="fa-brands fa-product-hunt"></i> */}
             {isSidebarOpen && <span className="ml-3">Products Management</span>}
           </a>
-          <a
+          {/* <a
             href="/settings"
             className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
           >
             <i className={`fas ${isSidebarOpen ? "fa-cogs" : "fa-cog"}`}></i>
             {isSidebarOpen && <span className="ml-3">Settings</span>}
-          </a>
+          </a> */}
           {/* <a
             href="/reports"
             className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"

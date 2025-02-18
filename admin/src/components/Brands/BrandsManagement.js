@@ -79,92 +79,90 @@ const BrandsManagement = () => {
     setFilteredData(filtered);
   };
     return (
-        <div className="h-screen flex flex-col">
+      <div className="h-screen flex flex-col">
+  <div className="flex flex-1">
+    {/* Sticky Sidebar */}
+    <Sidebar />
 
-    
-          <div className="flex flex-1 overflow-hidden">
-            {/* Sticky Sidebar */}
-            <aside className="sticky top-0 h-full">
-              <Sidebar />
-            </aside>
-    
-            {/* Main Content */}
-            <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
-              <div className="flex items-center justify-between mb-4">
-                <h1 className="text-xl font-bold">Brands Management</h1>
-                <div className='p-1'>
-                  <button
-                    onClick={handleAddCategory}
-                    className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-green-600"
-                  >
-                    Add Brand
-                  </button>
-                </div>
-              </div>
-    
-              {/* Search */}
-              <div className="flex items-center mb-4 space-x-4">
-                <input
-                  type="text"
-                  placeholder="Search Brands..."
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  className="border rounded px-4 py-2 w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-    
-              {Array.isArray(filteredData) && filteredData.length > 0 ? (
-  <table className="table-auto w-full bg-white shadow-md rounded-lg border border-gray-200 overflow-hidden">
-    <thead>
-      <tr className="bg-gray-200">
-        <th className="border px-4 py-2">#</th>
-        <th className="border px-4 py-2">Logo</th>
-        <th className="border px-4 py-2">Name</th>
-        <th className="border px-4 py-2">Country</th>
-        <th className="border px-4 py-2">Founded Year</th>
-        <th className="border px-4 py-2">Description</th>
-        <th className="border px-4 py-2">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {filteredData.map((brand, index) => (
-        <tr key={brand._id} className="text-center">
-          <td className="border px-4 py-2">{index + 1}</td>
-          <td className="border px-4 py-2">
-            {brand.logoUrl ? (
-              <img src={brand.logoUrl} alt={brand.name} className="h-15 w-15 object-cover mx-auto" />
-            ) : (
-              "N/A"
-            )}
-          </td>
-          <td className="border px-4 py-2">{brand.name}</td>
-          <td className="border px-4 py-2">{brand.country}</td>
-          <td className="border px-4 py-2">{brand.foundedYear || "N/A"}</td>
-          <td className="border px-4 py-2 w-7/12">{brand.description || "No description"}</td>
-          <td className="border px-4 py-2 space-x-2">
-            <button
-              onClick={() => handleEdit(brand._id)}
-              className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => handleDelete(brand._id)}
-              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-            >
-              Delete
-            </button>
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-) : (
-  <p>No brands available</p>
-)}
-            </main>
-          </div>
+    {/* Main Content */}
+    <main className="flex-grow bg-gray-100 p-6 overflow-y-auto min-h-screen">
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-xl font-bold">Brands Management</h1>
+        <div className="p-1">
+          <button
+            onClick={handleAddCategory}
+            className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-green-600"
+          >
+            <i class="fa fa-plus" aria-hidden="true"></i> Brand
+          </button>
         </div>
+      </div>
+
+      {/* Search */}
+      <div className="flex items-center mb-4 space-x-4">
+        <input
+          type="text"
+          placeholder="Search Brands..."
+          value={searchTerm}
+          onChange={handleSearch}
+          className="border rounded px-4 py-2 w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Brands Table */}
+      {Array.isArray(filteredData) && filteredData.length > 0 ? (
+        <table className="table-auto w-full bg-white shadow-md rounded-lg border border-gray-200 overflow-hidden">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border px-4 py-2">#</th>
+              <th className="border px-4 py-2">Logo</th>
+              <th className="border px-4 py-2">Name</th>
+              <th className="border px-4 py-2">Country</th>
+              <th className="border px-4 py-2">Founded Year</th>
+              <th className="border px-4 py-2">Description</th>
+              <th className="border px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredData.map((brand, index) => (
+              <tr key={brand._id} className="text-center">
+                <td className="border px-4 py-2">{index + 1}</td>
+                <td className="border px-4 py-2">
+                  {brand.logoUrl ? (
+                    <img src={brand.logoUrl} alt={brand.name} className="h-15 w-15 object-cover mx-auto" />
+                  ) : (
+                    "N/A"
+                  )}
+                </td>
+                <td className="border px-4 py-2">{brand.name}</td>
+                <td className="border px-4 py-2">{brand.country}</td>
+                <td className="border px-4 py-2">{brand.foundedYear || "N/A"}</td>
+                <td className="border px-4 py-2 w-7/12">{brand.description || "No description"}</td>
+                <td className="border px-4 py-2 space-x-2 w-2/12">
+                  <button
+                    onClick={() => handleEdit(brand._id)}
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                  >
+                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                  </button>
+                  <button
+                    onClick={() => handleDelete(brand._id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                  >
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p>No brands available</p>
+      )}
+    </main>
+  </div>
+</div>
+
   )
 }
 

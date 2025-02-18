@@ -28,9 +28,9 @@ const Dashboard = () => {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sticky Sidebar */}
-        <aside className="sticky top-0 h-full">
+       
           <Sidebar />
-        </aside>
+       
 
         {/* Main Content */}
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
