@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import fetchProducts from "../components/Back_ShopNow";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -14,9 +14,21 @@ const ShopNow = () => {
   const [user, setUser] = useState(null);
   const [cartLoading, setCartLoading] = useState({});
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [maxPrice, setMaxPrice] = useState(1000000);
-  const [brands, setBrands] = useState([]);
+  const [filters, setFilters] = useState({
+    category: "",
+    price: 1000000,
+    brand: "",
+    cores: "",
+    vram: "",
+    memory: "",
+    type: "",
+    size: "",
+    capacity: "",
+    motherboardBrand: "",
+    socket: "",
+    formFactor: "",
+    memorySlots: "",
+  });
 
   useEffect(() => {
     const storedUser = sessionStorage.getItem("ClientUser");
@@ -27,7 +39,7 @@ const ShopNow = () => {
         const data = await fetchProducts();
         setProducts(data);
         setCategories([...new Set(data.map((p) => p.category))]);
-      } catch {
+      } catch (err) {
         setError("Failed to load products");
       } finally {
         setLoading(false);
@@ -37,13 +49,67 @@ const ShopNow = () => {
     getProducts();
   }, []);
 
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+  };
+
   const filteredProducts = useMemo(() => {
-    return products.filter((product) =>
-      (search ? product.name.toLowerCase().includes(search.toLowerCase()) : true) &&
-      (selectedCategory ? product.category === selectedCategory : true) &&
-      (maxPrice ? Number(product.price) <= maxPrice : true) // Ensure price filtering
-    );
-  }, [search, selectedCategory, maxPrice, products]);
+    return products.filter((product) => {
+        const {
+            category,
+            price,
+            brand,
+            cores,
+            vram,
+            memory,
+            size,
+            capacity,
+            motherboardBrand,
+            socket,
+            formFactor,
+            memorySlots,
+            storagetype,
+            wattage,  
+            efficiency, 
+            modularity
+        } = filters;
+
+        const productMotherboard = product.specifications?.motherboard || {};
+        const productGpu = product.specifications?.gpu || {};
+        const productCpu = product.specifications?.cpu || {};
+        const productStorage = product.specifications?.storage || {}; // Ensure storage exists
+        const productPsu = product.specifications?.psu || {};
+
+        const memorySlotsMatch =
+            !memorySlots ||
+            (Array.isArray(productMotherboard?.memorySlots)
+                ? productMotherboard.memorySlots.map(String).includes(memorySlots)
+                : String(productMotherboard?.memorySlots) === memorySlots);
+
+        return (
+            (search ? product.name.toLowerCase().includes(search.toLowerCase()) : true) &&
+            (!category || product.category === category) &&
+            product.price <= price &&
+            (!brand || product.brand === brand) &&
+            (!cores || String(productCpu?.cores) === String(cores)) &&
+            (!vram || String(productGpu?.vram) === String(vram)) &&
+            (!memory || product.memory === memory) &&
+            (!size || product.size === size) &&
+            (!capacity || String(productStorage?.capacity) === String(capacity)) && // Ensure storage capacity filter
+            (!motherboardBrand || productMotherboard?.manufacturer === motherboardBrand) &&
+            (!socket || productMotherboard?.socket === socket) &&
+            (!formFactor || productMotherboard?.formFactor === formFactor) &&
+            memorySlotsMatch &&
+            (category === "storage"
+                ? !storagetype || String(productStorage?.type) === String(storagetype) // Apply storage type filter only to storage category
+                : true) && // Ignore storage type for other categories
+            (!wattage || String(productPsu?.wattage) === String(wattage)) &&
+            (!efficiency || productPsu?.efficiency === efficiency) &&
+            (!modularity || productPsu?.modularity === modularity)
+        );
+    });
+}, [search, products, filters]);
+
   
 
   const handleAddToCart = async (product) => {
@@ -68,19 +134,17 @@ const ShopNow = () => {
     }
   };
 
+  if (loading) {
+    return <div className="text-center animate-pulse">Loading Products...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center text-red-600">Error: {error}</div>;
+  }
+
   return (
     <div className="flex flex-col lg:flex-row bg-gray-100 min-h-screen p-4">
-      <FilterPanel 
-        categories={categories} 
-        products={products} 
-        onFilterChange={(filters) => {
-          setSelectedCategory(filters.category);
-          setMaxPrice(filters.price);
-        }} 
-      />
-
-
-
+      <FilterPanel categories={categories} products={products} onFilterChange={handleFilterChange} />
 
       <section className="flex-1 py-6 px-4">
         <ToastContainer position="top-right" autoClose={2000} />
@@ -97,26 +161,21 @@ const ShopNow = () => {
           Shop Our Best Products
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-          {loading ? (
-            <div className="text-center col-span-full animate-pulse">Loading...</div>
-          ) : error ? (
-            <p className="text-center text-red-600 col-span-full">{error}</p>
-          ) : filteredProducts.length > 0 ? (
+          {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
               <div
                 key={product._id}
-                className="bg-white shadow-md rounded-lg p-4 text-center flex flex-col items-center justify-between w-full "
+                className="bg-white shadow-md rounded-lg p-4 text-center flex flex-col items-center justify-between w-full"
               >
                 <img
                   src={product.image || product.imageUrl}
                   alt={product.name}
                   className="w-full h-40 object-contain rounded-md"
                 />
-                <h3 className="mt-2 text-lg  font-semibold">{product.name}</h3>
+                <h3 className="mt-2 text-lg font-semibold">{product.name}</h3>
                 <p className="text-gray-600 text-sm md:text-base">
                   ₹{Number(product.price).toLocaleString()}
                 </p>
-
 
                 <div className="p-1 flex flex-col sm:flex-row justify-between gap-2 w-full">
                   <button
@@ -138,7 +197,6 @@ const ShopNow = () => {
                   </Link>
                 </div>
               </div>
-
             ))
           ) : (
             <p className="text-center col-span-full">No products found</p>
