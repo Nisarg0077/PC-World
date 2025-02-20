@@ -74,6 +74,39 @@ app.post('/api/products', async (req, res) => {
 });
 
 
+app.get('/api/getproducts/:catname', async (req, res) => {
+  try {
+    const { catname } = req.params; // Fetch category name from query params
+    console.log(catname);
+    
+    if (!catname) {
+      return res.status(400).json({ message: 'Category name is required' });
+    }
+
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+    // Fetch products that match the category
+    const products = await Product.find({ category: catname });
+
+    if (!products.length) {
+      return res.status(404).json({ message: 'No products found for this category' });
+    }
+
+    const updatedProducts = products.map(product => ({
+      ...product._doc,
+      imageUrl: `${baseUrl}/images/${product.imageUrl}`, // Construct full image URL
+    }));
+
+    res.json(updatedProducts);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ message: 'Failed to fetch products' });
+  }
+});
+
+
+
+
 
 app.post('/api/productInfo', async (req, res) => {
   try {
