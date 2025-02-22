@@ -34,7 +34,7 @@ export default function Navbar() {
 
   return (
     <nav className="bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg sticky top-0 z-50">
-      <div className="container mx-auto flex items-center justify-between p-4">
+      <div className="container mx-auto flex items-center justify-between px-4 py-1 ">
         <Link to="/" className="text-2xl font-bold text-white tracking-wide hover:opacity-80 transition">
           PC-World
         </Link>
@@ -60,7 +60,7 @@ export default function Navbar() {
           {/* User Dropdown */}
           {user ? (
             <div className="relative">
-              <button onClick={toggleDropdown} className="ml-4 focus:outline-none">
+              <button onClick={toggleDropdown} className="ml-4 mt-2 focus:outline-none">
               {user.profilePicture ? (
               <div className="w-10 h-10 rounded-full border-2 border-blue-500 flex items-center justify-center bg-gray-200">
                   <img

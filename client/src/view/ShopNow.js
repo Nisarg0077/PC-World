@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import fetchProducts from "../components/Back_ShopNow";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,22 +14,41 @@ const ShopNow = () => {
   const [user, setUser] = useState(null);
   const [cartLoading, setCartLoading] = useState({});
   const [categories, setCategories] = useState([]);
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  const queryParams = new URLSearchParams(location.search);
+  const catname = queryParams.get("catname") || "";
+
   const [filters, setFilters] = useState({
-    category: "",
+    category: catname || "",
     price: 1000000,
     brand: "",
     cores: "",
+    threads: "",
+    baseClock: "",
+    boostClock: "",
+    cache: "",
     vram: "",
+    vramType: "",
     memory: "",
+    speed: "",
     type: "",
     size: "",
-    capacity: "",
+    storageCapacity: "",
+    storageInterface: "",
+    rpm: "",
+    ramCapacity: "",
     motherboardBrand: "",
     socket: "",
     formFactor: "",
     memorySlots: "",
+    wattage: "",
+    efficiencyRating: "",
+    modularity: "",
   });
 
+  // Initialize user and fetch products
   useEffect(() => {
     const storedUser = sessionStorage.getItem("ClientUser");
     if (storedUser) setUser(JSON.parse(storedUser));
@@ -40,7 +59,8 @@ const ShopNow = () => {
         setProducts(data);
         setCategories([...new Set(data.map((p) => p.category))]);
       } catch (err) {
-        setError("Failed to load products");
+        setError("Failed to load products. Please try again later.");
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -49,71 +69,94 @@ const ShopNow = () => {
     getProducts();
   }, []);
 
+  // Update filters when category changes
+  useEffect(() => {
+    setFilters((prevFilters) => ({ ...prevFilters, category: catname }));
+  }, [catname]);
+
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
   };
 
+  // Filter products based on search and filters
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-        const {
-            category,
-            price,
-            brand,
-            cores,
-            vram,
-            memory,
-            size,
-            capacity,
-            motherboardBrand,
-            socket,
-            formFactor,
-            memorySlots,
-            storagetype,
-            wattage,  
-            efficiency, 
-            modularity
-        } = filters;
+      const {
+        category,
+        price,
+        brand,
+        cores,
+        threads,
+        baseClock,
+        boostClock,
+        cache,
+        vram,
+        vramType,
+        memory,
+        speed,
+        type,
+        size,
+        storageCapacity,
+        rpm,
+        storageInterface,
+        ramCapacity,
+        motherboardBrand,
+        socket,
+        formFactor,
+        memorySlots,
+        wattage,
+        efficiencyRating,
+        modularity,
+      } = filters;
 
-        const productMotherboard = product.specifications?.motherboard || {};
-        const productGpu = product.specifications?.gpu || {};
-        const productCpu = product.specifications?.cpu || {};
-        const productStorage = product.specifications?.storage || {}; // Ensure storage exists
-        const productPsu = product.specifications?.psu || {};
+      const productSpecs = product.specifications || {};
+      const productCpu = productSpecs.cpu || {};
+      const productGpu = productSpecs.gpu || {};
+      const productMotherboard = productSpecs.motherboard || {};
+      const productStorage = productSpecs.storage || {};
+      const productPsu = productSpecs.psu || {};
+      const productRam = productSpecs.ram || {};
 
-        const memorySlotsMatch =
-            !memorySlots ||
-            (Array.isArray(productMotherboard?.memorySlots)
-                ? productMotherboard.memorySlots.map(String).includes(memorySlots)
-                : String(productMotherboard?.memorySlots) === memorySlots);
-
-        return (
-            (search ? product.name.toLowerCase().includes(search.toLowerCase()) : true) &&
-            (!category || product.category === category) &&
-            product.price <= price &&
-            (!brand || product.brand === brand) &&
-            (!cores || String(productCpu?.cores) === String(cores)) &&
-            (!vram || String(productGpu?.vram) === String(vram)) &&
-            (!memory || product.memory === memory) &&
-            (!size || product.size === size) &&
-            (!capacity || String(productStorage?.capacity) === String(capacity)) && // Ensure storage capacity filter
-            (!motherboardBrand || productMotherboard?.manufacturer === motherboardBrand) &&
-            (!socket || productMotherboard?.socket === socket) &&
-            (!formFactor || productMotherboard?.formFactor === formFactor) &&
-            memorySlotsMatch &&
-            (category === "storage"
-                ? !storagetype || String(productStorage?.type) === String(storagetype) // Apply storage type filter only to storage category
-                : true) && // Ignore storage type for other categories
-            (!wattage || String(productPsu?.wattage) === String(wattage)) &&
-            (!efficiency || productPsu?.efficiency === efficiency) &&
-            (!modularity || productPsu?.modularity === modularity)
-        );
+      return (
+        (search ? product.name.toLowerCase().includes(search.toLowerCase()) : true) &&
+        (!category || product.category === category) &&
+        product.price <= price &&
+        (!brand || product.brand === brand) &&
+        (!cores || String(productCpu.cores) === String(cores)) &&
+        (!threads || String(productCpu.threads) === String(threads)) &&
+        (!baseClock || String(productCpu.baseClock) === String(baseClock)) &&
+        (!boostClock || String(productCpu.boostClock) === String(boostClock)) &&
+        (!cache || String(productCpu.cache) === String(cache)) &&
+        (!vram || String(productGpu.vram) === String(vram)) &&
+        (!vramType || productGpu.vramType === vramType) &&
+        (!memory || product.memory === memory) &&
+        (!speed || productRam.speed === speed) &&
+        (!type || String(productStorage.type) === String(type)) &&
+        (!size || product.size === size) &&
+        (!ramCapacity || (product.category === "ram" && String(productSpecs.ram?.capacity) === String(ramCapacity))) &&
+        (!storageCapacity || (product.category === "storage" && String(productSpecs.storage?.capacity) === String(storageCapacity))) &&
+        // (!Interface || productStorage.interface === Interface) &&
+        (!filters.storageInterface || productStorage.interface === filters.storageInterface)&&
+        (!rpm || String(productStorage.rpm) === String(rpm)) &&
+        (!motherboardBrand || productMotherboard.manufacturer === motherboardBrand) &&
+        (!socket ||
+          (product.category === "cpu" && String(productCpu.socket) === String(socket)) ||
+          (product.category === "motherboard" && String(productMotherboard.socket) === String(socket))) &&
+        (!formFactor || productMotherboard.formFactor === formFactor) &&
+        (!memorySlots || String(productMotherboard.memorySlots) === String(memorySlots)) &&
+        (!wattage || String(productPsu.wattage) === String(wattage)) &&
+        (!efficiencyRating || productPsu.efficiencyRating === efficiencyRating) &&
+        (!modularity || productPsu.modularity === modularity)
+      );
     });
-}, [search, products, filters]);
+  }, [search, products, filters]);
 
-  
-
+  // Add product to cart
   const handleAddToCart = async (product) => {
-    if (!user) return toast.error("Please log in to add items to the cart.");
+    if (!user) {
+      navigate("/login");
+      return;
+    }
 
     setCartLoading((prev) => ({ ...prev, [product._id]: true }));
     try {
@@ -123,7 +166,7 @@ const ShopNow = () => {
         name: product.name,
         price: product.price,
         quantity: 1,
-        imageUrl: product.image || product.imageUrl.replace("http://localhost:5000/images/", ""),
+        imageUrl: product.image || product.imageUrl,
       });
       toast.success("Product added to cart successfully!");
       window.dispatchEvent(new Event("cartUpdated"));
@@ -144,7 +187,12 @@ const ShopNow = () => {
 
   return (
     <div className="flex flex-col lg:flex-row bg-gray-100 min-h-screen p-4">
-      <FilterPanel categories={categories} products={products} onFilterChange={handleFilterChange} />
+      <FilterPanel
+        categories={categories}
+        category={filters.category}
+        products={products}
+        onFilterChange={handleFilterChange}
+      />
 
       <section className="flex-1 py-6 px-4">
         <ToastContainer position="top-right" autoClose={2000} />

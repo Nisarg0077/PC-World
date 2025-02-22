@@ -51,58 +51,63 @@ const Home = () => {
 
             <div className="bg-gray-200 flex justify-center">
                 {/* Category Slider Section */}
-                <section className="py-12 px-5 md:px-10 text-center w-full max-w-7xl mx-auto">
-                    <h2 className="text-3xl font-bold text-gray-800 mb-6">PC Parts</h2>
-                    {categories.length > 0 ? (
-                        <div className="relative">
-                            {/* Swiper Component */}
-                            <Swiper
-                                modules={[Pagination, Autoplay, Navigation]}
-                                spaceBetween={15}
-                                slidesPerView={1}
-                                breakpoints={{
-                                    400: { slidesPerView: 1 },
-                                    640: { slidesPerView: 2 },
-                                    1024: { slidesPerView: 3 },
-                                    1280: { slidesPerView: 4 },
-                                }}
-                                autoplay={{ delay: 3000, disableOnInteraction: false }}
-                                pagination={{ clickable: true }}
-                                navigation={{
-                                    nextEl: ".swiper-button-next",
-                                    prevEl: ".swiper-button-prev",
-                                }}
-                                className="mt-8 h-64 p-10" // Reduced height here
-                            >
-                                {categories.map((category, index) => {
-                                    const imageKey = category.name.toLowerCase().replace(/\s+/g, "");
-                                    const imageSrc = images[imageKey] || pcparts;
+                <section className="relative py-12 px-5 md:px-10 text-center w-full max-w-7xl mx-auto">
+    {/* Blurred edges effect */}
+    <div className="absolute inset-0 bg-white blur-xl opacity-20 pointer-events-none"></div>
 
-                                    return (
-                                        <SwiperSlide key={index} className="flex justify-center items-center">
-                                            <Link to={`/category?catname=${imageKey}`} className="w-full">
-                                                <div className="bg-white shadow-md rounded-xl p-4 md:p-5 h-48 w-44 md:w-48 flex flex-col items-center transition hover:scale-105 hover:shadow-lg">
-                                                    <img
-                                                        src={imageSrc}
-                                                        alt={category.name}
-                                                        className="w-full h-32 object-contain rounded-md mb-1" // Reduced image height
-                                                    />
-                                                    <h3 className="text-lg font-semibold text-gray-700">
-                                                        {category.name}
-                                                    </h3>
-                                                </div>
-                                            </Link>
-                                        </SwiperSlide>
-                                    );
-                                })}
-                            </Swiper>
+    <h2 className="text-3xl font-bold text-gray-800 mb-6 relative z-10">PC Parts</h2>
 
-                            {/* ... (Navigation Buttons) */}
-                        </div>
-                    ) : (
-                        <p className="text-gray-600 mt-4">Loading categories...</p>
-                    )}
-                </section>
+    {categories.length > 0 ? (
+        <div className="relative z-10">
+            {/* Swiper Component */}
+            <Swiper
+                modules={[Pagination, Autoplay, Navigation]}
+                spaceBetween={15}
+                slidesPerView={1}
+                breakpoints={{
+                    400: { slidesPerView: 1 },
+                    640: { slidesPerView: 2 },
+                    1024: { slidesPerView: 3 },
+                    1280: { slidesPerView: 4 },
+                }}
+                autoplay={{ delay: 3000, disableOnInteraction: false }}
+                pagination={{ clickable: true }}
+                navigation={{
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                }}
+                className="mt-8 h-64 p-10" // Reduced height here
+            >
+                {categories.map((category, index) => {
+                    const imageKey = category.name.toLowerCase().replace(/\s+/g, "");
+                    const imageSrc = images[imageKey] || pcparts;
+
+                    return (
+                        <SwiperSlide key={index} className="flex justify-center items-center">
+                            <Link to={`/shopnow?catname=${imageKey}`} className="w-full">
+                                <div className="bg-white shadow-md rounded-xl p-4 md:p-5 h-48 w-44 md:w-48 flex flex-col items-center transition hover:scale-105 hover:shadow-lg">
+                                    <img
+                                        src={imageSrc}
+                                        alt={category.name}
+                                        className="w-full h-32 object-contain rounded-md mb-1" // Reduced image height
+                                    />
+                                    <h3 className="text-lg font-semibold text-gray-700">
+                                        {category.name}
+                                    </h3>
+                                </div>
+                            </Link>
+                        </SwiperSlide>
+                    );
+                })}
+            </Swiper>
+
+            {/* ... (Navigation Buttons) */}
+        </div>
+    ) : (
+        <p className="text-gray-600 mt-4 relative z-10">Loading categories...</p>
+    )}
+</section>
+
             </div>
 
 
