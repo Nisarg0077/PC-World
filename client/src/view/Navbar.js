@@ -34,7 +34,7 @@ export default function Navbar() {
 
   return (
     <nav className="bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg sticky top-0 z-50">
-      <div className="container mx-auto flex items-center justify-between px-4 py-1 ">
+      <div className="container mx-auto flex items-center justify-between px-4 py-2 ">
         <Link to="/" className="text-2xl font-bold text-white tracking-wide hover:opacity-80 transition">
           PC-World
         </Link>

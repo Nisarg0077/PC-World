@@ -17,6 +17,7 @@ const brandMaigration = require('./migration/brands-migration');
 const prodTypMigration = require('./migration/prodTyp-migration');
 const multer = require('multer');
 const Cart = require('./models/Cart')
+const Feedback = require('./models/Feedback');
 // const path = require('path');
 
 process.setMaxListeners(15);
@@ -833,6 +834,143 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
 });
 ;
 
+
+// fedback APIs start
+
+
+app.post('/api/feedback-in', async (req, res) => {
+  try {
+    const { userId, productId, productTitle, title, description } = req.body;
+
+    // Validate input
+    if (!userId || !productId || !productTitle || !title || !description) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    // Create a new feedback document
+    const newFeedback = new Feedback({
+      userId,
+      productId,
+      productTitle,
+      title,
+      description
+    });
+
+    // Save to database
+    await newFeedback.save();
+
+    res.status(201).json({ success: true, message: "Feedback submitted successfully" });
+  } catch (error) {
+    console.error("Error submitting feedback:", error);
+    res.status(500).json({ error: "Internal server error", details: error.message });
+  }
+});
+
+
+
+app.post('/api/feedbacks', async (req, res) => {
+  try {
+    const feedbacks = await Feedback.find({isActive: true});
+    return res.json(feedbacks);
+  } catch (error) {
+    console.error("Error fetching feedbacks:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+})
+
+
+app.get('/api/approved-feedbacks/:productId', async (req, res) => {
+  try {
+    const { productId } = req.params;
+    console.log(productId);
+    
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({ message: "Invalid product ID format." });
+    }
+
+    const objectId = new mongoose.Types.ObjectId(productId);
+    const feedbacks = await Feedback.find({ productId: objectId, status: "approved" });
+
+    if (!feedbacks.length) {
+      return res.status(404).json({ message: "No approved feedbacks found for this product." });
+    }
+
+    res.json(feedbacks);
+  } catch (error) {
+    console.error("Error fetching feedbacks:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+;
+
+app.get("/api/feedbacks/pending", async (req, res) => {
+  try {
+    const feedbacks = await Feedback.find({ isActive: false })
+      .populate("userId", "username")
+      .populate("productId", "title");
+
+    res.json(feedbacks);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching pending feedbacks", details: error.message });
+  }
+});
+
+
+
+app.put("/api/feedbacks/approve/:id", async (req, res) => {
+  try {
+    const feedback = await Feedback.findByIdAndUpdate(req.params.id, { isActive: true }, { new: true });
+
+    if (!feedback) {
+      return res.status(404).json({ error: "Feedback not found" });
+    }
+
+    res.json({ success: true, message: "Feedback approved successfully", feedback });
+  } catch (error) {
+    res.status(500).json({ error: "Error approving feedback", details: error.message });
+  }
+
+});
+
+app.delete("/api/feedbacks/:id", async (req, res) => {
+  try {
+    const feedback = await Feedback.findByIdAndDelete(req.params.id);
+
+    if (!feedback) {
+      return res.status(404).json({ error: "Feedback not found" });
+    }
+
+    res.json({ success: true, message: "Feedback deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Error deleting feedback", details: error.message });
+  }
+});
+
+
+app.put("/api/feedbacks/:id/disapprove", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Update isActive to false
+    const updatedFeedback = await Feedback.findByIdAndUpdate(
+      id,
+      { isActive: false },
+      { new: true }
+    );
+
+    if (!updatedFeedback) {
+      return res.status(404).json({ error: "Feedback not found" });
+    }
+
+    res.json({ success: true, message: "Feedback disapproved successfully", feedback: updatedFeedback });
+  } catch (error) {
+    console.error("Error disapproving feedback:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+// feedback APIs end
 
 
 app.get('/mgrt/prod', (req, res) => {

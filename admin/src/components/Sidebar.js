@@ -63,6 +63,14 @@ const Sidebar = () => {
             {/* <i class="fa-brands fa-product-hunt"></i> */}
             {isSidebarOpen && <span className="ml-3">Products Management</span>}
           </a>
+          <a
+            href="/feedback"
+            className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
+          >
+            <i className={`fs ${isSidebarOpen ? "fa-solid fa-comments" : "fa-solid fa-comments"}`}></i>
+            {/* <i class="fa-brands fa-product-hunt"></i> */}
+            {isSidebarOpen && <span className="ml-3">feedback Management</span>}
+          </a>
           {/* <a
             href="/settings"
             className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
