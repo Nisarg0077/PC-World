@@ -14,7 +14,6 @@ const ShopNow = () => {
   const [user, setUser] = useState(null);
   const [cartLoading, setCartLoading] = useState({});
   const [categories, setCategories] = useState([]);
-
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
