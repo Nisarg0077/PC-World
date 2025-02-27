@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
+import LineChartComponent from "./LineChart";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null); // Start with null, because it's an object
@@ -36,7 +37,6 @@ const Dashboard = () => {
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
           <h1 className="text-xl font-bold">Admin Dashboard</h1>
           <p>Welcome, {user.firstName} {user.lastName}</p>
-          {/* Your content goes here */}
         </main>
       </div>
     </div>

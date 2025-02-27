@@ -10,7 +10,9 @@ import ClinetProfile from './view/ClientProfile';
 import Cart from './view/Cart';
 import Navbar from './view/Navbar';
 import { CartProvider } from './components/CartContext';
-// import Category from './view/Category';
+import AboutUs from './AboutUs';
+import ContactUs from './ContactUs';
+import EditProfile from './view/EditProfile';
 
 function App() {
   return (
@@ -42,7 +44,9 @@ function Layout() {
         <Route path='/shopnow' Component={ShopNow}/>
         <Route path='/viewProduct' Component={ViewProudct}/>
         <Route path='/cart' Component={Cart}/>
-        {/* <Route path='/category' Component={Category}/> */}
+        <Route path='/aboutus' Component={AboutUs}/>
+        <Route path='/contactus' Component={ContactUs}/>
+        <Route path='/editprofile' Component={EditProfile}/>
         <Route path="*" Component={NotFound}/>
       </Routes>
     </>

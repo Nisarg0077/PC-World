@@ -229,7 +229,7 @@ const ShopNow = () => {
                     className={`px-4 py-2 rounded-md transition w-full sm:w-1/2 text-sm text-white ${
                       cartLoading[product._id]
                         ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700"
+                        : "bg-purple-700 hover:bg-purple-900"
                     }`}
                     onClick={() => handleAddToCart(product)}
                     disabled={cartLoading[product._id]}
@@ -238,7 +238,7 @@ const ShopNow = () => {
                   </button>
                   <Link
                     to={`/viewProduct?pid=${product._id}`}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-center text-sm w-full sm:w-1/2"
+                    className="px-4 py-2 bg-purple-700 text-white rounded-md hover:bg-purple-800 transition text-center text-sm w-full sm:w-1/2"
                   >
                     View Product
                   </Link>

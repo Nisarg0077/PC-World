@@ -88,6 +88,9 @@ const AdminProfile = () => {
                   <span className="font-semibold">Role:</span> {user?.role}
                 </p>
                 <p className="text-lg text-gray-700">
+                  <span className="font-semibold">department:</span> {user?.department}
+                </p>
+                <p className="text-lg text-gray-700">
                   <span className="font-semibold">Phone:</span> {user?.phone}
                 </p>
               </div>
@@ -96,19 +99,21 @@ const AdminProfile = () => {
             {/* Address Section */}
             <div className="mt-6">
               <h3 className="text-xl font-semibold text-gray-800">Address</h3>
-              <p className="text-lg text-gray-700">{user?.address?.street}</p>
-              <p className="text-lg text-gray-700">
-                {user?.address?.city}, {user?.address?.state} - {user?.address?.zip}
-              </p>
+              {user?.address?.[0] ? (
+                <>
+                  <p className="text-lg text-gray-700">{user.address[0].street}</p>
+                  <p className="text-lg text-gray-700">
+                    {user.address[0].city}, {user.address[0].state} - {user.address[0].zip}
+                  </p>
+                </>
+              ) : (
+                <p className="text-lg text-gray-700">No address available.</p>
+              )}
             </div>
 
             {/* Account Info */}
             <div className="mt-6">
   <h3 className="text-xl font-semibold text-gray-800">Account Information</h3>
-  <p className="text-lg text-gray-700">
-    <span className="font-semibold">Created At: </span> 
-    {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
-  </p>
   <p className="text-lg text-gray-700">
     <span className="font-semibold">Last Updated: </span> 
     {user?.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : "N/A"}
@@ -117,9 +122,9 @@ const AdminProfile = () => {
 
             {/* Action Buttons */}
             <div className="mt-6 flex space-x-4">
-              <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+              {/* <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
                 Edit Profile
-              </button>
+              </button> */}
               <button className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
                 Logout
               </button>

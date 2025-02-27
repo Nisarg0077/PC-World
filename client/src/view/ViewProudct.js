@@ -144,11 +144,42 @@ export const ViewProudct = () => {
                 </div>
               </div>
             </div>
+
+            {product.specifications && (
+              <div className="p-8 bg-gray-50">
+                <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Specifications</h2>
+                {Object.entries(product.specifications).map(([key, value]) => (
+                  <div key={key} className="mb-8">
+                    {/* <h3 className="text-2xl font-semibold text-gray-800 mb-4 capitalize">
+                      {key.replace(/([A-Z])/g, ' $1')}
+                    </h3> */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {Object.entries(value).map(([subKey, subValue]) => (
+                        <div
+                          key={subKey}
+                          className="bg-gradient-to-r from-violet-600 to-indigo-600 p-4 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl border border-gray-200"
+                        >
+                          <span className="block font-medium text-white capitalize">
+                            {subKey.replace(/([A-Z])/g, ' $1')}:
+                          </span>
+                          <span className="text-white">
+                            {typeof subValue === 'boolean' ? (subValue ? 'Yes' : 'No') : subValue}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <p className="text-center text-gray-700">Product not found.</p>
         )}
-      </section>
+
+        </section>
+
+      
 
       {user ? (
         <section className="container mx-auto px-4 py-4">
