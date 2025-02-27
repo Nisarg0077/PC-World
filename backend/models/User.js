@@ -4,7 +4,7 @@ const addressSchema = new mongoose.Schema({
   street: { type: String, trim: true },
   city: { type: String, trim: true },
   state: { type: String, trim: true },
-  zip: { type: String, match: /^[0-9]{5}(-[0-9]{4})?$/ }, // US ZIP Code format
+  zip: { type: String }, // US ZIP Code format
 });
 
 const userSchema = new mongoose.Schema({

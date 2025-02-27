@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import axios from "axios";
 
 const ClinetProfile = () => {
   const [user, setUser] = useState(null);  // ✅ Fix: Start with `null`
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -20,7 +21,7 @@ const ClinetProfile = () => {
       try {
         const parsedAdmin = JSON.parse(storedClient);
         console.log("Fetching user:", parsedAdmin.username);  // ✅ Debugging
-  
+        
         const response = await axios.post("http://localhost:5000/api/client/user", {
           username: parsedAdmin.username
         });
@@ -44,7 +45,7 @@ const ClinetProfile = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gray-100">
+    <div className=" flex flex-col bg-gray-100">
       {/* Navbar */}
       <header className="sticky top-0 z-50 bg-white shadow-md">
        
@@ -67,7 +68,7 @@ const ClinetProfile = () => {
                   <img
                     src={`http://localhost:5000/images/${user.profilePicture}`} // Ensure the correct path
                     alt="Profile"
-                    className="w-24 h-24 object-cover rounded-full"
+                    className="w-23 h-23 border-2 border-blue-500 object-cover rounded-full"
                     />
               
                 ) : (
@@ -91,9 +92,6 @@ const ClinetProfile = () => {
                   <span className="font-semibold">Email:</span> {user?.email}
                 </p>
                 <p className="text-lg text-gray-700">
-                  <span className="font-semibold">Role:</span> {user?.role}
-                </p>
-                <p className="text-lg text-gray-700">
                   <span className="font-semibold">Phone:</span> {user?.phone}
                 </p>
               </div>
@@ -102,30 +100,32 @@ const ClinetProfile = () => {
             {/* Address Section */}
             <div className="mt-6">
               <h3 className="text-xl font-semibold text-gray-800">Address</h3>
-              <p className="text-lg text-gray-700">{user?.address?.street}</p>
-              <p className="text-lg text-gray-700">
-                {user?.address?.city}, {user?.address?.state} - {user?.address?.zip}
-              </p>
+              {user?.address?.[0] ? (
+                <>
+                  <p className="text-lg text-gray-700">{user.address[0].street}</p>
+                  <p className="text-lg text-gray-700">
+                    {user.address[0].city}, {user.address[0].state} - {user.address[0].zip}
+                  </p>
+                </>
+              ) : (
+                <p className="text-lg text-gray-700">No address available.</p>
+              )}
             </div>
 
             {/* Account Info */}
             <div className="mt-6">
-  <h3 className="text-xl font-semibold text-gray-800">Account Information</h3>
-  <p className="text-lg text-gray-700">
-    <span className="font-semibold">Created At: </span> 
-    {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
-  </p>
-  <p className="text-lg text-gray-700">
-    <span className="font-semibold">Last Updated: </span> 
-    {user?.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : "N/A"}
-  </p>
-</div>
+              <h3 className="text-xl font-semibold text-gray-800">Account Information</h3>
+              <p className="text-lg text-gray-700">
+                <span className="font-semibold">Last Updated: </span> 
+                {user?.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : "N/A"}
+              </p>
+            </div>
 
             {/* Action Buttons */}
             <div className="mt-6 flex space-x-4">
-              <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+              <Link to={`/editprofile?uid=${user._id}`} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
                 Edit Profile
-              </button>
+              </Link>
               <button 
               onClick={() => {
                 sessionStorage.removeItem("ClientUser");

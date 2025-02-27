@@ -41,7 +41,7 @@ export default function Navbar() {
 
         {/* Desktop Menu */}
         <ul className="hidden md:flex space-x-8 items-center text-white text-lg">
-          {["Home", "Shop Now", "About", "Services", "Contact"].map((item, index) => (
+          {["Home", "Shop Now", "About Us", "Contact Us"].map((item, index) => (
             <li key={index}>
               <Link to={item === "Home" ? "/" : `/${item.toLowerCase().replace(/\s/g, "")}`} className="hover:text-yellow-300 transition duration-200">
                 {item}

@@ -38,7 +38,7 @@ const Home = () => {
             {/* Hero Section */}
             <section className="relative flex items-center justify-center h-screen bg-gradient-to-r from-blue-600 to-purple-600 text-white text-center px-6">
                 <div>
-                    <h1 className="text-4xl md:text-6xl font-bold">Welcome to PC-World</h1>
+                    <h1 className="text-4xl md:text-6xl font-bold ">Welcome to PC-World</h1>
                     <p className="mt-4 text-lg md:text-xl">Your one-stop shop for the latest PCs and accessories</p>
                     <Link
                         to="/shopnow"
