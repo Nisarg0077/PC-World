@@ -10,7 +10,7 @@ const AboutUs = () => {
         </p>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 mt-12 grid md:grid-cols-3 gap-6">
+      {/* <div className="max-w-6xl mx-auto px-6 mt-12 grid md:grid-cols-3 gap-6">
 
         <div className='hover:bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 hover:scale-105 p-1 rounded-xl'>
             <div className="bg-white shadow-lg p-6 rounded-xl  transition-all duration-300 ">
@@ -42,7 +42,7 @@ const AboutUs = () => {
       <div className="text-center mt-12">
         <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Join Us on Our Journey</h2>
         <p className="text-lg text-gray-600 mt-2">Stay ahead with the latest in PC technology. Follow us and build your dream PC with confidence!</p>
-      </div>
+      </div> */}
     </div>
   )
 }

@@ -62,7 +62,7 @@ const EditProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-  
+
     const formData = new FormData();
     Object.entries(user).forEach(([key, value]) => {
       if (key === 'address') {
@@ -71,15 +71,25 @@ const EditProfile = () => {
         formData.append(key, value);
       }
     });
-  
+
     if (file) formData.append('image', file);
-  
+
     try {
-      await axios.put(`http://localhost:5000/api/users/${uid}`, formData, {
+      const response = await axios.put(`http://localhost:5000/api/users/${uid}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
+
+      // Fetch updated user data from the backend
+      const updatedUser = response.data.user;
+
+      // Update session storage
+      const sessionData = JSON.parse(sessionStorage.getItem("ClientUser"));
+      const updatedSessionData = { ...sessionData, ...updatedUser };
+      sessionStorage.setItem("ClientUser", JSON.stringify(updatedSessionData));
+
       toast.success('User updated successfully');
       navigate('/userProfile');
+      window.location.reload();
     } catch (error) {
       console.error("API Error:", error);
       toast.error(error.response?.data?.message || 'Failed to update user.');

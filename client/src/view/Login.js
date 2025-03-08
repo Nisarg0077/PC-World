@@ -1,7 +1,7 @@
 import React,{useState,useEffect} from 'react'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import "font-awesome/css/font-awesome.min.css";
 
 export const Login = () => {
     const [username, setUsername] = useState(""); // State for username input
@@ -40,28 +40,29 @@ export const Login = () => {
   };
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-    <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-sm">
-      <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">Login</h2>
+    <div className=" flex items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 p-2">
+    <div className="bg-white shadow-lg rounded-lg p-8">
+      <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Login</h2>
       <form onSubmit={handleLogin}>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Username</label>
+          <label className="block text-sm font-bold text-gray-700">Username</label>
           <input
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="mt-1 block w-full p-2 rounded-md border border-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="Enter your username"
             required
           />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Password</label>
+          <label className="block text-sm font-bold text-gray-700">Password</label>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full p-2 rounded-md border border-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               placeholder="Enter your password"
               required
             />
@@ -70,13 +71,13 @@ export const Login = () => {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute inset-y-0 right-0 px-3 py-1 text-gray-500 hover:text-gray-800 focus:outline-none"
             >
-              {showPassword ? "Hide" : "Show"}
+              {showPassword ? <i class="fa fa-eye-slash" aria-hidden="true"></i> : <i class="fa fa-eye" aria-hidden="true"></i>}
             </button>
           </div>
         </div>
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md font-bold hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
         >
           Login
         </button>
@@ -90,10 +91,22 @@ export const Login = () => {
           )}
         </div>
       )}
-      <div>
-      If not already user?<a href='/register' className='text-blue-600'> Register here.</a>
-      </div>
+      <div className="mt-4 text-center">
+  <p>
+    If not already a user?{" "}
+    <a href="/register" className="text-blue-600 hover:underline">
+      Register here.
+    </a>
+  </p>
+  <p className="mt-5">
+    <a href="/" className="text-white bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-md hover:underline">
+      Go to Home
+    </a>
+  </p>
+</div>
+
     </div>
+  </div>
   </div>
   )
 }

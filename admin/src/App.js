@@ -26,6 +26,8 @@ import UserMgmt from './components/Users/UserMgmt';
 import EditUser from './components/Users/EditUser';
 import Feedback from '../src/components/Feedback/FeedbackMgmt';
 import FeedbackApproval from './components/Feedback/FeedbackApproval';
+import AddMouseProduct from './components/Products/AddMouseProduct';
+import AddKeyboardProduct from './components/Products/AddKeyboardProduct';
 
 function Layout() {
   const location = useLocation();
@@ -48,6 +50,8 @@ function Layout() {
         <Route path='/add-ram' Component={AddRAMProduct} />
         <Route path='/add-storage' Component={AddStorageProduct} />
         <Route path='/add-psu' Component={AddPSUProduct} />
+        <Route path='/add-mouse' Component={AddMouseProduct} />
+        <Route path='/add-keyboard' Component={AddKeyboardProduct} />
         <Route path='/product-info' Component={ProductInfo} />
         <Route path='/edit-product' Component={EditProductPage} />
         <Route path='/categories' Component={categoriesMgmt} />

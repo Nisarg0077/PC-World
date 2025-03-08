@@ -87,7 +87,7 @@ const FeedbackApproval = () => {
                   feedbacks.map((feedback) => (
                     <tr key={feedback._id} className="hover:bg-gray-100">
                       <td className="border p-2">{feedback.userId.username || "Unknown"}</td>
-                      <td className="border p-2">{feedback.productTitle || "Unknown"}</td>
+                      <td className="border p-2 w-3/12">{feedback.productTitle || "Unknown"}</td>
                       <td className="border p-2">{feedback.title}</td>
                       <td className="border p-2">{feedback.description}</td>
                       <td className="border p-2">
@@ -103,14 +103,14 @@ const FeedbackApproval = () => {
                             onClick={() => approveFeedback(feedback._id)}
                             className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
                           >
-                            Approve
+                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                           </button>
                         )}
                         <button
                           onClick={() => deleteFeedback(feedback._id)}
                           className="bg-red-500 text-white px-3 py-1 rounded"
                         >
-                          Delete
+                          <i class="fa fa-trash" aria-hidden="true"></i>
                         </button>
                       </td>
                     </tr>

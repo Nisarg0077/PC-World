@@ -1,32 +1,34 @@
 import React, { useState, useEffect, useMemo } from "react";
 
-const FilterPanel = ({ categories, category, products, onFilterChange }) => {
+const FilterPanel = ({ categories, category, products, filteredParams, onFilterChange }) => {
+  console.log('from Filter Panal', filteredParams);
+  
   const [filters, setFilters] = useState({
-    category: category || "",
-    price: 1000000,
-    brand: "",
-    cores: "",
-    threads: "",
-    baseClock: "",
-    boostClock: "",
-    cache: "",
-    vram: "",
-    vramType: "",
-    memory: "",
-    ramCapacity: "",
-    speed: "",
-    storageCapacity: "",
-    storageInterface: "", // Renamed from 'interface'
-    rpm: "",
-    type: "",
-    size: "",
-    motherboardBrand: "",
-    socket: "",
-    formFactor: "",
-    memorySlots: "",
-    wattage: "",
-    efficiencyRating: "",
-    modularity: "",
+    category: filteredParams.category || category || "",
+    price: Number(filteredParams.price) || 1000000,
+    brand: filteredParams.brand || "",
+    cores: filteredParams.cores || "",
+    threads: filteredParams.threads || "",
+    baseClock: filteredParams.baseClock || "",
+    boostClock: filteredParams.boostClock || "",
+    cache: filteredParams.cache || "",
+    vram: filteredParams.vram || "",
+    vramType: filteredParams.vramType || "",
+    memory: filteredParams.memory || "",
+    speed: filteredParams.speed || "",
+    type: filteredParams.type || "",
+    size: filteredParams.size || "",
+    storageCapacity: filteredParams.storageCapacity || "",
+    storageInterface: filteredParams.storageInterface || "",
+    rpm: filteredParams.rpm || "",
+    ramCapacity: filteredParams.ramCapacity || "",
+    motherboardBrand: filteredParams.motherboardBrand || "",
+    socket: filteredParams.socket || "",
+    formFactor: filteredParams.formFactor || "",
+    memorySlots: filteredParams.memorySlots || "",
+    wattage: filteredParams.wattage || "",
+    efficiencyRating: filteredParams.efficiencyRating || "",
+    modularity: filteredParams.modularity || "",
   });
 
   const [maxProductPrice, setMaxProductPrice] = useState(1000000);
@@ -35,7 +37,7 @@ const FilterPanel = ({ categories, category, products, onFilterChange }) => {
     if (products.length > 0) {
       const highestPrice = Math.max(...products.map((p) => Number(p.price)));
       setMaxProductPrice(highestPrice);
-      setFilters((prevFilters) => ({ ...prevFilters, price: highestPrice }));
+      setFilters((prevFilters) => ({ ...prevFilters, price: Number(filteredParams.price) || highestPrice }));
     }
   }, [products]);
 
@@ -146,7 +148,7 @@ const FilterPanel = ({ categories, category, products, onFilterChange }) => {
   );
 
   return (
-    <div className="bg-white p-4 shadow-md rounded-lg m-2 w-2/12">
+    <div className="bg-white p-4 shadow-md rounded-lg m-2 w-2/12 sm:w-11/12 md:w-2/12">
       <h3 className="text-lg font-semibold mb-2">Filter Products</h3>
 
       {/* Category Filter */}

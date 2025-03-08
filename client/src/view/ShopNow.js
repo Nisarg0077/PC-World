@@ -5,12 +5,14 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import FilterPanel from "./FilterPanel";
+import queryString from 'query-string';
 
 const ShopNow = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [search, setSearch] = useState("");
+  const [searchQuery, setSearchQuery] = useState(""); // Temporary search input value
+  const [search, setSearch] = useState(""); // Actual search term used for filtering
   const [user, setUser] = useState(null);
   const [cartLoading, setCartLoading] = useState({});
   const [categories, setCategories] = useState([]);
@@ -19,33 +21,55 @@ const ShopNow = () => {
   const queryParams = new URLSearchParams(location.search);
   const catname = queryParams.get("catname") || "";
 
-  const [filters, setFilters] = useState({
-    category: catname || "",
-    price: 1000000,
-    brand: "",
-    cores: "",
-    threads: "",
-    baseClock: "",
-    boostClock: "",
-    cache: "",
-    vram: "",
-    vramType: "",
-    memory: "",
-    speed: "",
-    type: "",
-    size: "",
-    storageCapacity: "",
-    storageInterface: "",
-    rpm: "",
-    ramCapacity: "",
-    motherboardBrand: "",
-    socket: "",
-    formFactor: "",
-    memorySlots: "",
-    wattage: "",
-    efficiencyRating: "",
-    modularity: "",
+
+  const filteredParams = {};
+  queryParams.forEach((value, key) => {
+    if (value.trim()) {
+      filteredParams[key] = value;
+    }
   });
+  
+  console.log("Filtered Params:", filteredParams);
+  
+  const [filters, setFilters] = useState(() => ({
+    category: filteredParams.category || catname || "",
+    price: parseInt(filteredParams.price) || 1000000,
+    brand: filteredParams.brand || "",
+    cores: filteredParams.cores || "",
+    threads: filteredParams.threads || "",
+    baseClock: filteredParams.baseClock || "",
+    boostClock: filteredParams.boostClock || "",
+    cache: filteredParams.cache || "",
+    vram: filteredParams.vram || "",
+    vramType: filteredParams.vramType || "",
+    memory: filteredParams.memory || "",
+    speed: filteredParams.speed || "",
+    type: filteredParams.type || "",
+    size: filteredParams.size || "",
+    storageCapacity: filteredParams.storageCapacity || "",
+    storageInterface: filteredParams.storageInterface || "",
+    rpm: filteredParams.rpm || "",
+    ramCapacity: filteredParams.ramCapacity || "",
+    motherboardBrand: filteredParams.motherboardBrand || "",
+    socket: filteredParams.socket || "",
+    formFactor: filteredParams.formFactor || "",
+    memorySlots: filteredParams.memorySlots || "",
+    wattage: filteredParams.wattage || "",
+    efficiencyRating: filteredParams.efficiencyRating || "",
+    modularity: filteredParams.modularity || "",
+  }));
+  
+  console.log("Filters State:", filters);
+  
+  useEffect(() => {
+    const filtersFromViewProduct = location.state?.filters;
+    console.log(filtersFromViewProduct)
+    if (filtersFromViewProduct) {
+      setFilters(filtersFromViewProduct);
+      // Optional: Clear the state after using it
+      navigate({ ...location, state: null });
+    }
+  }, [location.state]);
 
   // Initialize user and fetch products
   useEffect(() => {
@@ -68,13 +92,21 @@ const ShopNow = () => {
     getProducts();
   }, []);
 
-  // Update filters when category changes
   useEffect(() => {
-    setFilters((prevFilters) => ({ ...prevFilters, category: catname }));
+    setFilters((prevFilters) => ({ ...prevFilters, category: catname || filteredParams.category }));
   }, [catname]);
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
+  };
+
+  // Handle search button click
+  const handleSearch = () => {
+    if (searchQuery.trim() === "") {
+      toast.info("Please enter a search term.");
+      return;
+    }
+    setSearch(searchQuery); // Update the actual search term
   };
 
   // Filter products based on search and filters
@@ -134,8 +166,7 @@ const ShopNow = () => {
         (!size || product.size === size) &&
         (!ramCapacity || (product.category === "ram" && String(productSpecs.ram?.capacity) === String(ramCapacity))) &&
         (!storageCapacity || (product.category === "storage" && String(productSpecs.storage?.capacity) === String(storageCapacity))) &&
-        // (!Interface || productStorage.interface === Interface) &&
-        (!filters.storageInterface || productStorage.interface === filters.storageInterface)&&
+        (!filters.storageInterface || productStorage.interface === filters.storageInterface) &&
         (!rpm || String(productStorage.rpm) === String(rpm)) &&
         (!motherboardBrand || productMotherboard.manufacturer === motherboardBrand) &&
         (!socket ||
@@ -190,6 +221,7 @@ const ShopNow = () => {
         categories={categories}
         category={filters.category}
         products={products}
+        filteredParams={filteredParams}
         onFilterChange={handleFilterChange}
       />
 
@@ -200,14 +232,22 @@ const ShopNow = () => {
             type="text"
             placeholder="Search product"
             className="border border-gray-400 p-2 w-full max-w-md rounded-md"
-            onChange={(e) => setSearch(e.target.value)}
-            value={search}
+            onChange={(e) => setSearchQuery(e.target.value)} // Update temporary search query
+            value={searchQuery} // Bind to temporary search query
+            aria-label="Search product"
           />
+          <button
+            className="bg-blue-600 p-2 px-4 mx-1 rounded-md text-white"
+            onClick={handleSearch} // Trigger search on button click
+            aria-label="Search"
+          >
+            <i className="fa fa-search" aria-hidden="true"></i>
+          </button>
         </div>
         <h2 className="text-2xl md:text-3xl font-bold text-gray-800 text-center mb-6">
           Shop Our Best Products
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
               <div
@@ -218,31 +258,43 @@ const ShopNow = () => {
                   src={product.image || product.imageUrl}
                   alt={product.name}
                   className="w-full h-40 object-contain rounded-md"
+                  onError={(e) => {
+                    e.target.src = "https://via.placeholder.com/150"; // Fallback image
+                  }}
                 />
                 <h3 className="mt-2 text-lg font-semibold">{product.name}</h3>
                 <p className="text-gray-600 text-sm md:text-base">
-                  ₹{Number(product.price).toLocaleString()}
+                  ₹{Intl.NumberFormat('en-IN').format(product.price).toLocaleString()}
                 </p>
-
                 <div className="p-1 flex flex-col sm:flex-row justify-between gap-2 w-full">
-                  <button
-                    className={`px-4 py-2 rounded-md transition w-full sm:w-1/2 text-sm text-white ${
-                      cartLoading[product._id]
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-purple-700 hover:bg-purple-900"
-                    }`}
-                    onClick={() => handleAddToCart(product)}
-                    disabled={cartLoading[product._id]}
-                  >
-                    {cartLoading[product._id] ? "Adding..." : "Add to Cart"}
-                  </button>
-                  <Link
-                    to={`/viewProduct?pid=${product._id}`}
-                    className="px-4 py-2 bg-purple-700 text-white rounded-md hover:bg-purple-800 transition text-center text-sm w-full sm:w-1/2"
-                  >
-                    View Product
-                  </Link>
-                </div>
+                   <button
+                     className={`px-2 py-2 rounded-md transition-all duration-200 w-full sm:w-1/2 text-sm font-semibold border-2 border-transparent ${
+                       cartLoading[product._id]
+                         ? "bg-gray-400 cursor-not-allowed text-white"
+                         : "bg-purple-700 text-white hover:bg-white hover:text-purple-700 hover:border-purple-700"
+                     }`}
+                     onClick={() => handleAddToCart(product)}
+                     disabled={cartLoading[product._id]}
+                     aria-label="Add to cart"
+                   >
+                     {cartLoading[product._id] ? "Adding..." : "Add to Cart"}
+                   </button>
+                   <Link
+                     to={{
+                      pathname: `/viewProduct`,
+                      search: `?pid=${product._id}&${queryString.stringify(filters)}`,
+                      // state: { 
+                      //   filteredData: JSON.stringify(filters),  // Pass the actual filters state
+                      //   previousPath: location.pathname + location.search
+                      // }
+                    }}
+                     className="px-2 py-2 rounded-md transition-all duration-200 w-full sm:w-1/2 text-sm font-semibold border-2 border-transparent bg-purple-700 text-white text-center hover:bg-white hover:text-purple-700 hover:border-purple-700"
+                     aria-label="View product"
+                   >
+                     View Product
+                   </Link>
+                 </div>
+
               </div>
             ))
           ) : (
