@@ -2,8 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Product = require('./models/Product');
 const { ObjectId } = require('mongodb');
-// const bcrypt = require('bcrypt');
-// const jwt = require('jsonwebtoken');
 const User = require('./models/User');
 const Brand = require('./models/Brands');
 const Category = require('./models/Category');
@@ -18,6 +16,7 @@ const prodTypMigration = require('./migration/prodTyp-migration');
 const multer = require('multer');
 const Cart = require('./models/Cart')
 const Feedback = require('./models/Feedback');
+const Accessory = require('./models/Accessory')
 // const path = require('path');
 
 process.setMaxListeners(15);
@@ -151,6 +150,7 @@ app.get('/api/product/:pid', async (req, res) => {
 app.post('/api/product/:pid', async (req, res) => {
   try {
     const { pid } = req.params;
+
     const updatedProduct = await Product.findByIdAndUpdate(pid, req.body, { new: true });
     if (!updatedProduct) {
       return res.status(404).json({ message: 'Product not found' });
@@ -519,13 +519,17 @@ app.post("/api/register", async (req, res) => {
       lastName: req.body.lastName,
       email: req.body.email,
       phone: req.body.phone,
-      address: {
+      role: req.body.role,
+      address: [{
         street: req.body.street,
         city: req.body.city,
         state: req.body.state,
         zip: req.body.zip,
-      },
+      }],
     });
+
+    console.log(newUser);
+    
 
     await newUser.save();
     res.status(201).json({ message: "User registered successfully!" });
@@ -697,6 +701,41 @@ app.get('/api/users', async (req, res) => {
   } catch (error) {
     console.error("Error fetching users:", error);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+app.put('/api/users/:userId', upload.single('image'), async (req, res) => {
+  const { userId } = req.params;
+  const updates = req.body;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update user fields
+    Object.keys(updates).forEach((key) => {
+      if (key === 'address') {
+        user[key] = JSON.parse(updates[key]); // Parse address if it's a string
+      } else {
+        user[key] = updates[key];
+      }
+    });
+
+    // Update profile picture if a new file is uploaded
+    if (req.file) {
+      user.profilePicture = req.file.filename;
+    }
+
+    await user.save();
+
+    // Return the updated user object
+    res.status(200).json({ message: 'User updated successfully', user });
+  } catch (err) {
+    console.error("Error updating user:", err);
+    res.status(500).json({ message: 'Error updating user data', error: err.message });
   }
 });
 
@@ -935,6 +974,116 @@ app.put("/api/feedbacks/:id/disapprove", async (req, res) => {
 
 
 // feedback APIs end
+
+// accessory APIs start
+app.post('/accessories',  async (req, res) => {
+   
+    try {
+      const accessory = await Accessory.find();
+      res.json(accessory)
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+);
+
+// READ - Get all accessories (with filtering)
+app.get('/accessories', async (req, res) => {
+  try {
+    const { category, minPrice, maxPrice, brand } = req.query;
+    const filter = {};
+    
+    if (category) filter.category = category;
+    if (brand) filter.brand = brand;
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = minPrice;
+      if (maxPrice) filter.price.$lte = maxPrice;
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const accessories = await Accessory.find(filter)
+      .populate('brand', 'name')
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Accessory.countDocuments(filter);
+
+    res.json({
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      accessories
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.post('/api/accessories', async (req, res) => {
+  try {
+    console.log('Received Data:', req.body.formData); // Log the received data
+
+    const accessory = new Accessory(req.body.fromData);
+    const savedAccessory = await accessory.save();
+
+    console.log('Saved to DB:', savedAccessory); // Log the saved data
+    res.status(201).json(savedAccessory);
+  } catch (error) {
+    console.error('Error:', error.message); // Log the error
+    res.status(500).json({ message: error.message });
+  }
+});
+// READ - Get single accessory
+app.get('/accessories/:id', async (req, res) => {
+  try {
+    const accessory = await Accessory.findById(req.params.id)
+      .populate('brand', 'name logo');
+      
+    if (!accessory) {
+      return res.status(404).json({ message: 'Accessory not found' });
+    }
+    res.json(accessory);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// UPDATE - Update accessory
+app.put('/accessories/:id', async (req, res) => {
+  try {
+    const accessory = await Accessory.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!accessory) {
+      return res.status(404).json({ message: 'Accessory not found' });
+    }
+    res.json(accessory);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// DELETE - Delete accessory
+app.delete('/accessories/:id', async (req, res) => {
+  try {
+    const accessory = await Accessory.findByIdAndDelete(req.params.id);
+    if (!accessory) {
+      return res.status(404).json({ message: 'Accessory not found' });
+    }
+    res.json({ message: 'Accessory deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// accessory APIs end
 
 
 app.get('/mgrt/prod', (req, res) => {

@@ -137,10 +137,14 @@ const Products = () => {
 
         {/* Main Content */}
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex-col items-center justify-between mb-4">
             <h1 className="text-xl font-bold">Product Management System</h1>
+            <div className='flex px-2'>
             <div className="p-1">
-              <button
+            <fieldset className='border border-black p-3'>
+
+              <legend className='font-bold text-lg'>Add PC Parts:</legend>         
+                <button
                 onClick={handleAddCPUProduct}
                 className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-green-600"
               >
@@ -178,6 +182,22 @@ const Products = () => {
               >
                 <i class="fa fa-plus" aria-hidden="true"></i> PSU
               </button>
+              </fieldset>
+            </div>
+            {/* <div className='p-1'>
+              <fieldset className='border border-black p-3'>
+
+              <legend className='font-bold text-lg'>Add Accessories:</legend>
+              
+            <button
+                onClick={() => navigate('/add-keyboard')}
+                className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-green-600"
+              >
+                <i class="fa fa-plus" aria-hidden="true"></i> keyboard
+              </button>
+           
+              </fieldset>
+            </div> */}
             </div>
           </div>
 
@@ -215,6 +235,7 @@ const Products = () => {
               <thead>
                 <tr className="bg-gray-200">
                   <th className="border px-4 py-2">View</th>
+                  <th className="border px-4 py-2">Image</th>
                   <th className="border px-4 py-2">Name</th>
                   <th className="border px-4 py-2">Category</th>
                   <th className="border px-4 py-2">Price</th>
@@ -235,7 +256,10 @@ const Products = () => {
                         <i className="fa fa-eye text-blue-700" aria-hidden="true"></i>
                       </Link>
                     </td>
-                    <td className="border px-4 py-2 w-5/12">{product.name}</td>
+                    <td className="border py-2 w-1/12">
+                        <img className='' src={product.imageUrl} alt={product.imageUrl} />
+                    </td>
+                    <td className="border px-4 py-2 w-6/12">{product.name}</td>
                     <td className="border px-4 py-2">
                       {product.category.toUpperCase()}
                     </td>

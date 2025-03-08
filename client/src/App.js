@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import NotFound from './view/NotFound';
 import Home from './view/Home';
 import ShopNow from './view/ShopNow';
-import { ViewProudct } from './view/ViewProudct';
+import {ViewProduct} from './view/ViewProduct';
 import { Login } from './view/Login';
 import Register from './view/Register';
 import ClinetProfile from './view/ClientProfile';
@@ -42,7 +42,7 @@ function Layout() {
         <Route path='/register' Component={Register} /> 
         <Route path='/userProfile' Component={ClinetProfile}/>
         <Route path='/shopnow' Component={ShopNow}/>
-        <Route path='/viewProduct' Component={ViewProudct}/>
+        <Route path='/viewProduct' Component={ViewProduct}/>
         <Route path='/cart' Component={Cart}/>
         <Route path='/aboutus' Component={AboutUs}/>
         <Route path='/contactus' Component={ContactUs}/>

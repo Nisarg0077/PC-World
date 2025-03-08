@@ -4,23 +4,37 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ClipLoader } from "react-spinners"; // For loading spinner
+import { useNavigate, useLocation } from "react-router-dom";
+import queryString from 'query-string';
 
-export const ViewProudct = () => {
+export const ViewProduct = () => {
   const [product, setProduct] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [feedbackTitle, setFeedbackTitle] = useState("");
   const [feedbackDesc, setFeedbackDesc] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
+  // const [filteredData, setFilteredData] = useState([]);
+  
+  const filters = queryString.parse(location.search);
 
+  // Use filteredData and previousPath here
+  console.log('Received filters:', filters);
+
+   const putFilteredData = () => {
+      //setFilteredData(queryString.parse(filters))
+      // console.log(filters);
+      
+   }
+  
   useEffect(() => {
     const storedUser = sessionStorage.getItem("ClientUser");
+    putFilteredData();
     if (storedUser) {
       setUser(JSON.parse(storedUser));
       
     }
-
-    
-
     const getinfo = async () => {
       try {
         const params = new URLSearchParams(window.location.search);
@@ -116,6 +130,7 @@ export const ViewProudct = () => {
                 />
               </div>
 
+
               <div className="flex-1">
                 <h1 className="text-4xl font-bold text-gray-900 mb-4">{product.name}</h1>
                 <p className="text-gray-700 text-lg mb-6">{product.description}</p>
@@ -143,7 +158,12 @@ export const ViewProudct = () => {
                   </button>
                 </div>
               </div>
+                <div>
+                  <button onClick={() => navigate(`/shopnow?${queryString.stringify(filters)}`)} className="bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2 text-white font-bold rounded-md">Back</button>
+                </div>
             </div>
+
+            
 
             {product.specifications && (
               <div className="p-8 bg-gray-50">
@@ -212,7 +232,9 @@ export const ViewProudct = () => {
           </div>
         </section>
       ) : (
-        <h2 className="text-center text-lg font-semibold">Login to give Feedback</h2>
+        <div className="bg-gray-100 shadow-2xl rounded-lg px-6 py-2 mb-10">
+          <h2 className="text-center text-lg font-semibold">Login to give Feedback</h2>
+        </div>
       )}
 
 

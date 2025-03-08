@@ -33,34 +33,44 @@ export default function Navbar() {
   const toggleMobileMenu = () => setIsOpen(!isOpen);
 
   return (
-    <nav className="bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg sticky top-0 z-50">
-      <div className="container mx-auto flex items-center justify-between px-4 py-2 ">
-        <Link to="/" className="text-2xl font-bold text-white tracking-wide hover:opacity-80 transition">
+    <nav className="bg-gradient-to-r from-blue-600  to-purple-600 shadow-lg sticky top-0 z-50">
+      <div className="container mx-auto flex items-center justify-between px-4 py-1">
+        <Link to="/" className="text-2xl font-bold text-white tracking-wide hover:bg-violet-700 p-2 rounded-md hover:text-yellow-300 transition">
           PC-World
         </Link>
 
         {/* Desktop Menu */}
-        <ul className="hidden md:flex space-x-8 items-center text-white text-lg">
+        <ul className="hidden md:flex space-x-8 items-center text-white text-lg ">
           {["Home", "Shop Now", "About Us", "Contact Us"].map((item, index) => (
-            <li key={index}>
-              <Link to={item === "Home" ? "/" : `/${item.toLowerCase().replace(/\s/g, "")}`} className="hover:text-yellow-300 transition duration-200">
+            <li key={index} className="hover:bg-violet-700 h-fit p-2 rounded-md">
+              <Link to={item === "Home" ? "/" : `/${item.toLowerCase().replace(/\s/g, "")}`} className="hover:text-yellow-300 transition duration-200 font-semibold">
                 {item}
               </Link>
             </li>
           ))}
-
-          {/* Cart Icon */}
-          <li className="relative">
-            <Link to="/cart" className="flex items-center hover:text-yellow-300 transition duration-200">
-              <i className="fa fa-shopping-cart fa-lg text-white"></i>
-              <span className="ml-2 font-bold bg-red-500 text-white text-sm px-2 py-1 rounded-full">{cartCount}</span>
-            </Link>
-          </li>
+          {
+            user ? (
+              <li className="relative hover:bg-violet-700 h-fit p-2 rounded-md">
+              <Link to="/cart" className="flex items-center  hover:text-yellow-300 transition duration-200">
+                <i className="fa fa-shopping-cart fa-lg text-white"></i>
+                <span className="ml-2 font-bold bg-red-500 text-white text-sm px-2 py-1 rounded-full">{cartCount}</span>
+              </Link>
+            </li>
+            ) : (
+              <li className="md:hidden relative hover:bg-violet-700 h-fit p-2 rounded-md">
+              <Link to="/cart" className="flex items-center  hover:text-yellow-300 transition duration-200">
+                <i className="fa fa-shopping-cart fa-lg text-white"></i>
+                <span className="ml-2 font-bold bg-red-500 text-white text-sm px-2 py-1 rounded-full">{cartCount}</span>
+              </Link>
+            </li>
+            )
+          }
+          
 
           {/* User Dropdown */}
           {user ? (
-            <div className="relative">
-              <button onClick={toggleDropdown} className="ml-4 mt-2 focus:outline-none">
+              <div className="relative hover:bg-violet-700 rounded-md px-2">
+              <button onClick={toggleDropdown} className=" mt-2 focus:outline-none">
               {user.profilePicture ? (
               <div className="w-10 h-10 rounded-full border-2 border-blue-500 flex items-center justify-center bg-gray-200">
                   <img
@@ -69,6 +79,7 @@ export default function Navbar() {
                     className="w-10 h-10 object-contain rounded-full"
                   />
               </div>
+           
                 ) : (
                   <div className="w-10 h-10 rounded-full border-4 border-blue-500 flex items-center justify-center bg-gray-200">
                   <span className="text-md font-bold text-gray-600">
@@ -78,14 +89,16 @@ export default function Navbar() {
                 )}
               </button>
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-3 bg-white text-gray-800 rounded-md shadow-xl w-48 z-10">
+                <div className="absolute right-0 mt-2 bg-white text-gray-800 rounded-md shadow-xl w-48 z-10">
                   <Link to="/userProfile" className="block px-4 py-2 hover:bg-gray-100 transition">Profile</Link>
                   <button
                     onClick={() => {
                       sessionStorage.removeItem("ClientUser");
-                      navigate("/login");
+                      setIsDropdownOpen(false);
+                      navigate("/");
+                      window.location.reload();
                     }}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition"
+                    className="block w-full text-left px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-t-none rounded-md transition"
                   >
                     Logout
                   </button>
@@ -104,11 +117,25 @@ export default function Navbar() {
         {/* Mobile Menu Button */}
         <div className="md:hidden flex items-center ml-2">
           
-            <Link to="/cart" className="flex items-center justify-center hover:text-yellow-300 transition duration-200 mx-4">
-              <i className="fa fa-shopping-cart fa-lg text-white"></i>
-              <span className="ml-1 font-bold bg-red-500 text-white text-sm px-2 py-1 rounded-full">{cartCount}</span>
-            </Link>
-        
+        <ul>
+        {
+            user ? (
+              <li className="relative hover:bg-violet-700 h-fit p-2 rounded-md">
+              <Link to="/cart" className="flex items-center  hover:text-yellow-300 transition duration-200">
+                <i className="fa fa-shopping-cart fa-lg text-white"></i>
+                <span className="ml-2 font-bold bg-red-500 text-white text-sm px-2 py-1 rounded-full">{cartCount}</span>
+              </Link>
+            </li>
+            ) : (
+              <li className="hidden relative hover:bg-violet-700 h-fit p-2 rounded-md">
+              <Link to="/cart" className="flex items-center  hover:text-yellow-300 transition duration-200">
+                <i className="fa fa-shopping-cart fa-lg text-white"></i>
+                <span className="ml-2 font-bold bg-red-500 text-white text-sm px-2 py-1 rounded-full">{cartCount}</span>
+              </Link>
+            </li>
+            )
+          }
+        </ul>
           <button onClick={toggleMobileMenu} className="text-white focus:outline-none">
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -137,7 +164,9 @@ export default function Navbar() {
               <button
                 onClick={() => {
                   sessionStorage.removeItem("ClientUser");
-                  navigate("/login");
+                  setIsDropdownOpen(false);
+                  navigate("/");
+                  window.location.reload();
                 }}
                 className="block w-full text-white bg-red-600 px-4 py-2 hover:bg-red-700 transition"
               >

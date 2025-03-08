@@ -83,7 +83,7 @@ const FeedbackMgmt = () => {
               onClick={handleApproval}
               className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-green-600"
             >
-              <i className="fa fa-plus" aria-hidden="true"></i> FeedbackApproval
+              <i className="fa fa-plus" aria-hidden="true"></i> Feedback Approval
             </button>
           </div>
           {loading ? (
@@ -105,21 +105,21 @@ const FeedbackMgmt = () => {
                     feedbacks.map((feedback) => (
                       <tr key={feedback._id} className="hover:bg-gray-100">
                         <td className="border p-2">{users[feedback.userId] || "Unknown"}</td>
-                        <td className="border p-2">{feedback.productTitle}</td>
+                        <td className="border p-2 w-3/12">{feedback.productTitle}</td>
                         <td className="border p-2">{feedback.title}</td>
-                        <td className="border p-2">{feedback.description}</td>
+                        <td className="border p-2 w-3/12">{feedback.description}</td>
                         <td className="border p-2 space-x-2">
                           <button
                             onClick={() => deleteFeedback(feedback._id)}
                             className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                           >
-                            Delete
+                            <i class="fa fa-trash-o" aria-hidden="true"></i>
                           </button>
                           <button
                             onClick={() => disapproveFeedback(feedback._id)}
                             className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
                           >
-                            Disapprove
+                            <i class="fa fa-thumbs-down" aria-hidden="true"></i>
                           </button>
                         </td>
                       </tr>

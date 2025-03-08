@@ -29,14 +29,14 @@ const Sidebar = () => {
             href="/"
             className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
           >
-            <i className={`fas ${isSidebarOpen ? "fa-tachometer-alt" : "fa-chart-bar"}`}></i>
+            <i className={`fas ${isSidebarOpen ? "fa-tachometer-alt" : "fa-tachometer-alt"}`}></i>
             {isSidebarOpen && <span className="ml-3">Dashboard</span>}
           </a>
           <a
             href="/users"
             className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
           >
-            <i className={`fas ${isSidebarOpen ? "fa-users" : "fa-user-friends"}`}></i>
+            <i className={`fas ${isSidebarOpen ? "fa-users" : "fa-users"}`}></i>
             {isSidebarOpen && <span className="ml-3">Users Management</span>}
           </a>
           <a

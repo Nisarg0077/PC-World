@@ -10,8 +10,6 @@ const Cart = () => {
   const { state, dispatch } = useCart();
   const navigate = useNavigate();
 
-
-
   // Fetch user from session storage
   useEffect(() => {
     const storedUser = sessionStorage.getItem("ClientUser");
@@ -32,14 +30,13 @@ const Cart = () => {
     const updateCartCount = () => {
       if (user) fetchCart(user.id);
     };
-  
+
     window.addEventListener("cartUpdated", updateCartCount);
-  
+
     return () => {
       window.removeEventListener("cartUpdated", updateCartCount);
     };
   }, [user]);
-  
 
   const fetchCart = async (userId) => {
     setLoading(true);
@@ -57,35 +54,30 @@ const Cart = () => {
 
   const handleUpdateQuantity = async (productId, newQuantity) => {
     if (newQuantity < 1) return;
-  
-    console.log("Updating product:", productId, "New quantity:", newQuantity); 
-  
+
     setCart((prevCart) => {
       const updatedCartItems = prevCart.cartItems.map((item) =>
         item.product === productId ? { ...item, quantity: newQuantity } : item
       );
-    
+
       dispatch({
         type: "UPDATE_QUANTITY",
         payload: { product: productId, quantity: newQuantity },
       });
-    
+
       return { ...prevCart, cartItems: updatedCartItems };
     });
-    
-  
+
     try {
       await axios.put(`http://localhost:5000/api/cart/update/${user.id}/${productId}`, {
         quantity: newQuantity,
       });
-  
+
       window.dispatchEvent(new Event("cartUpdated"));
     } catch (error) {
       console.error("Failed to update quantity:", error);
     }
   };
-  
-  
 
   const handleRemoveItem = async (productId) => {
     try {
@@ -114,9 +106,9 @@ const Cart = () => {
   };
 
   return (
-    <div className="bg-gray-100 p-10 pt-0">
-      <div className="container mx-auto py-4 px-20">
-        <h2 className="text-2xl font-bold mb-4">Shopping Cart</h2>
+    <div className="bg-gray-100 p-2 sm:p-2 md:p-4">
+      <div className="container mx-auto py-2 px-2 sm:p-6 lg:p-8">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4">Shopping Cart</h2>
 
         {loading ? (
           <p>Loading cart...</p>
@@ -124,66 +116,77 @@ const Cart = () => {
           <p>Your cart is empty.</p>
         ) : (
           <>
-            <table className="table-auto w-full border-collapse border border-gray-300">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="border px-4 py-2">Image</th>
-                  <th className="border px-4 py-2">Product</th>
-                  <th className="border px-4 py-2">Price</th>
-                  <th className="border px-4 py-2">Quantity</th>
-                  <th className="border px-4 py-2">Total</th>
-                  <th className="border px-4 py-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-              {cart?.cartItems?.map((item) => (
-                    <tr key={item.product._id}>
-                      <td className="border px-4 py-2">
-                        <img className="w-20" src={item.product.imageUrl} alt={item.product.name} width="50" />
+            <div className="overflow-x-auto">
+              <table className="min-w-full border-collapse border border-gray-300">
+                <thead>
+                  <tr className="bg-gray-200">
+                    <th className="border px-2 sm:px-4 py-2 text-sm sm:text-base">Image</th>
+                    <th className="border px-2 sm:px-4 py-2 text-sm sm:text-base">Product</th>
+                    <th className="border px-2 sm:px-4 py-2 text-sm sm:text-base">Price</th>
+                    <th className="border px-2 sm:px-4 py-2 text-sm sm:text-base">Quantity</th>
+                    <th className="border px-2 sm:px-4 py-2 text-sm sm:text-base">Total</th>
+                    <th className="border px-2 sm:px-4 py-2 text-sm sm:text-base">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cart?.cartItems?.map((item) => (
+                    <tr key={item.product._id} className="text-center">
+                      <td className="border px-2 sm:px-4 py-2">
+                        <img
+                          className="w-12 sm:w-20 mx-auto"
+                          src={item.product.imageUrl}
+                          alt={item.product.name}
+                        />
                       </td>
-                      <td className="border px-4 py-2 font-bold">{item.product.name}</td>
-                      <td className="border px-4 py-2">₹{item.product.price}</td>
-                      <td className="border px-4 py-2">
-                        <button
-                          onClick={() => handleUpdateQuantity(item.product._id, item.quantity - 1)}
-                          className="px-1 py-1 bg-gray-300 rounded-md mx-1"
-                        >
-                          -
-                        </button>
-                        {item.quantity}
-                        <button
-                          onClick={() => handleUpdateQuantity(item.product._id, item.quantity + 1)}
-                          className="px-1 py-1 bg-gray-300 rounded-md mx-1"
-                        >
-                          +
-                        </button>
+                      <td className="border px-2 sm:px-4 py-2 text-sm sm:text-base font-bold">
+                        {item.product.name}
                       </td>
-                      <td className="border px-4 py-2">
-                        ₹{(item.product.price * item.quantity).toFixed(2)}
+                      <td className="border px-2 sm:px-4 py-2 text-sm sm:text-base">
+                        ₹{Intl.NumberFormat('en-IN').format(item.product.price)}
                       </td>
-                      <td className="border px-4 py-2">
+                      <td className="border px-2 sm:px-4 py-2 text-sm sm:text-base">
+                        <div className="flex items-center justify-center">
+                          <button
+                            onClick={() => handleUpdateQuantity(item.product._id, item.quantity - 1)}
+                            className="px-1 pb-1 rounded-xl mx-1 bg-gradient-to-r from-red-400 to-red-600 text-white text-xl font-bold"
+                          >
+                            -
+                          </button>
+                          <span>{item.quantity}</span>
+                          <button
+                            onClick={() => handleUpdateQuantity(item.product._id, item.quantity + 1)}
+                            className="px-1 pb-1 rounded-xl mx-1 bg-gradient-to-r from-lime-400 to-emerald-500 text-white text-xl font-bold"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </td>
+                      <td className="border px-2 sm:px-4 py-2 text-sm sm:text-base">
+                        ₹{Intl.NumberFormat('en-IN').format((item.product.price * item.quantity).toFixed(2))}
+                      </td>
+                      <td className="border px-2 sm:px-4 py-2 text-sm sm:text-base">
                         <button
                           onClick={() => handleRemoveItem(item.product._id)}
-                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                          className="bg-red-500 text-white px-2 sm:px-3 py-1 rounded hover:bg-red-600"
                         >
-                          Remove
+                          <i class="fa fa-trash-o" aria-hidden="true"></i>
                         </button>
                       </td>
                     </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
 
-              </tbody>
-            </table>
-
-            <div className="mt-6 flex justify-between items-center">
-              <h3 className="text-xl font-bold">
+            <div className="mt-6 flex flex-col sm:flex-row justify-between items-center">
+              <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-0">
                 Total: ₹
-                {cart?.cartItems?.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}
+                {Intl.NumberFormat('en-IN').format(cart?.cartItems?.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2))}
               </h3>
 
               <button
                 onClick={handleClearCart}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 font-bold"
               >
                 Clear Cart
               </button>

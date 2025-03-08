@@ -20,6 +20,7 @@ const EditProductPage = () => {
     imageUrl: "",
     specifications: {},
   });
+  
 
   const [image, setImage] = useState(null);
 
@@ -73,23 +74,61 @@ const EditProductPage = () => {
     setProductData((prevData) => ({
       ...prevData,
       [name]: value,
+      
     }));
   };
 
+  // const handleSpecificationChange = (e) => {
+  //   const { name, type, checked, value } = e.target;
+  //   const category = productData.category?.toLowerCase(); // Ensure category exists
+  
+  //   setProductData((prevData) => ({
+  //     ...prevData,
+  //     specifications: {
+  //       ...prevData.specifications,
+  //       [category]: {
+  //         ...(prevData.specifications?.[category] || {}), // Ensure category exists
+  //         [name]: value,
+  //         [name]: type === "checkbox" ? checked : value,
+  //       },
+
+  //     },
+  //   }));
+  // };
+
   const handleSpecificationChange = (e) => {
-    const { name, value } = e.target;
-    const category = productData.category.toLowerCase();
-    setProductData((prevData) => ({
-      ...prevData,
-      specifications: {
+    const { name, type, checked, value } = e.target;
+    const category = productData.category?.toLowerCase();
+  
+    setProductData((prevData) => {
+      // Ensure the correct category is being modified
+      const updatedCategorySpecs = {
+        ...(prevData.specifications?.[category] || {}), // Ensure it exists
+        [name]: type === "checkbox" ? checked : value, // Handle checkboxes properly
+      };
+  
+      // Build the new specifications object **without empty categories**
+      const updatedSpecifications = {
         ...prevData.specifications,
-        [category]: {
-          ...prevData.specifications[category],
-          [name]: value,
-        },
-      },
-    }));
+        [category]: updatedCategorySpecs,
+      };
+  
+      // Remove any categories that are still empty
+      Object.keys(updatedSpecifications).forEach((key) => {
+        if (Object.keys(updatedSpecifications[key]).length === 0) {
+          delete updatedSpecifications[key];
+        }
+      });
+  
+      return {
+        ...prevData,
+        specifications: updatedSpecifications,
+      };
+    });
   };
+  
+  
+  
 
   const handleConnectorChange = (e) => {
     const options = [...e.target.selectedOptions].map((option) => option.value);
@@ -229,95 +268,113 @@ const EditProductPage = () => {
           </>
         );
         case "psu":
+          return (
+            <>
+              <div>
+                <label htmlFor="brand" className="block font-medium mb-2">Brand</label>
+                <select
+                  id="brand"
+                  name="brand"
+                  value={productData.brand || ""}
+                  onChange={handleChange}
+                  required
+                  className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Brand</option>
+                  {brands.map((brand) => (
+                    <option key={brand._id} value={brand.name}>{brand.name}</option>
+                  ))}
+                </select>
+              </div>
+
+        {/* Ensure powerSupply exists before accessing */}
+        {["wattage", "efficiencyRating"].map((spec) => (
+          <div key={spec}>
+            <label htmlFor={spec} className="block font-medium mb-2">
+              {spec.charAt(0).toUpperCase() + spec.slice(1)}
+            </label>
+            <input
+              type="text"
+              id={spec}
+              name={spec}
+              value={specifications?.psu?.[spec] || ""}
+              onChange={handleSpecificationChange}
+              placeholder={`Enter ${spec}`}
+              required
+              className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        ))}
+
+        {/* Modular PSU */}
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            id="modular"
+            name="modular"
+            checked={!!specifications?.psu?.modular} // Ensure it's always a boolean
+            onChange={(e) =>
+              handleSpecificationChange({
+                target: { name: "modular", value: e.target.checked },
+              })
+            }
+            className="mr-2"
+          />
+          <label htmlFor="modular" className="font-medium">Modular PSU</label>
+        </div>
+
+        {/* Connectors */}
+        <div>
+          <label className="block font-medium mb-2">Connectors</label>
+          <select multiple onChange={handleConnectorChange} className="border rounded px-4 py-2 w-full">
+            {["24-pin ATX", "8-pin CPU", "6+2-pin PCIe", "SATA", "Molex"].map((conn) => (
+              <option key={conn} value={conn}>
+                {conn}
+              </option>
+            ))}
+          </select>
+        </div>
+      </>
+  );
+  case "keyboard":
   return (
     <>
-      <div>
-        <label htmlFor="brand" className="block font-medium mb-2">Brand</label>
-        <select
-          id="brand"
-          name="brand"
-          value={productData.brand || ""}
-          onChange={handleChange}
-          required
-          className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">Select Brand</option>
-          {brands.map((brand) => (
-            <option key={brand._id} value={brand.name}>{brand.name}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Ensure powerSupply exists before accessing */}
-      {["wattage", "efficiencyRating"].map((spec) => (
+      {["switchType", "layout", "keyCount"].map((spec) => (
         <div key={spec}>
           <label htmlFor={spec} className="block font-medium mb-2">
             {spec.charAt(0).toUpperCase() + spec.slice(1)}
           </label>
           <input
-            type="text"
+            type={spec === "keyCount" ? "number" : "text"}
             id={spec}
             name={spec}
-            value={specifications?.psu?.[spec] || ""}
+            value={specifications.keyboard[spec] || ""}
             onChange={handleSpecificationChange}
             placeholder={`Enter ${spec}`}
-            required
             className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       ))}
 
-      {/* Modular PSU */}
-      <div className="flex items-center">
+      <div className="mt-2 flex items-center space-x-2">
         <input
           type="checkbox"
-          id="modular"
-          name="modular"
-          checked={!!specifications?.psu?.modular} // Ensure it's always a boolean
-          onChange={(e) =>
-            handleSpecificationChange({
-              target: { name: "modular", value: e.target.checked },
-            })
-          }
-          className="mr-2"
+          id="backlit"
+          name="backlit"
+          checked={!!specifications?.keyboard?.backlit} // Ensure it's always a boolean
+            onChange={(e) =>
+              handleSpecificationChange({
+                target: { name: "backlit", value: e.target.checked },
+              })
+            }
+          className="h-5 w-5 text-blue-600"
         />
-        <label htmlFor="modular" className="font-medium">Modular PSU</label>
-      </div>
-
-      {/* Connectors */}
-      <div>
-        <label className="block font-medium mb-2">Connectors</label>
-        <select multiple onChange={handleConnectorChange} className="border rounded px-4 py-2 w-full">
-          {["24-pin ATX", "8-pin CPU", "6+2-pin PCIe", "SATA", "Molex"].map((conn) => (
-            <option key={conn} value={conn}>
-              {conn}
-            </option>
-          ))}
-        </select>
+        <label htmlFor="backlit" className="font-medium">
+          Backlit
+        </label>
       </div>
     </>
   );
-
-  // case "psu": // Ensure powerSupply is handled correctly
-  //     return Object.keys(specifications[category]).map((field) => (
-  //       <div key={field}>
-  //         <label htmlFor={field} className="block font-medium mb-2">
-  //           {field.charAt(0).toUpperCase() + field.slice(1)}
-  //         </label>
-  //         <input
-  //           type="text"
-  //           id={field}
-  //           name={field}
-  //           value={specifications[category]?.[field] || ""}
-  //           onChange={handleSpecificationChange}
-  //           placeholder={`Enter ${field}`}
-  //           className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-  //         />
-  //       </div>
-  //     ));
-
-
-        
 
       default:
         return null;
