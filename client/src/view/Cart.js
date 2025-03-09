@@ -12,7 +12,7 @@ const Cart = () => {
 
   // Fetch user from session storage
   useEffect(() => {
-    const storedUser = sessionStorage.getItem("ClientUser");
+    const storedUser = sessionStorage.getItem("clientUser");
     if (!storedUser) {
       navigate("/login");
       return;

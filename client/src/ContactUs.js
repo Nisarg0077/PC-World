@@ -15,13 +15,10 @@ const ContactUs = () => {
                 <p>Office: 456 IT Park, surat, Gujarat 395007</p>
                 <p><i class="fa fa-phone" aria-hidden="true"></i><strong> Helpline No:</strong> +91 123 456 789</p>
                 <p><i class="fa fa-envelope text-black"></i> <strong>Email:</strong> support@pcworld.com</p>
-                <p><i class="fa fa-globe" aria-hidden="true"></i> <strong>Website:</strong> <a href="https://www.pc-world.com" className="text-blue-600 hover:underline">www.pcworld.com</a></p>
         
                 <h3 className="text-lg font-semibold mt-4">Business Hours:</h3>
                 <p>8:00 AM - 6:00 PM</p>
                 </div>
-        
-                <p className="text-gray-600 mt-6">We look forward to assisting you!</p>
             </div>
       </div>
     );

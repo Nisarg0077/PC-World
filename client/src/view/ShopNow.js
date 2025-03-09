@@ -11,8 +11,8 @@ const ShopNow = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState(""); // Temporary search input value
-  const [search, setSearch] = useState(""); // Actual search term used for filtering
+  const [searchQuery, setSearchQuery] = useState(""); 
+  const [search, setSearch] = useState("");
   const [user, setUser] = useState(null);
   const [cartLoading, setCartLoading] = useState({});
   const [categories, setCategories] = useState([]);
@@ -20,7 +20,8 @@ const ShopNow = () => {
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const catname = queryParams.get("catname") || "";
-
+  // const searchFromViewProducts = queryParams.get("search") || "";
+  
 
   const filteredParams = {};
   queryParams.forEach((value, key) => {
@@ -59,13 +60,22 @@ const ShopNow = () => {
     modularity: filteredParams.modularity || "",
   }));
   
-  console.log("Filters State:", filters);
+  // console.log("Filters State:", filters);
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const searchFromViewProducts = queryParams.get("search") || "";
+  
+    setSearch(searchFromViewProducts);
+    setSearchQuery(searchFromViewProducts); // Ensure the input field updates
+  }, [location.search]);  // Run whenever the URL changes
+  
   
   useEffect(() => {
     const filtersFromViewProduct = location.state?.filters;
-    console.log(filtersFromViewProduct)
+    // console.log(filtersFromViewProduct)
     if (filtersFromViewProduct) {
       setFilters(filtersFromViewProduct);
+      // setSearchQuery(searchFromViewProducts)
       // Optional: Clear the state after using it
       navigate({ ...location, state: null });
     }
@@ -100,16 +110,14 @@ const ShopNow = () => {
     setFilters(newFilters);
   };
 
-  // Handle search button click
   const handleSearch = () => {
     if (searchQuery.trim() === "") {
       toast.info("Please enter a search term.");
       return;
     }
-    setSearch(searchQuery); // Update the actual search term
+    setSearch(searchQuery);
   };
-
-  // Filter products based on search and filters
+  
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const {
@@ -232,8 +240,10 @@ const ShopNow = () => {
             type="text"
             placeholder="Search product"
             className="border border-gray-400 p-2 w-full max-w-md rounded-md"
-            onChange={(e) => setSearchQuery(e.target.value)} // Update temporary search query
-            value={searchQuery} // Bind to temporary search query
+            onChange={(e) => {
+              setSearchQuery(e.target.value )
+            }} // Update temporary search query
+            value={searchQuery } // Bind to temporary search query
             aria-label="Search product"
           />
           <button
@@ -282,7 +292,7 @@ const ShopNow = () => {
                    <Link
                      to={{
                       pathname: `/viewProduct`,
-                      search: `?pid=${product._id}&${queryString.stringify(filters)}`,
+                      search: `?pid=${product._id}&${queryString.stringify(filters)}&search=${search}`,
                       // state: { 
                       //   filteredData: JSON.stringify(filters),  // Pass the actual filters state
                       //   previousPath: location.pathname + location.search

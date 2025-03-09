@@ -17,8 +17,8 @@ const multer = require('multer');
 const Cart = require('./models/Cart')
 const Feedback = require('./models/Feedback');
 const Accessory = require('./models/Accessory')
-// const path = require('path');
-
+const path = require('path');
+const nodemailer = require("nodemailer");
 process.setMaxListeners(15);
 
 const uri = 'mongodb://127.0.0.1:27017/pc-world'; 
@@ -37,9 +37,9 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
 
 
 
-  const path = require('path');
-  app.use('/images', express.static('images'));
+  // app.use('/images', express.static('images'));
   app.use('/images', express.static(path.join(__dirname, 'images')));
+  // app.use('/images/aadhar', express.static(path.join(__dirname, 'images')));
 
 
   const storage = multer.diskStorage({
@@ -48,8 +48,12 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
       cb(null, Date.now() + path.extname(file.originalname));
     },
   });
+
+
   
+
   const upload = multer({ storage });
+  // const uploadAadhar = multer({ storage: aadharImageStorage });
 
 app.get('/', (req, res) => {
   res.send("Hello");
@@ -492,7 +496,34 @@ app.post('/api/user/login', async (req, res) => {
     if (password !== user.password) {
       return res.status(401).json({ message: 'Invalid password' });
     }
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      auth: {
+        user: 'nisarglimbachiya028@gmail.com', // Replace with your email
+        pass: 'axeptrcseciqqdbf' // Replace with your email password or app password
+      }
+    });
 
+    const mailOptions = {
+      from: 'nisarglimbachiya028@gmail.com',
+      to: user.email, // Send email to the registered user
+      subject: 'LogIn successful',
+      html: ` <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; text-align: center;">
+      <h1 style="color: #333;">Welcome, ${user.firstName}!</h1>
+      <p style="font-size: 16px; color: #555;">Your Login was successful.</p>
+    </div>`
+    };
+
+    // Send the email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
     return res.status(200).json({
       message: 'Login successful',
       user: {
@@ -510,33 +541,116 @@ app.post('/api/user/login', async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
-app.post("/api/register", async (req, res) => {
+app.post("/api/register", upload.fields([{ name: 'aadharFront', maxCount: 1 }, { name: 'aadharBack', maxCount: 1 }]), async (req, res) => {
+ 
   try {
+//     console.log('Processed Body:', JSON.stringify(req.body, null, 2));
+// console.log('Office Address:', req.body.officeAddress);
+// console.log('Residential Address:', req.body.address);
+    
+    // if (!req.body.officeAddress) {
+    //   return res.status(400).json({ error: "Office address is required." });
+    // }
+    // // Check if residential address is provided
+    // if (!req.body.address) {
+    //   return res.status(400).json({ error: "Residential address is required." });
+    // }
     const newUser = new User({
       username: req.body.username,
-      password: req.body.password,
+      password: req.body.password,  // Now securely hashed
       firstName: req.body.firstName,
       lastName: req.body.lastName,
+      dob: new Date(req.body.dob), // Ensure date format is correct
+      gender: req.body.gender, // Ensure date format is correct
+      phoneNumber: req.body.phoneNumber,
+      designation: req.body.designation,
+      jobProfile: req.body.jobProfile,
+      orgName: req.body.orgName,
+      officeAddress: {
+        officeBuilding: req.body['officeAddress.officeBuilding'],
+        officeStreet: req.body['officeAddress.officeStreet'],
+        officeCity: req.body['officeAddress.officeCity'],
+        officeState: req.body['officeAddress.officeState'],
+        officePinCode: req.body['officeAddress.officePinCode']
+      },
       email: req.body.email,
-      phone: req.body.phone,
-      role: req.body.role,
-      address: [{
-        street: req.body.street,
-        city: req.body.city,
-        state: req.body.state,
-        zip: req.body.zip,
-      }],
+      
+      address: {
+        building: req.body['address.building'],
+        street: req.body['address.street'],
+        city: req.body['address.city'],
+        state: req.body['address.state'],
+        pinCode: req.body['address.pinCode']
+      },    
+      aadharNumber: req.body.aadharNumber,
+      aadharFront: req.files['aadharFront'] ? req.files['aadharFront'][0].filename : null,
+      aadharBack: req.files['aadharBack'] ? req.files['aadharBack'][0].filename : null,
+      role: 'client'
     });
-
-    console.log(newUser);
     
 
     await newUser.save();
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      auth: {
+        user: 'nisarglimbachiya028@gmail.com', // Replace with your email
+        pass: 'axeptrcseciqqdbf' // Replace with your email password or app password
+      }
+    });
+
+    const mailOptions = {
+      from: 'nisarglimbachiya028l@gmail.com',
+      to: req.body.email, // Send email to the registered user
+      subject: 'Welcome to Our PC-World!',
+      html: ` <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; text-align: center;">
+      <h1 style="color: #333;">Welcome, ${req.body.firstName}!</h1>
+      <p style="font-size: 16px; color: #555;">Your registration was successful.</p>
+      <p style="font-size: 16px; color: #333;"><strong>Username:</strong> ${req.body.username}</p>
+      <p style="font-size: 16px; color: #555;">Thank you for registering with us.</p>
+    </div>`
+    };
+
+    // Send the email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
+
+
     res.status(201).json({ message: "User registered successfully!" });
+
   } catch (error) {
-    res.status(500).json({ error: "Error registering user" });
+    if (error.code === 11000) {
+      res.status(409).json({ error: "Username, email, or Aadhar number already exists." });
+    } else {
+      console.error(error);
+      res.status(500).json({ error: "Error registering user" });
+    }
   }
 });
+
+
+app.post('/api/uploadAadhar', upload.fields([{ name: 'aadharFront', maxCount: 1 }, { name: 'aadharBack', maxCount: 1 }]), (req, res) => {
+  if (!req.files) {
+    return res.status(400).json({ error: 'No files uploaded' });
+  }
+
+  console.log('Files:', req.files); // Debugging
+  console.log('Body:', req.body); // Debugging
+
+  res.json({
+    aadharFront: req.files['aadharFront'] ? req.files['aadharFront'][0].filename : null,
+    aadharBack: req.files['aadharBack'] ? req.files['aadharBack'][0].filename : null,
+  });
+});
+
+
 
 app.post('/api/admin/user', async (req, res) => {
   try {
@@ -559,27 +673,61 @@ app.post('/api/admin/user', async (req, res) => {
     res.status(500).json({ error: "Failed to fetch AdminUser" });
   }
 });
+// app.post('/api/client/user', async (req, res) => {
+//   try {
+//     const { username } = req.body;
+//     console.log(username);
+    
+
+//     if (!username) {
+//       return res.status(400).json({ error: "Username is required" });
+//     }
+
+//     const user = await User.findOne({ username, role: 'client' });
+
+//     if (!user) {
+//       return res.status(404).json({ error: "user not found" });
+//     }
+
+//     res.json(user);
+//     console.log(user);
+//   } catch (error) {
+//     console.error("Error fetching User:", error);
+//     res.status(500).json({ error: "Failed to fetch User" });
+//   }
+// });
+
 app.post('/api/client/user', async (req, res) => {
   try {
     const { username } = req.body;
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
 
     if (!username) {
       return res.status(400).json({ error: "Username is required" });
     }
 
-    const user = await User.findOne({ username, role: 'client' });
+    const user = await User.findOne({ username, role: 'client' }).lean();
 
     if (!user) {
-      return res.status(404).json({ error: "user not found" });
+      return res.status(404).json({ error: "User not found" });
     }
 
-    res.json(user);
-    console.log(user);
+    // Create new object with image URLs
+    const userWithImages = {
+      ...user,
+      aadharFront: user.aadharFront ? `${baseUrl}/images/${user.aadharFront}` : null,
+      aadharBack: user.aadharBack ? `${baseUrl}/images/${user.aadharBack}` : null
+    };
+
+    res.json(userWithImages);
+
   } catch (error) {
     console.error("Error fetching User:", error);
     res.status(500).json({ error: "Failed to fetch User" });
   }
 });
+
+
 
 
 app.post("/api/cart/add", async (req, res) => {
@@ -705,9 +853,45 @@ app.get('/api/users', async (req, res) => {
 });
 
 
-app.put('/api/users/:userId', upload.single('image'), async (req, res) => {
+// app.put('/api/users/:userId', upload.fields([{ name: 'aadharFront', maxCount: 1 }, { name: 'aadharBack', maxCount: 1 }]), async (req, res) => {
+//   const { userId } = req.params;
+//   const fromData = req.body;
+
+//   try {
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+
+//     // Update user fields
+//     Object.keys(fromData).forEach((key) => {
+//       if (key === 'address') {fromData
+//         user[key] = JSON.parse(fromData[key]); // Parse address if it's a string
+//       } else {
+//         user[key] = fromData[key];
+//       }
+//     });
+
+//     // Update profile picture if a new file is uploaded
+//     if (req.file) {
+//       user.profilePicture = req.file.filename;
+//     }
+
+//     await user.save();
+
+//     // Return the updated user object
+//     res.status(200).json({ message: 'User updated successfully', user });
+//   } catch (err) {
+//     console.error("Error updating user:", err);
+//     res.status(500).json({ message: 'Error updating user data', error: err.message });
+//   }
+// });
+
+app.put('/api/users/:userId', upload.fields([
+  { name: 'aadharFront', maxCount: 1 }, 
+  { name: 'aadharBack', maxCount: 1 }
+]), async (req, res) => {
   const { userId } = req.params;
-  const updates = req.body;
 
   try {
     const user = await User.findById(userId);
@@ -715,31 +899,50 @@ app.put('/api/users/:userId', upload.single('image'), async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Update user fields
-    Object.keys(updates).forEach((key) => {
-      if (key === 'address') {
-        user[key] = JSON.parse(updates[key]); // Parse address if it's a string
-      } else {
-        user[key] = updates[key];
+    // Handle nested address fields
+    const addressFields = ['building', 'street', 'city', 'state', 'pinCode'];
+    const officeAddressFields = ['officeBuilding', 'officeStreet', 'officeCity', 'officeState', 'officePinCode'];
+
+    // Update regular fields
+    Object.keys(req.body).forEach(key => {
+      if (user[key] !== undefined && !key.startsWith('address.') && !key.startsWith('officeAddress.')) {
+        user[key] = req.body[key];
       }
     });
 
-    // Update profile picture if a new file is uploaded
-    if (req.file) {
-      user.profilePicture = req.file.filename;
+    // Update address
+    addressFields.forEach(field => {
+      const key = `address.${field}`;
+      if (req.body[key] !== undefined) {
+        user.address[field] = req.body[key];
+      }
+    });
+
+    // Update officeAddress
+    officeAddressFields.forEach(field => {
+      const key = `officeAddress.${field}`;
+      if (req.body[key] !== undefined) {
+        user.officeAddress[field] = req.body[key];
+      }
+    });
+
+    // Handle file updates
+    if (req.files) {
+      if (req.files['aadharFront']) {
+        user.aadharFront = req.files['aadharFront'][0].filename;
+      }
+      if (req.files['aadharBack']) {
+        user.aadharBack = req.files['aadharBack'][0].filename;
+      }
     }
 
     await user.save();
-
-    // Return the updated user object
     res.status(200).json({ message: 'User updated successfully', user });
   } catch (err) {
     console.error("Error updating user:", err);
     res.status(500).json({ message: 'Error updating user data', error: err.message });
   }
 });
-
-
 
 // DELETE API to delete a user by ID
 app.delete('/api/users/:id', async (req, res) => {

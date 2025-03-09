@@ -10,7 +10,7 @@ const ClinetProfile = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const storedClient = sessionStorage.getItem("ClientUser");
+      const storedClient = sessionStorage.getItem("clientUser");
         
       if (!storedClient) {
         console.error("clientUser not found in sessionStorage");
@@ -20,14 +20,14 @@ const ClinetProfile = () => {
   
       try {
         const parsedAdmin = JSON.parse(storedClient);
-        console.log("Fetching user:", parsedAdmin.username);  // ✅ Debugging
+        // console.log("Fetching user:", parsedAdmin.username);  // ✅ Debugging
         
         const response = await axios.post("http://localhost:5000/api/client/user", {
           username: parsedAdmin.username
         });
   
         if (response.data) {
-          console.log("User data received:", response.data);  // ✅ Debugging
+          // console.log("User data received:", response.data);  // ✅ Debugging
           setUser(response.data);
         } else {
           console.error("Empty user data received");
@@ -73,7 +73,7 @@ const ClinetProfile = () => {
               
                 ) : (
                  
-                  <span className="text-md font-bold text-gray-600">
+                  <span className="text-md font-bold text-gray-600 text-6xl">
                     {user?.firstName?.charAt(0).toUpperCase()}
                   </span>
                 )}
@@ -92,7 +92,7 @@ const ClinetProfile = () => {
                   <span className="font-semibold">Email:</span> {user?.email}
                 </p>
                 <p className="text-lg text-gray-700">
-                  <span className="font-semibold">Phone:</span> {user?.phone}
+                  <span className="font-semibold">Phone:</span> {user?.phoneNumber}
                 </p>
               </div>
             </div>
@@ -100,16 +100,43 @@ const ClinetProfile = () => {
             {/* Address Section */}
             <div className="mt-6">
               <h3 className="text-xl font-semibold text-gray-800">Address</h3>
-              {user?.address?.[0] ? (
+              {user?.address? (
                 <>
-                  <p className="text-lg text-gray-700">{user.address[0].street}</p>
+                  <p className="text-lg text-gray-700">{user.address.building},</p>
+                  <p className="text-lg text-gray-700">{user.address.street},</p>
                   <p className="text-lg text-gray-700">
-                    {user.address[0].city}, {user.address[0].state} - {user.address[0].zip}
+                    {user.address.city}, {user.address.state} - {user.address.pinCode}
                   </p>
                 </>
               ) : (
                 <p className="text-lg text-gray-700">No address available.</p>
               )}
+            </div>
+            <div className="mt-6">
+              <h3 className="text-xl font-semibold text-gray-800">Office Address</h3>
+              {user?.officeAddress? (
+                <>
+                  <p className="text-lg text-gray-700">{user.officeAddress.officeBuilding},</p>
+                  <p className="text-lg text-gray-700">{user.officeAddress.officeStreet},</p>
+                  <p className="text-lg text-gray-700">
+                    {user.officeAddress.officeCity}, {user.officeAddress.officeState} - {user.officeAddress.officePinCode}
+                  </p>
+                </>
+              ) : (
+                <p className="text-lg text-gray-700">No address available.</p>
+              )}
+            </div>
+            <div className="mt-6">
+              <h3 className="text-xl font-semibold text-gray-800">Aadhar Card Information</h3>
+
+            <p className="text-lg text-gray-700 ">Aadhar Number: <span>{user.aadharNumber}</span></p>
+
+
+            <h3 className="text-xl font-semibold text-gray-800 mt-2">Aadhar Card Images</h3>
+            <img className="w-2/5 my-2" src={`${user.aadharFront}`} alt={user.aadharFront} />
+            <img className="w-2/5 my-2" src={`${user.aadharBack}`} alt={user.aadharBack} />
+      
+             
             </div>
 
             {/* Account Info */}
@@ -128,7 +155,7 @@ const ClinetProfile = () => {
               </Link>
               <button 
               onClick={() => {
-                sessionStorage.removeItem("ClientUser");
+                sessionStorage.removeItem("clientUser");
                 navigate("/login");
               }}
               className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">

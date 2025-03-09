@@ -1,4 +1,6 @@
-
+* {
+  transition: all 500 ease-in-out;
+}
 /* Style the scrollbar for the main content */
 ::-webkit-scrollbar {
     width: 4px;

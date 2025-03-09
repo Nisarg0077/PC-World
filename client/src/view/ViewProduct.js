@@ -18,9 +18,13 @@ export const ViewProduct = () => {
   // const [filteredData, setFilteredData] = useState([]);
   
   const filters = queryString.parse(location.search);
+  const queryParams = new URLSearchParams(location.search);
+  const search = queryParams.get("search") || "";
 
+  console.log(search);
+  
   // Use filteredData and previousPath here
-  console.log('Received filters:', filters);
+  // console.log('Received filters:', filters);
 
    const putFilteredData = () => {
       //setFilteredData(queryString.parse(filters))
@@ -159,7 +163,7 @@ export const ViewProduct = () => {
                 </div>
               </div>
                 <div>
-                  <button onClick={() => navigate(`/shopnow?${queryString.stringify(filters)}`)} className="bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2 text-white font-bold rounded-md">Back</button>
+                  <button onClick={() => navigate(`/shopnow?${queryString.stringify(filters)}&search=${search}`)} className="bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2 text-white font-bold rounded-md">Back</button>
                 </div>
             </div>
 
