@@ -28,7 +28,9 @@ import Feedback from '../src/components/Feedback/FeedbackMgmt';
 import FeedbackApproval from './components/Feedback/FeedbackApproval';
 import AddMouseProduct from './components/Products/AddMouseProduct';
 import AddKeyboardProduct from './components/Products/AddKeyboardProduct';
-
+import AddMonitorProduct from './components/Products/AddMonitorProducts';
+import AddPcCaseProduct from './components/Products/AddPcCaseProduct';
+import AddCpuCoolerProduct from './components/Products/AddCpuCoolerProduct';
 function Layout() {
   const location = useLocation();
 
@@ -52,6 +54,9 @@ function Layout() {
         <Route path='/add-psu' Component={AddPSUProduct} />
         <Route path='/add-mouse' Component={AddMouseProduct} />
         <Route path='/add-keyboard' Component={AddKeyboardProduct} />
+        <Route path='/add-monitor' Component={AddMonitorProduct} />
+        <Route path='/add-pccase' Component={AddPcCaseProduct} />
+        <Route path='/add-cpucooler' Component={AddCpuCoolerProduct} />
         <Route path='/product-info' Component={ProductInfo} />
         <Route path='/edit-product' Component={EditProductPage} />
         <Route path='/categories' Component={categoriesMgmt} />

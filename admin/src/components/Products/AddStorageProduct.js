@@ -22,7 +22,7 @@ const AddStorageProduct = () => {
         type: '',
         interface: '',
         capacity: '',
-        rpm: '',
+        speed: '',
       },
     },
   });
@@ -113,7 +113,7 @@ const AddStorageProduct = () => {
             type: '',
             interface: '',
             capacity: '',
-            rpm: '',
+            speed: '',
           },
         },
       });
@@ -166,7 +166,7 @@ const AddStorageProduct = () => {
               </select>
             </div>
 
-            {['type', 'interface', 'capacity', 'rpm'].map((spec) => (
+            {['type', 'interface', 'capacity', 'speed'].map((spec) => (
               <div key={spec}>
                 <label htmlFor={spec} className="block font-medium mb-2">
                   {spec.charAt(0).toUpperCase() + spec.slice(1)}

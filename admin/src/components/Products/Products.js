@@ -1,18 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from '../Sidebar';
 import axios from 'axios';
 
 const Products = () => {
+const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const currentPageFromURL = Number(queryParams.get("page")) || 1;
+
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState('name'); // 'name', 'price', 'stock'
-  const [sortOrder, setSortOrder] = useState('asc'); // 'asc' or 'desc'
-  const [currentPage, setCurrentPage] = useState(1); // Current page
-  const [itemsPerPage, setItemsPerPage] = useState(10); // Items per page
-  const [totalPages, setTotalPages] = useState(1); // Total pages
-  const navigate = useNavigate();
+  const [sortField, setSortField] = useState('name');
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [currentPage, setCurrentPage] = useState(currentPageFromURL);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Sync page state with URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const page = Number(params.get('page')) || 1;
+    if(page){
+      setCurrentPage(page);
+    }
+  }, [location.search]);
 
   // Check AdminUser session
   useEffect(() => {
@@ -54,34 +67,14 @@ const Products = () => {
     }
   };
 
-  // Handle Edit
+  // Handle Edit with page preservation
   const handleEdit = (id) => {
-    navigate(`/edit-product?pid=${id}`);
+    navigate(`/edit-product?pid=${id}&page=${currentPage}`);
   };
 
-  // Handle Add Product
-  const handleAddCPUProduct = () => {
-    navigate('/add-cpu');
-  };
-
-  const handleAddGPUProduct = () => {
-    navigate('/add-gpu');
-  };
-
-  const handleAddMotherboardProduct = () => {
-    navigate('/add-motherboard');
-  };
-
-  const handleAddRamProduct = () => {
-    navigate('/add-ram');
-  };
-
-  const handleAddStorageProduct = () => {
-    navigate('/add-storage');
-  };
-
-  const handleAddPSUProduct = () => {
-    navigate('/add-psu');
+  // Handle page change with URL update
+  const handlePageChange = (page) => {
+    navigate(`?page=${page}`);
   };
 
   // Handle Search
@@ -93,7 +86,7 @@ const Products = () => {
     );
     setFilteredData(filtered);
     setTotalPages(Math.ceil(filtered.length / itemsPerPage));
-    setCurrentPage(1); // Reset to the first page
+    handlePageChange(1); // Reset to first page when searching
   };
 
   // Handle Sorting
@@ -109,26 +102,42 @@ const Products = () => {
         : b[sortField].localeCompare(a[sortField]);
     });
     setFilteredData(sortedData);
-    setTotalPages(Math.ceil(sortedData.length / itemsPerPage));
-    setCurrentPage(1); // Reset to the first page
   };
 
-  // Trigger sorting whenever sortField or sortOrder changes
   useEffect(() => {
     handleSort();
   }, [sortField, sortOrder]);
-
-  // Handle page change
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
 
   // Get current page products
   const currentPageData = filteredData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
+  
+  
+  const handleAddCPUProduct = () => {
+    navigate('/add-cpu');
+  };
+  
+  const handleAddGPUProduct = () => {
+    navigate('/add-gpu');
+  };
+  
+  const handleAddMotherboardProduct = () => {
+    navigate('/add-motherboard');
+  };
+  
+  const handleAddRamProduct = () => {
+    navigate('/add-ram');
+  };
+  
+  const handleAddStorageProduct = () => {
+    navigate('/add-storage');
+  };
+  
+  const handleAddPSUProduct = () => {
+    navigate('/add-psu');
+  };
   return (
     <div className="h-screen flex flex-col">
       <div className="flex flex-1">
@@ -141,63 +150,87 @@ const Products = () => {
             <h1 className="text-xl font-bold">Product Management System</h1>
             <div className='flex px-2'>
             <div className="p-1">
-            <fieldset className='border border-black p-3'>
+            <fieldset className='border border-black p-3 bg-green-100'>
 
               <legend className='font-bold text-lg'>Add PC Parts:</legend>         
                 <button
                 onClick={handleAddCPUProduct}
-                className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-green-600"
+                className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-white hover:text-green-500 font-bold"
               >
                 <i class="fa fa-plus" aria-hidden="true"></i> CPU
               </button>
 
               <button
                 onClick={handleAddGPUProduct}
-                className="bg-green-500 text-white px-2 py-2 rounded hover:bg-green-600"
+                className="bg-green-500 text-white px-2 py-2 rounded hover:bg-white hover:text-green-500 font-bold"
               >
                 <i class="fa fa-plus" aria-hidden="true"></i> GPU
               </button>
               <button
                 onClick={handleAddMotherboardProduct}
-                className="bg-green-500 ml-2 text-white px-2 py-2 rounded hover:bg-green-600"
+                className="bg-green-500 ml-2 text-white px-2 py-2 rounded hover:bg-white hover:text-green-500 font-bold"
               >
                 <i class="fa fa-plus" aria-hidden="true"></i> Motherboard
               </button>
               <button
                 onClick={handleAddRamProduct}
-                className="bg-green-500 ml-2 text-white px-2 py-2 rounded hover:bg-green-600"
+                className="bg-green-500 ml-2 text-white px-2 py-2 rounded hover:bg-white hover:text-green-500 font-bold"
               >
                 <i class="fa fa-plus" aria-hidden="true"></i> RAM
               </button>
               <button
                 onClick={handleAddStorageProduct}
-                className="bg-green-500 ml-2 text-white px-2 py-2 rounded hover:bg-green-600"
+                className="bg-green-500 ml-2 text-white px-2 py-2 rounded hover:bg-white hover:text-green-500 font-bold"
               >
                 <i class="fa fa-plus" aria-hidden="true"></i> Storage
               </button>
 
               <button
                 onClick={handleAddPSUProduct}
-                className="bg-green-500 ml-2 text-white px-2 py-2 rounded hover:bg-green-600"
+                className="bg-green-500 ml-2 text-white px-2 py-2 rounded hover:bg-white hover:text-green-500 font-bold"
               >
                 <i class="fa fa-plus" aria-hidden="true"></i> PSU
               </button>
               </fieldset>
             </div>
-            {/* <div className='p-1'>
-              <fieldset className='border border-black p-3'>
+            <div className='p-1'>
+              <fieldset className='border border-black p-3 bg-green-100'>
 
               <legend className='font-bold text-lg'>Add Accessories:</legend>
               
             <button
                 onClick={() => navigate('/add-keyboard')}
-                className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-green-600"
+                className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-white hover:text-green-500 font-bold"
               >
-                <i class="fa fa-plus" aria-hidden="true"></i> keyboard
+                <i class="fa fa-plus" aria-hidden="true"></i> Keyboard
               </button>
+            <button
+                onClick={() => navigate('/add-mouse')}
+                className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-white hover:text-green-500 font-bold"
+              >
+                <i class="fa fa-plus" aria-hidden="true"></i> Mouse
+              </button>
+            <button
+                onClick={() => navigate('/add-monitor')}
+                className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-white hover:text-green-500 font-bold"
+              >
+                <i class="fa fa-plus" aria-hidden="true"></i> Monitor
+              </button>
+            <button
+                onClick={() => navigate('/add-pccase')}
+                className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-white hover:text-green-500 font-bold"
+              >
+                <i class="fa fa-plus" aria-hidden="true"></i> PC Case
+              </button>
+            {/* <button
+                onClick={() => navigate('/add-cpucooler')}
+                className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-white hover:text-green-500 font-bold"
+              >
+                <i class="fa fa-plus" aria-hidden="true"></i> CPU Cooler
+              </button> */}
            
               </fieldset>
-            </div> */}
+            </div>
             </div>
           </div>
 
@@ -259,7 +292,7 @@ const Products = () => {
                     <td className="border py-2 w-1/12">
                         <img className='' src={product.imageUrl} alt={product.imageUrl} />
                     </td>
-                    <td className="border px-4 py-2 w-6/12">{product.name}</td>
+                    <td className="border px-4 py-2 w-4/12">{product.name}</td>
                     <td className="border px-4 py-2">
                       {product.category.toUpperCase()}
                     </td>

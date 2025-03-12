@@ -33,7 +33,7 @@ export const ViewProduct = () => {
    }
   
   useEffect(() => {
-    const storedUser = sessionStorage.getItem("ClientUser");
+    const storedUser = sessionStorage.getItem("clientUser");
     putFilteredData();
     if (storedUser) {
       setUser(JSON.parse(storedUser));
