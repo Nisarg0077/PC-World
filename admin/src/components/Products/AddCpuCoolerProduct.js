@@ -5,11 +5,11 @@ import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const AddMouseProduct = () => {
+const AddCpuCoolerProduct = () => {
   const navigate = useNavigate();
-  const [mouseData, setMouseData] = useState({
+  const [cpuCoolerData, setCpuCoolerData] = useState({
     name: '',
-    category: 'mouse',
+    category: 'cpu_cooler',
     brand: '',
     model: '',
     description: '',
@@ -17,13 +17,14 @@ const AddMouseProduct = () => {
     stock: '',
     imageUrl: '',
     specifications: {
-      mouse: {
-        dpi: '',
-        buttons: '',
-        sensorType: '',
-        connectivity: '',
-        weight: '',
-      }
+        cpuCooler: {
+            type: '',
+            fanSize: '',
+            rpm: '',
+            compatibility: '',
+            dimensions: '',
+            weight: '',
+        }
     },
   });
 
@@ -52,7 +53,7 @@ const AddMouseProduct = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setMouseData((prevData) => ({
+    setCpuCoolerData((prevData) => ({
       ...prevData,
       [name]: name === 'price' || name === 'stock' ? parseFloat(value) || '' : value,
     }));
@@ -60,15 +61,14 @@ const AddMouseProduct = () => {
 
   const handleSpecificationChange = (e) => {
     const { name, value } = e.target;
-    setMouseData((prevData) => ({
+    setCpuCoolerData((prevData) => ({
       ...prevData,
       specifications: {
         ...prevData.specifications,
-        mouse: {
-          ...prevData.specifications.mouse,
-          [name]: name === 'dpi' || name === 'buttons' || name === 'weight' ? parseFloat(value) || '' : value,
-        },
+        [name]: value,
+        [name]: name === "rpm" && value === "" ? "N/A" : value,
       },
+      
     }));
   };
 
@@ -76,7 +76,7 @@ const AddMouseProduct = () => {
     const file = e.target.files[0];
     if (file) {
       setImage(file);
-      setMouseData(prev => ({ ...prev, imageUrl: file.name }));
+      setCpuCoolerData((prev) => ({ ...prev, imageUrl: file.name }));
     }
   };
 
@@ -92,18 +92,17 @@ const AddMouseProduct = () => {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
 
-        const updatedMouseData = {
-          ...mouseData,
-          imageUrl: uploadResponse.data.imageUrl
+        const updatedCpuCoolerData = {
+          ...cpuCoolerData,
+          imageUrl: uploadResponse.data.imageUrl,
         };
 
-        await axios.post('http://localhost:5000/api/productsin', updatedMouseData);
-        toast.success('Mouse Product added successfully!');
+        await axios.post('http://localhost:5000/api/productsin', updatedCpuCoolerData);
+        toast.success('CPU Cooler added successfully!');
 
-        // Reset Form
-        setMouseData({
+        setCpuCoolerData({
           name: '',
-          category: 'mouse',
+          category: 'cpu_cooler',
           brand: '',
           model: '',
           description: '',
@@ -111,20 +110,21 @@ const AddMouseProduct = () => {
           stock: '',
           imageUrl: '',
           specifications: {
-            mouse: {
-              dpi: '',
-              buttons: '',
-              sensorType: '',
-              connectivity: '',
-              weight: '',
+            cpuCooler: {
+                type: '',
+                fanSize: '',
+                rpm: '',
+                compatibility: '',
+                dimensions: '',
+                weight: '',
             }
           },
         });
         setImage(null);
       }
     } catch (error) {
-      console.error('Error adding Mouse product:', error);
-      toast.error('Failed to add Mouse product.');
+      console.error('Error adding CPU Cooler:', error);
+      toast.error('Failed to add CPU Cooler.');
     }
   };
 
@@ -134,7 +134,7 @@ const AddMouseProduct = () => {
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
-          <h1 className="text-2xl font-bold mb-4">Add Mouse Product</h1>
+          <h1 className="text-2xl font-bold mb-4">Add CPU Cooler</h1>
           <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4">
             {['name', 'model', 'description', 'price', 'stock'].map((field) => (
               <div key={field}>
@@ -145,7 +145,7 @@ const AddMouseProduct = () => {
                   type={field === 'price' || field === 'stock' ? 'number' : 'text'}
                   id={field}
                   name={field}
-                  value={mouseData[field]}
+                  value={cpuCoolerData[field]}
                   onChange={handleChange}
                   placeholder={`Enter ${field}`}
                   required
@@ -159,7 +159,7 @@ const AddMouseProduct = () => {
               <select
                 id="brand"
                 name="brand"
-                value={mouseData.brand}
+                value={cpuCoolerData.brand}
                 onChange={handleChange}
                 required
                 className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -169,66 +169,49 @@ const AddMouseProduct = () => {
                 ))}
               </select>
             </div>
-
-            {['dpi', 'buttons', 'weight'].map((spec) => (
-              <div key={spec}>
-                <label htmlFor={spec} className="block font-medium mb-2">
-                  {spec.charAt(0).toUpperCase() + spec.slice(1)}
-                </label>
-                <input
-                  type="number"
-                  id={spec}
-                  name={spec}
-                  value={mouseData.specifications.mouse[spec]}
-                  onChange={handleSpecificationChange}
-                  placeholder={`Enter ${spec}`}
-                  required={spec !== 'weight'}
-                  className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            ))}
-
-            <div>
-              <label htmlFor="sensorType" className="block font-medium mb-2">Sensor Type</label>
+            {/* <div>
+              <label htmlFor="brand" className="block font-medium mb-2">cooler Type</label>
               <select
-                id="sensorType"
-                name="sensorType"
-                value={mouseData.specifications.mouse.sensorType}
-                onChange={handleSpecificationChange}
+                id={cpuCoolerData.category}
+                name={cpuCoolerData.category}
+                value={cpuCoolerData.brand}
+                onChange={handleChange}
                 required
-                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Sensor Type</option>
-                <option value="Optical">Optical</option>
-                <option value="Laser">Laser</option>
-                <option value="Trackball">Trackball</option>
+                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Select Brand</option>
+                {brands.map((brand) => (
+                  <option key={brand._id} value={brand.name}>{brand.name}</option>
+                ))}
               </select>
             </div>
+             */}
 
-            <div>
-              <label htmlFor="connectivity" className="block font-medium mb-2">Connectivity</label>
-              <select
-                id="connectivity"
-                name="connectivity"
-                value={mouseData.specifications.mouse.connectivity}
-                onChange={handleSpecificationChange}
-                required
-                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Connectivity</option>
-                <option value="Wired">Wired</option>
-                <option value="Wireless">Wireless</option>
-                <option value="Bluetooth">Bluetooth</option>
-              </select>
-            </div>
+            {["compatibility", "dimensions", "weight"].map((field) => (
+  <div key={field}>
+    <label htmlFor={field} className="block font-medium mb-2">
+      {field.charAt(0).toUpperCase() + field.slice(1)}
+    </label>
+    <input
+      type="text"
+      id={field}
+      name={field}
+      value={cpuCoolerData.specifications[field]}
+      onChange={handleSpecificationChange}
+      placeholder={`Enter ${field}`}
+      required
+      className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+))}
+
 
             <div>
               <label htmlFor="image" className="block font-medium mb-2">Upload Image</label>
-              <input type="file" id="image" accept="image/*" onChange={handleImageChange} required className="border rounded px-4 py-2 w-full" />
+              <input type="file" id="image" accept="image/*" onChange={handleImageChange} className="border rounded px-4 py-2 w-full" />
             </div>
 
             <button type="submit" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
-              Add Mouse Product
+              Add CPU Cooler
             </button>
           </form>
         </main>
@@ -237,4 +220,4 @@ const AddMouseProduct = () => {
   );
 };
 
-export default AddMouseProduct;
+export default AddCpuCoolerProduct;

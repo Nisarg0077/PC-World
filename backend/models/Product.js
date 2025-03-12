@@ -1,135 +1,3 @@
-// const mongoose = require("mongoose");
-
-// // RAM Schema
-// const ramSchema = new mongoose.Schema(
-//   {
-//     type: String,
-//     speed: String,
-//     capacity: Number,
-//     modules: Number,
-//     casLatency: String,
-//   },
-//   { _id: false }
-// );
-
-// // Storage Schema
-// const storageSchema = new mongoose.Schema(
-//   {
-//     type: String,
-//     interface: String,
-//     capacity: String,
-//     rpm: Number,
-//   },
-//   { _id: false }
-// );
-
-// // Power Supply Schema (PSU)
-// const powerSupplySchema = new mongoose.Schema(
-//   {
-//     wattage: Number,
-//     efficiencyRating: String,
-//     modular: { type: Boolean, default: false }, // True for modular PSUs
-//     connectors: [String], // List of available connectors
-//   },
-//   { _id: false }
-// );
-
-// // Accessory Schema
-// const accessorySchema = new mongoose.Schema(
-//   {
-//     type: {
-//       type: String,
-//       enum: ["Keyboard", "Mouse", "Headset", "Monitor", "Webcam", "Speaker", "Other"],
-//       required: true,
-//     },
-//     interface: String,
-//     compatibility: [String],
-//     dimensions: String,
-//     weight: Number,
-//     features: [String],
-//     keyboard: {
-//       switchType: String,
-//       layout: String,
-//       keyCount: Number,
-//       backlit: Boolean,
-//     },
-//     mouse: {
-//       dpi: Number,
-//       buttons: Number,
-//       sensorType: String,
-//     },
-//     headset: {
-//       driverSize: Number,
-//       frequencyResponse: String,
-//       microphone: Boolean,
-//     },
-//     monitor: {
-//       screenSize: Number,
-//       resolution: String,
-//       refreshRate: Number,
-//       panelType: String,
-//     },
-//   },
-//   { _id: false }
-// );
-
-// // Specification Schema
-// const specificationSchema = new mongoose.Schema(
-//   {
-//     cpu: {
-//       manufacturer: String,
-//       cores: Number,
-//       threads: Number,
-//       baseClock: Number,
-//       boostClock: Number,
-//       socket: String,
-//       cache: String,
-//     },
-//     gpu: {
-//       manufacturer: String,
-//       vram: Number,
-//       vramType: String,
-//       coreClock: Number,
-//       memoryClock: Number,
-//       interface: String,
-//     },
-//     ram: ramSchema, // Embedded RAM schema
-//     motherboard: {
-//       manufacturer: String,
-//       socket: String,
-//       chipset: String,
-//       formFactor: String,
-//       memorySlots: Number,
-//       storageInterfaces: String,
-//     },
-//     storage: storageSchema, // Embedded Storage schema
-//     desktopCase: {
-//       brand: String,
-//       formFactor: String,
-//       material: String,
-//     },
-//     psu: powerSupplySchema, // Embedded Power Supply schema
-//     accessory: accessorySchema, // Embedded Accessory schema
-//   },
-//   { _id: false }
-// );
-
-// // Product Schema
-// const productSchema = new mongoose.Schema({
-//   name: { type: String, required: true },
-//   category: { type: String, enum: ['cpu', 'gpu', 'ram', 'storage', 'keyboard', 'mouse', 'monitor'] },
-//   brand: { type: String, required: true },
-//   model: { type: String, required: true },
-//   description: String,
-//   price: { type: Number, required: true },
-//   stock: { type: Number, default: 0 },
-//   imageUrl: String,
-//   specifications: specificationSchema, // Embedding specifications
-//   createdAt: { type: Date, default: Date.now },
-//   updatedAt: { type: Date, default: Date.now },
-// });
-
-// module.exports = mongoose.model("Product", productSchema);
 const mongoose = require("mongoose");
 
 // RAM Schema
@@ -150,7 +18,7 @@ const storageSchema = new mongoose.Schema(
     type: String,
     interface: String,
     capacity: String,
-    rpm: Number,
+    speed: Number,
   },
   { _id: false }
 );
@@ -183,32 +51,58 @@ const mouseSchema = new mongoose.Schema(
     dpi: Number,
     buttons: Number,
     sensorType: String,
+    connectivity: String,
+    weight: String
   },
   { _id: false }
 );
 
 // Headset Schema
-const headsetSchema = new mongoose.Schema(
-  {
-    driverSize: Number,
-    frequencyResponse: String,
-    microphone: Boolean,
-  },
-  { _id: false }
-);
+// const headsetSchema = new mongoose.Schema(
+//   {
+//     driverSize: Number,
+//     frequencyResponse: String,
+//     microphone: Boolean,
+//   },
+//   { _id: false }
+// );
 
+
+const pcCaseSchema = new mongoose.Schema({
+    formFactor: { type: String, required: true }, // ATX, Micro-ATX, Mini-ITX
+    material: { type: String, required: true },
+    dimensions: { type: String, required: true }, // e.g., "450mm x 210mm x 470mm"
+    weight: { type: Number, required: true }, // in kg
+    fanSupport: { type: String, required: true }, // e.g., "3x 120mm front, 1x 120mm rear"
+    radiatorSupport: { type: String, required: true }, // e.g., "Up to 360mm front, 240mm top"
+    gpuClearance: { type: Number, required: true }, // in mm
+    cpuCoolerClearance: { type: Number, required: true }, // in mm
+    psuSupport: { type: String, required: true }, // e.g., "ATX, SFX"
+  },{ _id: false });
+
+const cpuCoolerSchema = new mongoose.Schema({
+    coolerType: {type: String, enum: ["Air", "Liquid"], required: true}, // Air or Liquid
+    fanSize: {type: String},
+    rpm: {type: Number, default: "N/A"},
+    compatibility: {type: String, required: true},
+    dimensions: {type: String, required: true},
+    weight: {type: Number, required: true},
+},{_id: false});
 // Monitor Schema
 const monitorSchema = new mongoose.Schema(
   {
-    screenSize: Number,
-    resolution: String,
-    refreshRate: Number,
-    panelType: String,
+    screenSize: { type: String, required: true },
+    resolution: { type: String, required: true },
+    refreshRate: { type: Number, default: 60 },
+    panelType: { type: String, enum: ["IPS", "VA", "TN", "OLED"], required: true },
+    responseTime: { type: Number },
+    hdrSupport: { type: Boolean, default: false }, 
+    adaptiveSync: { type: String, enum: ["G-Sync", "FreeSync", "None"]},
+    ports: { type: [String] }, 
   },
   { _id: false }
 );
 
-// Specification Schema
 const specificationSchema = new mongoose.Schema(
   {
     cpu: {
@@ -244,23 +138,20 @@ const specificationSchema = new mongoose.Schema(
       material: String,
     },
     psu: powerSupplySchema,
-
-    // Global Accessories
     keyboard: keyboardSchema,
     mouse: mouseSchema,
-    headset: headsetSchema,
     monitor: monitorSchema,
+    pcCase: pcCaseSchema,
+    cpuCooler: cpuCoolerSchema
   },
   { _id: false }
 );
-
-// Product Schema
 const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     category: { 
       type: String, 
-      enum: ['cpu', 'gpu', 'ram', 'storage', 'keyboard', 'mouse', 'monitor', 'headset'], 
+      enum: ['cpu', 'gpu', 'ram', 'storage', 'keyboard', 'mouse', 'monitor', 'PC Case', 'cpu_cooler'], 
       required: true 
     },
     brand: { type: String, required: true },
@@ -272,7 +163,8 @@ const productSchema = new mongoose.Schema(
     specifications: specificationSchema,
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
-  }
+  },
+
 );
 
 // Ensure updatedAt updates automatically

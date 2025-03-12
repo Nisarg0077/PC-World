@@ -40,14 +40,6 @@ export default function Register() {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
 
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [name]: value,
-  //   }));
-  // };
-
 
   const [usernameModified, setUsernameModified] = useState(false);
 

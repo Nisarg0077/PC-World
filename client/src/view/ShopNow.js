@@ -83,7 +83,7 @@ const ShopNow = () => {
 
   // Initialize user and fetch products
   useEffect(() => {
-    const storedUser = sessionStorage.getItem("ClientUser");
+    const storedUser = sessionStorage.getItem("clientUser");
     if (storedUser) setUser(JSON.parse(storedUser));
 
     const getProducts = async () => {

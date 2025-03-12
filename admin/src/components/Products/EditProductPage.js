@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams  } from "react-router-dom";
 import axios from "axios";
 import Sidebar from "../Sidebar";
 import { toast, ToastContainer } from "react-toastify";
@@ -21,11 +21,14 @@ const EditProductPage = () => {
     specifications: {},
   });
   
+  
 
   const [image, setImage] = useState(null);
 
   const queryParams = new URLSearchParams(location.search);
   const pid = queryParams.get("pid");
+  const prevPage = queryParams.get("page");
+//  console.log(prevPage);
  
   useEffect(() => {
     if (!pid) {
@@ -46,11 +49,7 @@ const EditProductPage = () => {
         const fetchedData = res.data;
   
         // Ensure powerSupply exists in specifications
-        if (!fetchedData.specifications.psu) {
-          fetchedData.specifications.psu = {};
-        }
-  
-        setProductData(fetchedData);
+         setProductData(fetchedData);
       })
       .catch((error) => {
         console.error("Error fetching product data:", error);
@@ -130,19 +129,60 @@ const EditProductPage = () => {
   
   
 
-  const handleConnectorChange = (e) => {
-    const options = [...e.target.selectedOptions].map((option) => option.value);
-    setProductData((prevData) => ({
-      ...prevData,
-      specifications: {
-        ...prevData.specifications,
+  // const handleConnectorChange = (e) => {
+  //   const options = [...e.target.selectedOptions].map((option) => option.value);
+  //   setProductData((prevData) => ({
+  //     ...prevData,
+  //     specifications: {
+  //       ...prevData.specifications,
+  //       psu: {
+  //         ...prevData.specifications.psu,
+  //         connectors: options,
+  //       },
+  //     },
+  //   }));
+  // };
+
+//   const handleConnectorChange = (e) => {
+//   const options = [...e.target.selectedOptions].map((option) => option.value);
+//   setProductData((prevData) => ({
+//     ...prevData,
+//     specifications: {
+//       ...prevData.specifications,
+//       ...(prevData.specifications.psu && {
+//         psu: { ...prevData.specifications.psu, connectors: options },
+//       }),
+//     },
+//   }));
+// };
+const handleConnectorChange = (e) => {
+  const options = [...e.target.selectedOptions].map((option) => option.value);
+
+  setProductData((prevData) => {
+    // Destructure existing specifications
+    let updatedSpecifications = { ...prevData.specifications };
+
+    // Only update PSU specifications if the product is a PSU
+    if (prevData.category === "PSU") {
+      updatedSpecifications = {
+        ...updatedSpecifications,
         psu: {
-          ...prevData.specifications.psu,
+          ...updatedSpecifications.psu,
           connectors: options,
         },
-      },
-    }));
-  };
+      };
+    } else {
+      // Remove `psu` if it's incorrectly added to other products
+      delete updatedSpecifications.psu;
+    }
+
+    return {
+      ...prevData,
+      specifications: updatedSpecifications,
+    };
+  });
+};
+
 
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
@@ -169,12 +209,14 @@ const EditProductPage = () => {
       await axios.post(`http://localhost:5000/api/product/${pid}`, finalProductData);
       console.log("Data", finalProductData);
       alert("Product updated successfully!");
-      navigate("/products");
+      navigate(`/products?page=${prevPage}`);
     } catch (error) {
       toast.error("Failed to update product.");
     }
   };
-
+  const handleBack = () => {
+    navigate(`/products?page=${prevPage}`);
+  }
   const renderSpecificationFields = () => {
     const { category, specifications } = productData;
     if (!specifications[category]) return null;
@@ -227,7 +269,7 @@ const EditProductPage = () => {
       case "storage":
         return (
           <>
-            {["type", "interface", "capacity", "rpm"].map((field) => (
+            {["type", "interface", "capacity", "speed"].map((field) => (
               <div key={field}>
                 <label htmlFor={field} className="block font-medium mb-2">
                   {field.charAt(0).toUpperCase() + field.slice(1)}
@@ -375,10 +417,69 @@ const EditProductPage = () => {
       </div>
     </>
   );
+  case "mouse":
+    return(
+      <>
+        {['dpi', 'buttons', 'weight'].map((spec) => (
+              <div key={spec}>
+                <label htmlFor={spec} className="block font-medium mb-2">
+                  {spec.charAt(0).toUpperCase() + spec.slice(1)}
+                </label>
+                <input
+                  type="number"
+                  id={spec}
+                  name={spec}
+                  value={specifications.mouse[spec]}
+                  onChange={handleSpecificationChange}
+                  placeholder={`Enter ${spec}`}
+                  required={spec !== 'weight'}
+                  className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            ))}
+
+            <div>
+              <label htmlFor="sensorType" className="block font-medium mb-2">Sensor Type</label>
+              <select
+                id="sensorType"
+                name="sensorType"
+                value={specifications.mouse.sensorType}
+                onChange={handleSpecificationChange}
+                required
+                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Sensor Type</option>
+                <option value="Optical">Optical</option>
+                <option value="Laser">Laser</option>
+                <option value="Trackball">Trackball</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="connectivity" className="block font-medium mb-2">Connectivity</label>
+              <select
+                id="connectivity"
+                name="connectivity"
+                value={specifications.mouse.connectivity}
+                onChange={handleSpecificationChange}
+                required
+                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Connectivity</option>
+                <option value="Wired">Wired</option>
+                <option value="Wireless">Wireless</option>
+                <option value="Bluetooth">Bluetooth</option>
+              </select>
+            </div>
+      </>
+    );
 
       default:
         return null;
     }
+
+
+   
   };
 
   return (
@@ -389,7 +490,10 @@ const EditProductPage = () => {
          
            <Sidebar />
          <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
+           <div className="flex justify-between px-4 mb-2">
            <h1 className="text-2xl font-bold mb-4">Edit Product</h1>
+           <button className="bg-green-500 py-0 px-3 text-white rounded-md" onClick={handleBack}>Back</button>
+           </div>
            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4">
              {['name', 'model', 'description', 'price', 'stock'].map((field) => (
               <div key={field}>

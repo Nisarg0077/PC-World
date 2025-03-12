@@ -181,7 +181,6 @@ app.delete('/api/products/:id', async (req, res) => {
 
     // Find and delete the product
     const deletedProduct = await Product.findByIdAndDelete(id);
-
     if (!deletedProduct) {
       return res.status(404).json({ error: 'Product not found' });
     }
@@ -196,6 +195,8 @@ app.delete('/api/products/:id', async (req, res) => {
 app.post('/api/productsin', upload.single('image'), async (req, res) => {
   try {
     const formData = req.body;
+    console.log(formData);
+    
 
     if (req.file) {
       formData.imageUrl = req.file.filename; // Save only the filename in the database
@@ -509,10 +510,10 @@ app.post('/api/user/login', async (req, res) => {
     const mailOptions = {
       from: 'nisarglimbachiya028@gmail.com',
       to: user.email, // Send email to the registered user
-      subject: 'LogIn successful',
+      subject: 'LogIn successful at PC-World',
       html: ` <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; text-align: center;">
       <h1 style="color: #333;">Welcome, ${user.firstName}!</h1>
-      <p style="font-size: 16px; color: #555;">Your Login was successful.</p>
+      <p style="font-size: 16px; color: #555;">Your Login was successful on PC-World.</p>
     </div>`
     };
 
