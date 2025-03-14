@@ -15,9 +15,11 @@ const cartReducer = (state, action) => {
           loading: false,
         };
       case "ADD_ITEM":
+        
         return {
           ...state,
           cartItems: [...state.cartItems, action.payload],
+          
         };
       case "REMOVE_ITEM":
         return {
@@ -77,13 +79,16 @@ export const CartProvider = ({ children }) => {
         console.error("Failed to fetch cart:", error);
       }
     };
-  
+    
+    const clearCart = () => {
+      dispatch({ type: "CLEAR_CART" });
+    };
     // Get total cart count
     const cartCount = state.cartItems.reduce((total, item) => total + item.quantity, 0);
 
   
     return (
-        <CartContext.Provider value={{ state, dispatch, fetchCart, cartCount }}>
+        <CartContext.Provider value={{ state, dispatch, fetchCart, cartCount, clearCart  }}>
         {children}
       </CartContext.Provider>
     );

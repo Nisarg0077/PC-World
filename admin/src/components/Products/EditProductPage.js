@@ -21,9 +21,21 @@ const EditProductPage = () => {
     specifications: {},
   });
   
+  const [specifications, setSpecifications] = useState({
+    cpuCooler: {
+      coolerType: "",
+      fanSize: "",
+      rpm: "",
+      compatibility: "",
+      dimensions: "",
+      weight: "",
+    },
+  });
+  
   
 
   const [image, setImage] = useState(null);
+  const availablePorts = ['HDMI', 'DisplayPort', 'USB-C', 'DVI', 'VGA'];
 
   const queryParams = new URLSearchParams(location.search);
   const pid = queryParams.get("pid");
@@ -47,7 +59,7 @@ const EditProductPage = () => {
       .get(`http://localhost:5000/api/product/${pid}`)
       .then((res) => {
         const fetchedData = res.data;
-  
+        
         // Ensure powerSupply exists in specifications
          setProductData(fetchedData);
       })
@@ -77,90 +89,126 @@ const EditProductPage = () => {
     }));
   };
 
-  // const handleSpecificationChange = (e) => {
-  //   const { name, type, checked, value } = e.target;
-  //   const category = productData.category?.toLowerCase(); // Ensure category exists
-  
-  //   setProductData((prevData) => ({
-  //     ...prevData,
-  //     specifications: {
-  //       ...prevData.specifications,
-  //       [category]: {
-  //         ...(prevData.specifications?.[category] || {}), // Ensure category exists
-  //         [name]: value,
-  //         [name]: type === "checkbox" ? checked : value,
-  //       },
+//   const handleSpecificationChange = (e) => {
+//     const { name, type, checked, value } = e.target;
+//     const category = productData.category?.toLowerCase();
 
-  //     },
-  //   }));
-  // };
+//     setProductData((prevData) => {
+//         let updatedSpecifications = { ...prevData.specifications };
+//         const categorySpecs = updatedSpecifications[category] || {};
 
-  const handleSpecificationChange = (e) => {
-    const { name, type, checked, value } = e.target;
-    const category = productData.category?.toLowerCase();
-  
-    setProductData((prevData) => {
-      // Ensure the correct category is being modified
-      const updatedCategorySpecs = {
-        ...(prevData.specifications?.[category] || {}), // Ensure it exists
-        [name]: type === "checkbox" ? checked : value, // Handle checkboxes properly
-      };
-  
-      // Build the new specifications object **without empty categories**
-      const updatedSpecifications = {
-        ...prevData.specifications,
-        [category]: updatedCategorySpecs,
-      };
-  
-      // Remove any categories that are still empty
-      Object.keys(updatedSpecifications).forEach((key) => {
-        if (Object.keys(updatedSpecifications[key]).length === 0) {
-          delete updatedSpecifications[key];
-        }
-      });
-  
-      return {
-        ...prevData,
-        specifications: updatedSpecifications,
-      };
-    });
-  };
-  
-  
-  
 
-  // const handleConnectorChange = (e) => {
-  //   const options = [...e.target.selectedOptions].map((option) => option.value);
-  //   setProductData((prevData) => ({
-  //     ...prevData,
-  //     specifications: {
-  //       ...prevData.specifications,
-  //       psu: {
-  //         ...prevData.specifications.psu,
-  //         connectors: options,
-  //       },
-  //     },
-  //   }));
-  // };
+//         if (!updatedSpecifications.pcCase) {
+//           updatedSpecifications.pcCase = {};  // Ensure it exists
+//       }
+//       updatedSpecifications.pcCase[name] = type === "checkbox" ? checked : value;
 
-//   const handleConnectorChange = (e) => {
-//   const options = [...e.target.selectedOptions].map((option) => option.value);
-//   setProductData((prevData) => ({
-//     ...prevData,
-//     specifications: {
-//       ...prevData.specifications,
-//       ...(prevData.specifications.psu && {
-//         psu: { ...prevData.specifications.psu, connectors: options },
-//       }),
-//     },
-//   }));
+
+//       if (!updatedSpecifications.cpuCooler) {
+//         updatedSpecifications.cpuCooler = {};  // Ensure it exists
+//     }
+//     updatedSpecifications.cpuCooler[name] = type === "checkbox" ? checked : value;
+//         if (category === 'monitor' && name === 'ports') {
+//             let updatedPorts = Array.isArray(categorySpecs.ports) ? [...categorySpecs.ports] : [];
+
+//             if (checked) {
+//                 if (!updatedPorts.includes(value)) {
+//                     updatedPorts.push(value);
+//                 }
+//             } else {
+//                 updatedPorts = updatedPorts.filter((port) => port !== value);
+//             }
+
+//             updatedSpecifications = {
+//                 ...updatedSpecifications,
+//                 [category]: {
+//                     ...categorySpecs,
+//                     ports: updatedPorts,
+//                 },
+//             };
+//         } else {
+//             updatedSpecifications = {
+//                 ...updatedSpecifications,
+//                 [category]: {
+//                     ...categorySpecs,
+//                     [name]: type === 'checkbox' ? checked : value,
+                    
+//                 },
+//             };
+//         }
+
+//         Object.keys(updatedSpecifications).forEach((key) => {
+//             if (Object.keys(updatedSpecifications[key]).length === 0) {
+//                 delete updatedSpecifications[key];
+//             }
+//         });
+
+//         return {
+//             ...prevData,
+//             specifications: updatedSpecifications,
+//         };
+//     });
 // };
+
+
+const handleSpecificationChange = (e) => {
+  const { name, type, checked, value } = e.target;
+  const category = productData.category?.toLowerCase();
+
+  if (!category) return; // Ensure category exists before updating
+
+  setProductData((prevData) => {
+    console.log("Category:", category);
+    console.log("Updating field:", name, "with value:", value);
+
+    let updatedSpecifications = { ...prevData.specifications };
+
+    // Ensure category exists before updating
+    if (!updatedSpecifications[category]) {
+      updatedSpecifications[category] = {};
+    }
+
+    // If category is "cpu cooler", update only its specifications
+    if (category === "pc case") {
+      updatedSpecifications.pcCase = {
+        ...(updatedSpecifications.pcCase || {}),
+        [name]: type === "checkbox" ? checked : value,
+      };
+    } else {
+      updatedSpecifications[category] = {
+        ...(updatedSpecifications[category] || {}),
+        [name]: type === "checkbox" ? checked : value,
+      };
+    }
+    if (category === "cpu cooler") {
+      updatedSpecifications["cpuCooler"] = {
+        ...(updatedSpecifications["cpuCooler"] || {}),
+        [name]: type === "checkbox" ? checked : value,
+      };
+    } else {
+      updatedSpecifications[category][name] = type === "checkbox" ? checked : value;
+    }
+
+    return {
+      ...prevData,
+      specifications: updatedSpecifications,
+    };
+  });
+};
+
+
+
+
+
+
 const handleConnectorChange = (e) => {
   const options = [...e.target.selectedOptions].map((option) => option.value);
 
   setProductData((prevData) => {
     // Destructure existing specifications
     let updatedSpecifications = { ...prevData.specifications };
+
+   
 
     // Only update PSU specifications if the product is a PSU
     if (prevData.category === "PSU") {
@@ -197,6 +245,8 @@ const handleConnectorChange = (e) => {
         const formData = new FormData();
         formData.append("image", image);
 
+        
+
         const uploadResponse = await axios.post("http://localhost:5000/api/upload", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
@@ -204,10 +254,24 @@ const handleConnectorChange = (e) => {
         imageUrl = uploadResponse.data.imageUrl;
       }
 
-      const finalProductData = { ...productData, imageUrl };
+      // const finalProductData = { ...productData, imageUrl };
+      const cleanSpecifications = Object.entries(productData.specifications).reduce(
+        (acc, [key, value]) => {
+          if (Object.keys(value).length > 0) {
+            acc[key] = value;
+          }
+          return acc;
+        }, {}
+      );
+  
+      const finalProductData = { 
+        ...productData, 
+        specifications: cleanSpecifications,
+        imageUrl 
+      };
 
       await axios.post(`http://localhost:5000/api/product/${pid}`, finalProductData);
-      console.log("Data", finalProductData);
+      // console.log("Data", finalProductData);
       alert("Product updated successfully!");
       navigate(`/products?page=${prevPage}`);
     } catch (error) {
@@ -219,9 +283,8 @@ const handleConnectorChange = (e) => {
   }
   const renderSpecificationFields = () => {
     const { category, specifications } = productData;
-    if (!specifications[category]) return null;
-    console.log(category);
-    console.log(specifications);
+    if (!specifications || !category) return null;
+    
     
     switch (category) {
       case "cpu":
@@ -473,7 +536,232 @@ const handleConnectorChange = (e) => {
             </div>
       </>
     );
+    case "monitor":
+      return(
+        <>
+           <div>
+                            <label htmlFor="screenSize" className="block font-medium mb-2">Screen Size (in inches)</label>
+                            <input
+                                type="text"
+                                id="screenSize"
+                                name="screenSize"
+                                value={specifications.monitor.screenSize}
+                                onChange={handleSpecificationChange}
+                                placeholder="Enter screen size"
+                                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
 
+                        <div>
+                            <label htmlFor="resolution" className="block font-medium mb-2">Resolution</label>
+                            <input
+                                type="text"
+                                id="resolution"
+                                name="resolution"
+                                value={specifications.monitor.resolution}
+                                onChange={handleSpecificationChange}
+                                placeholder="Enter resolution (e.g. 1920x1080)"
+                                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="refreshRate" className="block font-medium mb-2">Refresh Rate (Hz)</label>
+                            <input
+                                type="number"
+                                id="refreshRate"
+                                name="refreshRate"
+                                value={specifications.monitor.refreshRate}
+                                onChange={handleSpecificationChange}
+                                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="panelType" className="block font-medium mb-2">Panel Type</label>
+                            <input
+                                type="text"
+                                id="panelType"
+                                name="panelType"
+                                value={specifications.monitor.panelType}
+                                onChange={handleSpecificationChange}
+                                placeholder="Enter panel type (e.g. IPS, TN, VA)"
+                                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="responseTime" className="block font-medium mb-2">Response Time (ms)</label>
+                            <input
+                                type="number"
+                                id="responseTime"
+                                name="responseTime"
+                                value={specifications.monitor.responseTime}
+                                onChange={handleSpecificationChange}
+                                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="hdrSupport" className="block font-medium mb-2">HDR Support</label>
+                            <select
+                                id="hdrSupport"
+                                name="hdrSupport"
+                                value={specifications.monitor.hdrSupport}
+                                onChange={handleSpecificationChange}
+                                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value={false}>No</option>
+                                <option value={true}>Yes</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label htmlFor="adaptiveSync" className="block font-medium mb-2">Adaptive Sync</label>
+                            <select
+                                id="adaptiveSync"
+                                name="adaptiveSync"
+                                value={specifications.monitor.adaptiveSync}
+                                onChange={handleSpecificationChange}
+                                className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="None">None</option>
+                                <option value="G-Sync">G-Sync</option>
+                                <option value="FreeSync">FreeSync</option>
+                            </select>
+                        </div>
+
+                        <div>
+                        <label className="block font-medium mb-2">Ports</label>
+                        {availablePorts.map((port) => (
+                            <div key={port} className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id={port}
+                                    name="ports"
+                                    value={port}
+                                    checked={Array.isArray(specifications.monitor.ports) && specifications.monitor.ports.includes(port)}
+                                    onChange={handleSpecificationChange}
+                                    className="mr-2"
+                                />
+                                <label htmlFor={port}>{port}</label>
+                            </div>
+                        ))}
+                    </div>
+        </>
+      );
+
+      case 'PC Case':
+    return (
+        <>
+        <div>
+             {[
+                'formFactor', 
+                'material', 
+                'dimensions', 
+                'weight', 
+                'fanSupport', 
+                'radiatorSupport', 
+                'gpuClearance', 
+                'cpuCoolerClearance', 
+                'psuSupport'
+              ].map((spec) => (
+                <div key={spec}>
+                  <label htmlFor={spec} className="block font-medium mb-2">
+                    {spec.replace(/([A-Z])/g, ' $1').trim()}
+                  </label>
+                  <input
+                    type={['weight', 'gpuClearance', 'cpuCoolerClearance'].includes(spec) ? 'number' : 'text'}
+                    id={spec}
+                    name={spec}
+                    value={specifications.pcCase[spec]}
+                    onChange={handleSpecificationChange}
+                    placeholder={`Enter ${spec.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
+                    required
+                    className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    step={spec === 'weight' ? 0.1 : 1}
+                  />
+                </div>
+              ))}
+            </div>
+        </>
+    );
+  //   case 'cpu cooler':
+  // return (
+  //   <>
+  //     <div>
+  //       <label htmlFor="coolerType" className="block font-medium mb-2">
+  //         Cooler Type
+  //       </label>
+  //       <select
+  //         id="coolerType"
+  //         name="coolerType"
+  //         value={specifications.cpuCooler?.coolerType || ""}
+  //         onChange={handleSpecificationChange}
+  //         required
+  //         className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+  //       >
+  //         <option value="">Select Cooler Type</option>
+  //         <option value="Air">Air Cooler</option>
+  //         <option value="Liquid">Liquid Cooler</option>
+  //       </select>
+  //     </div>
+
+  //     {['fanSize', 'rpm', 'compatibility', 'dimensions', 'weight'].map((spec) => (
+  //       <div key={spec}>
+  //         <label htmlFor={spec} className="block font-medium mb-2">
+  //           {spec.charAt(0).toUpperCase() + spec.slice(1)}
+  //         </label>
+  //         <input
+  //           type="text"
+  //           id={spec}
+  //           name={spec}
+  //           value={specifications.cpuCooler?.[spec] || ""}
+  //           onChange={handleSpecificationChange}
+  //           className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+  //         />
+  //       </div>
+  //     ))}
+  //   </>
+  // );
+
+    case "cpu cooler":
+  return (
+    <>
+      <div>
+        <label htmlFor="coolerType" className="block font-medium mb-2">Cooler Type</label>
+        <select
+          id="coolerType"
+          name="coolerType"
+          value={specifications.cpuCooler?.coolerType || ""}
+          onChange={handleSpecificationChange}
+          required
+          className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Select Cooler Type</option>
+          <option value="Air">Air Cooler</option>
+          <option value="Liquid">Liquid Cooler</option>
+        </select>
+      </div>
+
+      {['fanSize', 'rpm', 'compatibility', 'dimensions', 'weight'].map((spec) => (
+        <div key={spec}>
+          <label htmlFor={spec} className="block font-medium mb-2">
+            {spec.charAt(0).toUpperCase() + spec.slice(1)}
+          </label>
+          <input
+  type="text"
+  id={spec}
+  name={spec}
+  value={specifications.cpuCooler?.[spec] || ""}
+  onChange={handleSpecificationChange}
+  className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+/>
+
+        </div>
+      ))}
+    </>
+  );
       default:
         return null;
     }
@@ -527,9 +815,22 @@ const handleConnectorChange = (e) => {
               />
             </div>
 
-            <button type="submit" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
-              Save Changes
-            </button>
+            <div className="flex justify-between mt-4">
+    <button
+      type="button"
+      onClick={handleBack}
+      className="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400"
+    >
+      Back
+    </button>
+    
+    <button
+      type="submit"
+      className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
+    >
+      Save Changes
+    </button>
+  </div>
           </form>
         </main>
       </div>

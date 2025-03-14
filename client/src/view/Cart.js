@@ -94,6 +94,10 @@ const Cart = () => {
       console.error("Failed to remove item:", error);
     }
   };
+  const handleCheckout = () => {
+    console.log(cart.cartItems)
+    navigate("/checkout", { state: { cartItems: cart.cartItems } });
+  };
 
   const handleClearCart = async () => {
     try {
@@ -142,7 +146,7 @@ const Cart = () => {
                         {item.product.name}
                       </td>
                       <td className="border px-2 sm:px-4 py-2 text-sm sm:text-base">
-                        ₹{Intl.NumberFormat('en-IN').format(item.product.price)}
+                        ₹{(item.product.price).toLocaleString('en-IN')}
                       </td>
                       <td className="border px-2 sm:px-4 py-2 text-sm sm:text-base">
                         <div className="flex items-center justify-center">
@@ -162,7 +166,7 @@ const Cart = () => {
                         </div>
                       </td>
                       <td className="border px-2 sm:px-4 py-2 text-sm sm:text-base">
-                        ₹{Intl.NumberFormat('en-IN').format((item.product.price * item.quantity).toFixed(2))}
+                        ₹{(item.product.price * item.quantity).toLocaleString('en-IN')}
                       </td>
                       <td className="border px-2 sm:px-4 py-2 text-sm sm:text-base">
                         <button
@@ -184,12 +188,20 @@ const Cart = () => {
                 {Intl.NumberFormat('en-IN').format(cart?.cartItems?.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2))}
               </h3>
 
+              <div className="flex gap-4">
               <button
                 onClick={handleClearCart}
                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 font-bold"
               >
                 Clear Cart
               </button>
+                <button
+                  onClick={handleCheckout}
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-bold"
+                >
+                  Checkout
+                </button>
+              </div>
             </div>
           </>
         )}

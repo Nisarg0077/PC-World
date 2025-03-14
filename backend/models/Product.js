@@ -83,7 +83,7 @@ const pcCaseSchema = new mongoose.Schema({
 const cpuCoolerSchema = new mongoose.Schema({
     coolerType: {type: String, enum: ["Air", "Liquid"], required: true}, // Air or Liquid
     fanSize: {type: String},
-    rpm: {type: Number, default: "N/A"},
+    rpm: {type: String, default: "N/A"},
     compatibility: {type: String, required: true},
     dimensions: {type: String, required: true},
     weight: {type: Number, required: true},
@@ -151,7 +151,7 @@ const productSchema = new mongoose.Schema(
     name: { type: String, required: true },
     category: { 
       type: String, 
-      enum: ['cpu', 'gpu', 'ram', 'storage', 'keyboard', 'mouse', 'monitor', 'PC Case', 'cpu_cooler'], 
+      enum: ['cpu', 'gpu', 'ram', 'storage', 'keyboard', 'mouse', 'monitor', 'PC Case', 'cpu cooler'], 
       required: true 
     },
     brand: { type: String, required: true },

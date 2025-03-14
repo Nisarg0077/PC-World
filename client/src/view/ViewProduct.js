@@ -138,7 +138,7 @@ export const ViewProduct = () => {
               <div className="flex-1">
                 <h1 className="text-4xl font-bold text-gray-900 mb-4">{product.name}</h1>
                 <p className="text-gray-700 text-lg mb-6">{product.description}</p>
-                <p className="text-3xl font-semibold text-blue-600 mb-6">₹{product.price}</p>
+                <p className="text-3xl font-semibold text-blue-600 mb-6">₹{product.price.toLocaleString('en-IN')}</p>
                 <div className="space-y-4 mb-6">
                   <p className="text-gray-600">
                     <span className="font-medium">Brand:</span> {product.brand}
@@ -157,7 +157,15 @@ export const ViewProduct = () => {
                   >
                     Add To Cart
                   </button>
-                  <button className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors duration-300">
+                  <button onClick={()=> {
+                    navigate('/checkout', {
+                      state: { 
+                        checkoutType: 'singleProduct',
+                        product: product // Pass full product object
+                      }
+                    });
+                    
+                  }} className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors duration-300">
                     Buy Now
                   </button>
                 </div>

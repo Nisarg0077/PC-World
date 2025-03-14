@@ -58,6 +58,20 @@ const ShopNow = () => {
     wattage: filteredParams.wattage || "",
     efficiencyRating: filteredParams.efficiencyRating || "",
     modularity: filteredParams.modularity || "",
+    switchType: filteredParams.switchType || "",
+    layout: filteredParams.layout || "",
+    keyCount: filteredParams.keyCount || "",
+    backlit: filteredParams.backlit === "true" || false,
+    dpi: filteredParams.dpi || "",
+    buttons: filteredParams.buttons || "",
+    weight: filteredParams.weight || "",
+    sensorType: filteredParams.sensorType || "",
+    connectivity: filteredParams.connectivity || "",
+    hdrSupport: filteredParams.hdrSupport === "true" ? true : filteredParams.hdrSupport === "false" ? false : false,
+    compatibility: Array.isArray(filteredParams.compatibility) ? filteredParams.compatibility : [],
+    caseFormFactor: filteredParams.caseFormFactor || "", // ✅ Form Factor (ATX, MicroATX, etc.)
+    casePsuSupport: filteredParams.casePsuSupport || "", // ✅ PSU Support (Yes/No)
+    caseSize: filteredParams.caseSize || "",
   }));
   
   // console.log("Filters State:", filters);
@@ -120,6 +134,7 @@ const ShopNow = () => {
   
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
+      
       const {
         category,
         price,
@@ -146,6 +161,30 @@ const ShopNow = () => {
         wattage,
         efficiencyRating,
         modularity,
+        switchType,
+        layout,
+        keyCount,
+        backlit,
+        dpi,        
+        buttons,    
+        weight,     
+        sensorType, 
+        connectivity,
+        screenSize,     
+        resolution,     
+        refreshRate,    
+        panelType,      
+        responseTime,   
+        hdrSupport,     
+        adaptiveSync,   
+        ports,
+        coolerType,
+        fanSize,
+        coolerRpm,
+        compatibility = [],
+        caseFormFactor,
+        casePsuSupport,
+        caseSize
       } = filters;
 
       const productSpecs = product.specifications || {};
@@ -155,12 +194,26 @@ const ShopNow = () => {
       const productStorage = productSpecs.storage || {};
       const productPsu = productSpecs.psu || {};
       const productRam = productSpecs.ram || {};
+      const productKeyboard = productSpecs.keyboard || {};
+      const productMouse = productSpecs.mouse || {};
+      const productMonitor = productSpecs.monitor || {};
+      const productCooler = productSpecs.cpuCooler || {};
+
+      const productCase = product.specifications?.pcCase || {};
+
+
+      const compatibilityString = product.specifications?.cpuCooler?.compatibility || "";
+      const sockets = compatibilityString ? compatibilityString.split(",").map((s) => s.trim()) : []; // ✅ Ensure sockets is always an array
+  
+      const isIntel = sockets.some((socket) => socket.startsWith("LGA"));
+      const isAMD = sockets.some((socket) => socket.startsWith("AM"));
+      
 
       return (
-        (search ? product.name.toLowerCase().includes(search.toLowerCase()) : true) &&
-        (!category || product.category === category) &&
-        product.price <= price &&
-        (!brand || product.brand === brand) &&
+        (!search.trim() || product.name.toLowerCase().includes(search.toLowerCase())) && // ✅ Allow empty search
+        (!category || product.category.toLowerCase() === category.toLowerCase()) &&
+        (!price || product.price <= price) &&
+        (!brand || product.brand?.toLowerCase() === brand.toLowerCase()) &&
         (!cores || String(productCpu.cores) === String(cores)) &&
         (!threads || String(productCpu.threads) === String(threads)) &&
         (!baseClock || String(productCpu.baseClock) === String(baseClock)) &&
@@ -174,7 +227,7 @@ const ShopNow = () => {
         (!size || product.size === size) &&
         (!ramCapacity || (product.category === "ram" && String(productSpecs.ram?.capacity) === String(ramCapacity))) &&
         (!storageCapacity || (product.category === "storage" && String(productSpecs.storage?.capacity) === String(storageCapacity))) &&
-        (!filters.storageInterface || productStorage.interface === filters.storageInterface) &&
+        (!storageInterface || productStorage.interface === storageInterface) &&
         (!rpm || String(productStorage.rpm) === String(rpm)) &&
         (!motherboardBrand || productMotherboard.manufacturer === motherboardBrand) &&
         (!socket ||
@@ -184,10 +237,40 @@ const ShopNow = () => {
         (!memorySlots || String(productMotherboard.memorySlots) === String(memorySlots)) &&
         (!wattage || String(productPsu.wattage) === String(wattage)) &&
         (!efficiencyRating || productPsu.efficiencyRating === efficiencyRating) &&
-        (!modularity || productPsu.modularity === modularity)
+        (!modularity || productPsu.modularity === modularity) &&
+        (!switchType || String(productKeyboard.switchType) === String(switchType)) &&
+        (!layout || String(productKeyboard.layout) === String(layout)) &&
+        (!keyCount || String(productKeyboard.keyCount) === String(keyCount)) &&
+        (backlit === false || productKeyboard.backlit === Boolean(backlit)) && // ✅ Proper Boolean Check
+        (!dpi || String(productMouse.dpi) === String(dpi)) &&
+        (!buttons || String(productMouse.buttons) === String(buttons)) &&
+        (!weight || String(productMouse.weight) === String(weight)) &&
+        (!sensorType || String(productMouse.sensorType) === String(sensorType)) &&
+        (!connectivity || String(productMouse.connectivity) === String(connectivity)) &&
+        (!screenSize || String(productMonitor.screenSize) === String(screenSize)) &&
+        (!resolution || String(productMonitor.resolution) === String(resolution)) &&
+        (!refreshRate || String(productMonitor.refreshRate) === String(refreshRate)) &&
+        (!panelType || String(productMonitor.panelType) === String(panelType)) &&
+        (!responseTime || String(productMonitor.responseTime) === String(responseTime)) &&
+        (hdrSupport === false || productMonitor.hdrSupport === (typeof hdrSupport === 'boolean' ? hdrSupport : hdrSupport === 'true'))&& // ✅ Boolean Fix
+        (!adaptiveSync || String(productMonitor.adaptiveSync) === String(adaptiveSync)) &&
+        (!ports || ports.length === 0 || (Array.isArray(productMonitor.ports) && ports.every(port => productMonitor.ports.includes(port)))) &&
+        (!coolerType || productCooler.coolerType?.toLowerCase() === coolerType.toLowerCase()) &&
+        (!fanSize || String(productCooler.fanSize) === String(fanSize)) &&
+        (!coolerRpm || String(productCooler.rpm) === String(coolerRpm)) &&
+        (compatibility.length === 0 || 
+          (compatibility.includes("Intel") && isIntel) || 
+          (compatibility.includes("AMD") && isAMD)) &&
+        (!caseFormFactor || productCase.formFactor?.toLowerCase() === caseFormFactor.toLowerCase())&&
+        // (!caseSize || productCase.size?.toLowerCase() === caseSize.toLowerCase())
+        (!caseSize || productCase.dimensions.trim() === caseSize.trim())
+
+
       );
     });
-  }, [search, products, filters]);
+}, [search, products, filters]);
+
+;
 
   // Add product to cart
   const handleAddToCart = async (product) => {

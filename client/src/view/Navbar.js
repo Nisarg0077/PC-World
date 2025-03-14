@@ -44,13 +44,19 @@ export default function Navbar() {
 
         {/* Desktop Menu */}
         <ul className="hidden md:flex space-x-8 items-center text-white text-lg">
-          {["Home", "Shop Now", "About Us", "Contact Us"].map((item, index) => (
+          {["Home", "Shop Now", "About Us"].map((item, index) => (
             <li key={index} className="hover:bg-violet-700 h-fit p-2 rounded-md">
               <Link to={item === "Home" ? "/" : `/${item.toLowerCase().replace(/\s/g, "")}`} className="hover:text-yellow-300 transition duration-200 font-semibold">
                 {item}
               </Link>
             </li>
           ))}
+
+<li className="hover:bg-violet-700 h-fit p-2 rounded-md">
+              <Link to='/custompc' className="hover:text-yellow-300 transition duration-200 font-semibold">
+              Custom PC
+              </Link>
+            </li>
 
           {/* Cart Icon */}
           {user && (
@@ -100,6 +106,7 @@ export default function Navbar() {
                   >
                     <div className="bg-white text-gray-800 rounded-md">
                       <Link to="/userProfile" className="block px-4 py-2 hover:bg-gray-100 transition">Profile</Link>
+                      <Link to="/orders" className="block px-4 py-2 hover:bg-gray-100 transition">Orders</Link>
                       <button
                         onClick={() => {
                           sessionStorage.removeItem("clientUser");

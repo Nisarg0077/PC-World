@@ -123,10 +123,16 @@ const AddMotherboardProduct = () => {
         },
       });
       setImage(null); // Reset image input
+      navigate('/products');
     } catch (error) {
       toast.error('Failed to add motherboard product.');
     }
   };
+
+  const handleBack = () => {
+    navigate(`/products`);
+  }
+
 
   return (
     <div className="h-screen flex flex-col">
@@ -205,6 +211,13 @@ const AddMotherboardProduct = () => {
             <button type="submit" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
               Add Motherboard Product
             </button>
+            <button
+      type="button"
+      onClick={handleBack}
+      className="bg-gray-300 ml-4 text-gray-700 px-6 py-2 rounded hover:bg-gray-400"
+    >
+      Back
+    </button>
           </form>
         </main>
       </div>
