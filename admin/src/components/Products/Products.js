@@ -222,12 +222,12 @@ const navigate = useNavigate();
               >
                 <i class="fa fa-plus" aria-hidden="true"></i> PC Case
               </button>
-            {/* <button
+            <button
                 onClick={() => navigate('/add-cpucooler')}
                 className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-white hover:text-green-500 font-bold"
               >
                 <i class="fa fa-plus" aria-hidden="true"></i> CPU Cooler
-              </button> */}
+              </button>
            
               </fieldset>
             </div>

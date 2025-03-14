@@ -20,6 +20,7 @@ import EditCategoryPage from './components/categories/EditCategoryPage';
 import AddPSUProduct from './components/Products/AddPSUProduct';
 import BrandsManagement from './components/Brands/BrandsManagement';
 import AddBrandForm from './components/Brands/AddBrandForm';
+import viewOrder from './components/Orders/viewOrder';
 import EditBrandPage from './components/Brands/EditBrandPage';
 import Navbar from './components/Navbar';
 import UserMgmt from './components/Users/UserMgmt';
@@ -31,6 +32,7 @@ import AddKeyboardProduct from './components/Products/AddKeyboardProduct';
 import AddMonitorProduct from './components/Products/AddMonitorProducts';
 import AddPcCaseProduct from './components/Products/AddPcCaseProduct';
 import AddCpuCoolerProduct from './components/Products/AddCpuCoolerProduct';
+import OrdersMgmt from './components/Orders/OrderMgmt';
 function Layout() {
   const location = useLocation();
 
@@ -58,6 +60,8 @@ function Layout() {
         <Route path='/add-pccase' Component={AddPcCaseProduct} />
         <Route path='/add-cpucooler' Component={AddCpuCoolerProduct} />
         <Route path='/product-info' Component={ProductInfo} />
+        <Route path='/Order' Component={OrdersMgmt} />
+        <Route path='/vieworder' Component={viewOrder} />
         <Route path='/edit-product' Component={EditProductPage} />
         <Route path='/categories' Component={categoriesMgmt} />
         <Route path='/add-category' Component={AddCategoryPage} />

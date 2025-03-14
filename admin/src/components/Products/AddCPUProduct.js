@@ -123,11 +123,16 @@ const AddCPUProduct = () => {
         },
       });
       setImage(null);
+      navigate('/products');
     } catch (error) {
       console.error('Error adding CPU product:', error);
       toast.error('Failed to add CPU product.');
     }
   };
+
+  const handleBack = () => {
+    navigate(`/products`);
+  }
 
   return (
     <div className="h-screen flex flex-col">
@@ -137,6 +142,8 @@ const AddCPUProduct = () => {
         <Sidebar />
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
           <h1 className="text-2xl font-bold mb-4">Add CPU Product</h1>
+
+          
           <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4">
             {['name', 'model', 'description', 'price', 'stock'].map((field) => (
               <div key={field}>
@@ -206,6 +213,13 @@ const AddCPUProduct = () => {
             <button type="submit" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
               Add CPU Product
             </button>
+            <button
+      type="button"
+      onClick={handleBack}
+      className="bg-gray-300 ml-4 text-gray-700 px-6 py-2 rounded hover:bg-gray-400"
+    >
+      Back
+    </button>
           </form>
         </main>
       </div>

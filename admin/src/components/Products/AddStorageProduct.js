@@ -118,10 +118,16 @@ const AddStorageProduct = () => {
         },
       });
       setImage(null); // Reset image input
+      navigate('/products');
     } catch (error) {
       toast.error('Failed to add Storage product.');
     }
   };
+
+  const handleBack = () => {
+    navigate(`/products`);
+  }
+
 
   return (
     <div className="h-screen flex flex-col">
@@ -200,6 +206,13 @@ const AddStorageProduct = () => {
             <button type="submit" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
               Add Storage Product
             </button>
+            <button
+      type="button"
+      onClick={handleBack}
+      className="bg-gray-300 ml-4 text-gray-700 px-6 py-2 rounded hover:bg-gray-400"
+    >
+      Back
+    </button>
           </form>
         </main>
       </div>

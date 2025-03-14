@@ -5,6 +5,7 @@ const { ObjectId } = require('mongodb');
 const User = require('./models/User');
 const Brand = require('./models/Brands');
 const Category = require('./models/Category');
+const Order = require("./models/Order");
 const cors = require('cors');
 const ProductType = require('./models/ProductType');
 const app = express();
@@ -987,6 +988,9 @@ app.get('/api/users/:id', async (req, res) => {
 
 
 
+
+
+
 app.put('/api/users/:userId', upload.single('image'), async (req, res) => {
   const { userId } = req.params;
   const { firstName, lastName, email, phone, department, gender, dateOfBirth, isActive, isDeleted, role, address } = req.body;
@@ -1287,7 +1291,329 @@ app.delete('/accessories/:id', async (req, res) => {
   }
 });
 
+
 // accessory APIs end
+
+
+
+//fatch address
+app.get("/api/user/address/:userId", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.address) {
+      return res.status(404).json({ message: "Address not found" });
+    }
+
+    res.json({
+      phone: user.phoneNumber || "", // Send phone number if available
+      building: user.address.building || "",
+      street: user.address.street || "",
+      city: user.address.city || "",
+      state: user.address.state || "",
+      pinCode: user.address.pinCode || "",
+    });
+  } catch (error) {
+    console.error("Error fetching address:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+//order apis
+
+app.post("/api/orderin", async (req, res) => {
+  try {
+    const { userId, email, items, totalAmount, shippingAddress } = req.body;
+
+    if (!userId || !email || !items || !totalAmount || !shippingAddress) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    const newOrder = new Order({
+      userId,
+      email,
+      items,
+      totalAmount,
+      shippingAddress,
+      paymentMethod: "COD",
+      paymentStatus: "Pending",
+      orderStatus: "Pending",
+    });
+
+    await newOrder.save();
+    res.status(201).json({ message: "Order placed successfully", order: newOrder });
+
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      auth: {
+        user: 'nisarglimbachiya028@gmail.com', // Replace with your email
+        pass: 'axeptrcseciqqdbf' // Replace with your email password or app password
+      }
+    });
+
+    const mailOptions = {
+      from: 'nisarglimbachiya028@gmail.com',
+      to: newOrder.email, // Send email to the registered user
+      subject: 'LogIn successful at PC-World',
+      html: ` <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; text-align: center;">
+      <h1 style="color: #333;">Hi, ${newOrder.shippingAddress.fullName}!</h1>
+      <p style="font-size: 16px; color: #555;">Your order is placed successfully.</p>
+    </div>`
+    };
+
+    // Send the email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+
+    });
+  } catch (error) {
+    console.error("Error placing order:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+
+app.get("/api/orders", async (req, res) => {
+  try {
+      const orders = await Order.find()
+          .populate("userId", "name email") // Populate user details
+          .populate("items.productId", "name price") // Populate product details
+          .sort({ createdAt: -1 }); // Newest orders first
+
+      res.json(orders);
+  } catch (err) {
+      res.status(500).json({ error: err.message });
+  }
+});
+
+// app.get("/api/orders/:oid", async (req, res) => {
+//   try {
+//       const { oid } = req.params; // Get Order ID from URL
+//       const order = await Order.findById(oid);
+
+//       if (!order) {
+//           return res.status(404).json({ message: "Order not found" });
+//       }
+
+//       res.json(order); // Return order data
+//   } catch (error) {
+//       console.error("Error fetching order:", error);
+//       res.status(500).json({ message: "Internal server error" });
+//   }
+// });
+
+app.get("/api/orders/:oid", async (req, res) => {
+  try {
+      const { oid } = req.params;
+      const order = await Order.findById(oid)
+           // Example if items reference products
+
+      if (!order) {
+          return res.status(404).json({ message: "Order not found" });
+      }
+
+      // Wrap the order in an object to match frontend expectations
+      res.json({ 
+          success: true,
+          order: order 
+      });
+  } catch (error) {
+      console.error("Error fetching order:", error);
+      res.status(500).json({ 
+          success: false,
+          message: "Internal server error" 
+      });
+  }
+});
+
+app.put("/api/orders/:id", async (req, res) => {
+  try {
+      const { orderStatus, paymentStatus } = req.body;
+
+      const updatedOrder = await Order.findByIdAndUpdate(
+          req.params.id,
+          { orderStatus, paymentStatus },
+          { new: true }
+      );
+
+      res.json(updatedOrder);
+  } catch (err) {
+      res.status(500).json({ error: err.message });
+  }
+});
+
+// ✅ Delete an order
+app.delete("/api/orders/:id", async (req, res) => {
+  try {
+      await Order.findByIdAndDelete(req.params.id);
+      res.json({ message: "Order deleted successfully" });
+  } catch (err) {
+      res.status(500).json({ error: err.message });
+  }
+});
+
+
+
+
+app.get("/api/orders/user/:userId", async (req, res) => {
+  try {
+      const { userId } = req.params;
+      
+      // Check if userId is provided
+      if (!userId) {
+          return res.status(400).json({ error: "User ID is required" });
+      }
+
+      // Find orders belonging to the user
+      const orders = await Order.find({ userId });
+
+      if (!orders.length) {
+          return res.status(404).json({ message: "No orders found for this user." });
+      }
+
+      res.json(orders);
+  } catch (err) {
+      console.error("Error fetching user orders:", err);
+      res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+
+///custom build
+
+app.get("/api/products/cpu/:brand", async (req, res) => {
+  try {
+    const { brand } = req.params;
+    // console.log(brand)
+    const cpus = await Product.find({ category: "cpu", brand: brand });
+    res.json(cpus);
+  } catch (error) {
+    console.error("Error fetching CPUs:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+app.get("/api/products/motherboard/:socket", async (req, res) => {
+  try {
+    const { socket } = req.params;
+    
+    // Fetch motherboards that match the given socket
+    const motherboards = await Product.find({ 
+      category: "motherboard", 
+      "specifications.motherboard.socket": socket 
+    });
+
+    res.json(motherboards); // ✅ Return only motherboards
+  } catch (error) {
+    console.error("Error fetching motherboards:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/api/products/gpu", async (req, res) => {
+  try {
+    const gpus = await Product.find({ category: "gpu" }); // ✅ Fetch only GPUs
+    res.json(gpus);
+  } catch (error) {
+    console.error("Error fetching GPUs:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+app.get("/api/products/ram", async (req, res) => {
+  try {
+    const rams = await Product.find({ category: "ram" });
+    console.log("Fetched RAMs:", rams); // ✅ Debugging
+    res.json(rams);
+  } catch (error) {
+    console.error("Error fetching RAMs:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
+app.get("/api/products/storage", async (req, res) => {
+  try {
+    const storages = await Product.find({ category: "storage" });
+    console.log("Fetched Storage Devices:", storages); // ✅ Debugging
+    res.json(storages);
+  } catch (error) {
+    console.error("Error fetching storage devices:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+app.get("/api/products/case", async (req, res) => {
+  try {
+    const cases = await Product.find({ category: "PC Case" });
+    console.log("Fetched PC Cases:", cases); // ✅ Debugging
+    res.json(cases);
+  } catch (error) {
+    console.error("Error fetching PC Cases:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/api/products/psu", async (req, res) => {
+  try {
+    const psus = await Product.find({ category: "psu" });
+    console.log("Fetched PSUs:", psus); // ✅ Debugging
+    res.json(psus);
+  } catch (error) {
+    console.error("Error fetching PSUs:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+app.get("/api/user/aadhar/:userId", async (req, res) => {
+  try {
+      const { userId } = req.params;
+      
+      // ✅ Fetch user with Aadhaar details from User model
+      const user = await User.findById(userId).select("aadharNumber aadharFront aadharBack");
+
+      if (!user) {
+          return res.status(404).json({ success: false, message: "User not found." });
+      }
+
+      if (!user.aadharNumber || !user.aadharFront || !user.aadharBack) {
+          return res.status(404).json({ success: false, message: "Aadhaar details not found for this user." });
+      }
+
+      // ✅ Return Aadhaar details
+      res.status(200).json({
+          success: true,
+          aadhaar: {
+              aadharNumber: user.aadharNumber,
+              aadharFront: user.aadharFront,
+              aadharBack: user.aadharBack
+          }
+      });
+
+  } catch (error) {
+      console.error("❌ Error fetching Aadhaar details:", error);
+      res.status(500).json({ success: false, message: "Server error." });
+  }
+});
+
 
 
 app.get('/mgrt/prod', (req, res) => {
