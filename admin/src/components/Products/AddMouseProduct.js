@@ -121,12 +121,18 @@ const AddMouseProduct = () => {
           },
         });
         setImage(null);
+        navigate('/products');
       }
     } catch (error) {
       console.error('Error adding Mouse product:', error);
       toast.error('Failed to add Mouse product.');
     }
   };
+
+  const handleBack = () => {
+    navigate(`/products`);
+  }
+
 
   return (
     <div className="h-screen flex flex-col">
@@ -230,6 +236,13 @@ const AddMouseProduct = () => {
             <button type="submit" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
               Add Mouse Product
             </button>
+            <button
+      type="button"
+      onClick={handleBack}
+      className="bg-gray-300 ml-4 text-gray-700 px-6 py-2 rounded hover:bg-gray-400"
+    >
+      Back
+    </button>
           </form>
         </main>
       </div>
