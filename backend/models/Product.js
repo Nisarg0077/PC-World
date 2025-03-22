@@ -57,16 +57,18 @@ const mouseSchema = new mongoose.Schema(
   { _id: false }
 );
 
-// Headset Schema
-// const headsetSchema = new mongoose.Schema(
-//   {
-//     driverSize: Number,
-//     frequencyResponse: String,
-//     microphone: Boolean,
-//   },
-//   { _id: false }
-// );
-
+const preBuiltSpecSchema = new mongoose.Schema(
+  {
+    cpu: { type: String, required: true },
+    gpu: { type: String, default: 'N/A'},
+    ram: { type: String, required: true },
+    storage: { type: String, required: true },
+    motherboard: { type: String, required: true },
+    psu: { type: String, required: true },
+    case: { type: String, required: true },
+  },
+  { _id: false }
+);
 
 const pcCaseSchema = new mongoose.Schema({
     formFactor: { type: String, required: true }, // ATX, Micro-ATX, Mini-ITX
@@ -102,6 +104,7 @@ const monitorSchema = new mongoose.Schema(
   },
   { _id: false }
 );
+
 
 const specificationSchema = new mongoose.Schema(
   {
@@ -142,7 +145,8 @@ const specificationSchema = new mongoose.Schema(
     mouse: mouseSchema,
     monitor: monitorSchema,
     pcCase: pcCaseSchema,
-    cpuCooler: cpuCoolerSchema
+    cpuCooler: cpuCoolerSchema,
+    preBuilt: preBuiltSpecSchema,
   },
   { _id: false }
 );
@@ -151,7 +155,7 @@ const productSchema = new mongoose.Schema(
     name: { type: String, required: true },
     category: { 
       type: String, 
-      enum: ['cpu', 'gpu', 'ram', 'storage', 'keyboard', 'mouse', 'monitor', 'PC Case', 'cpu cooler'], 
+      enum: ['cpu', 'gpu', 'ram', 'motherboard', 'storage', 'psu', 'keyboard', 'mouse', 'monitor', 'PC Case', 'cpu cooler', 'preBuilt'], 
       required: true 
     },
     brand: { type: String, required: true },
@@ -160,7 +164,13 @@ const productSchema = new mongoose.Schema(
     price: { type: Number, required: true, min: 0 },
     stock: { type: Number, default: 0, min: 0 },
     imageUrl: { type: String, required: true },
+    views: { type: Number, default: 0 },
+    orders: { type: Number, default: 0 },
     specifications: specificationSchema,
+    averageRating: {
+      type: Number,
+      default: 0,
+    },    
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },

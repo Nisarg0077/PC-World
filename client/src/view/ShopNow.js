@@ -72,6 +72,14 @@ const ShopNow = () => {
     caseFormFactor: filteredParams.caseFormFactor || "", // ✅ Form Factor (ATX, MicroATX, etc.)
     casePsuSupport: filteredParams.casePsuSupport || "", // ✅ PSU Support (Yes/No)
     caseSize: filteredParams.caseSize || "",
+    cpu: filteredParams.cpu  || "",
+    gpu: filteredParams.gpu  || "",
+     ram: filteredParams.ram  || "",
+     storage: filteredParams.storage  || "",
+     motherboard: filteredParams.motherboard  || "",
+     psu: filteredParams.psu  || "",
+     caseFilter: filteredParams.case  || ""
+
   }));
   
   // console.log("Filters State:", filters);
@@ -184,7 +192,8 @@ const ShopNow = () => {
         compatibility = [],
         caseFormFactor,
         casePsuSupport,
-        caseSize
+        caseSize,
+        cpu, gpu, ram, storage, motherboard, psu, caseFilter
       } = filters;
 
       const productSpecs = product.specifications || {};
@@ -263,7 +272,16 @@ const ShopNow = () => {
           (compatibility.includes("AMD") && isAMD)) &&
         (!caseFormFactor || productCase.formFactor?.toLowerCase() === caseFormFactor.toLowerCase())&&
         // (!caseSize || productCase.size?.toLowerCase() === caseSize.toLowerCase())
-        (!caseSize || productCase.dimensions.trim() === caseSize.trim())
+        (!caseSize || productCase.dimensions.trim() === caseSize.trim()) &&
+        (!cpu || product.specifications?.preBuilt?.cpu === cpu) &&
+(!gpu || product.specifications?.preBuilt?.gpu === gpu) &&
+(!ram || product.specifications?.preBuilt?.ram === ram) &&
+(!storage || product.specifications?.preBuilt?.storage === storage) &&
+(!motherboard || product.specifications?.preBuilt?.motherboard === motherboard) &&
+(!psu || product.specifications?.preBuilt?.psu === psu) &&
+(!caseFilter || product.specifications?.preBuilt?.case === caseFilter) &&
+(!filters.rating || Number(product.averageRating) >= Number(filters.rating))
+
 
 
       );
@@ -359,34 +377,58 @@ const ShopNow = () => {
                 <p className="text-gray-600 text-sm md:text-base">
                   ₹{Intl.NumberFormat('en-IN').format(product.price).toLocaleString()}
                 </p>
-                <div className="p-1 flex flex-col sm:flex-row justify-between gap-2 w-full">
-                   <button
-                     className={`px-2 py-2 rounded-md transition-all duration-200 w-full sm:w-1/2 text-sm font-semibold border-2 border-transparent ${
-                       cartLoading[product._id]
-                         ? "bg-gray-400 cursor-not-allowed text-white"
-                         : "bg-purple-700 text-white hover:bg-white hover:text-purple-700 hover:border-purple-700"
-                     }`}
-                     onClick={() => handleAddToCart(product)}
-                     disabled={cartLoading[product._id]}
-                     aria-label="Add to cart"
-                   >
-                     {cartLoading[product._id] ? "Adding..." : "Add to Cart"}
-                   </button>
-                   <Link
-                     to={{
-                      pathname: `/viewProduct`,
-                      search: `?pid=${product._id}&${queryString.stringify(filters)}&search=${search}`,
-                      // state: { 
-                      //   filteredData: JSON.stringify(filters),  // Pass the actual filters state
-                      //   previousPath: location.pathname + location.search
-                      // }
-                    }}
-                     className="px-2 py-2 rounded-md transition-all duration-200 w-full sm:w-1/2 text-sm font-semibold border-2 border-transparent bg-purple-700 text-white text-center hover:bg-white hover:text-purple-700 hover:border-purple-700"
-                     aria-label="View product"
-                   >
-                     View Product
-                   </Link>
-                 </div>
+
+                <p className="text-yellow-500 font-medium">
+  ⭐ {product.averageRating ? product.averageRating.toFixed(1) : 'No Rating'}
+</p>
+
+               
+                <div className="p-1 w-full">
+  {product.stock <= 0 ? (
+    <div className="bg-gray-100 rounded-lg flex flex-col sm:flex-row gap-3">
+      <div className="flex-1">
+        <div className="bg-red-600 text-white text-sm font-semibold text-center py-3 rounded-md w-full">
+          Out of Stock
+        </div>
+      </div>
+
+      <Link
+        to={{
+          pathname: `/viewProduct`,
+          search: `?pid=${product._id}&${queryString.stringify(filters)}&search=${search}`,
+        }}
+        className="flex-1 bg-purple-700 text-white text-sm font-semibold text-center py-3 rounded-md hover:bg-white hover:text-purple-700 border border-purple-700 transition-all duration-300"
+      >
+        View Product
+      </Link>
+    </div>
+  ) : (
+    <div className="bg-gray-100 rounded-lg flex flex-col sm:flex-row gap-3">
+      <button
+        className={`flex-1 text-sm font-semibold text-white py-3 rounded-md shadow-md transition-all duration-300 ${
+          cartLoading[product._id]
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-purple-700 hover:bg-white hover:text-purple-700 border border-purple-700"
+        }`}
+        onClick={() => handleAddToCart(product)}
+        disabled={cartLoading[product._id]}
+      >
+        {cartLoading[product._id] ? "Adding..." : "Add to Cart"}
+      </button>
+
+      <Link
+        to={{
+          pathname: `/viewProduct`,
+          search: `?pid=${product._id}&${queryString.stringify(filters)}&search=${search}`,
+        }}
+        className="flex-1 bg-purple-700 text-white text-sm font-semibold text-center py-3 rounded-md hover:bg-white hover:text-purple-700 border border-purple-700 transition-all duration-300"
+      >
+        View Product
+      </Link>
+    </div>
+  )}
+</div>
+
 
               </div>
             ))

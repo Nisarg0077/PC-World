@@ -133,12 +133,12 @@ const UsersManagement = () => {
                   
                   }
                   <td className="border px-4 py-2 space-x-2">
-                    <button
+                    {/* <button
                       onClick={() => handleEdit(user._id)}
                       className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                     >
                       <i class="fa fa-pencil" aria-hidden="true"></i>
-                    </button>
+                    </button> */}
                     <button
                       onClick={() => handleDelete(user._id)}
                       className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"

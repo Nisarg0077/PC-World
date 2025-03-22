@@ -385,7 +385,7 @@ const ViewOrder = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);  // ✅ Image Preview State
-
+    console.log(userAadhaar)
     const params = new URLSearchParams(window.location.search);
     const oid = params.get("oid");
     const navigate = useNavigate();
@@ -413,6 +413,7 @@ const ViewOrder = () => {
     // ✅ Fetch Aadhaar Details
     const fetchAadhaarDetails = async (userId) => {
         try {
+            console.log(userId)
             const response = await axios.get(`http://localhost:5000/api/user/aadhar/${userId}`);
             if (response.data.success) {
                 setUserAadhaar(response.data.aadhaar);
@@ -459,6 +460,10 @@ const ViewOrder = () => {
                             <tr>
                                 <td className="p-3 font-semibold border border-gray-300">Order ID</td>
                                 <td className="p-3 border border-gray-300">{oid}</td>
+                            </tr>
+                            <tr>
+                                <td className="p-3 font-semibold border border-gray-300">Customer Name</td>
+                                <td className="p-3 border border-gray-300">{userAadhaar?.username || "N/A"}</td>
                             </tr>
                             <tr>
                                 <td className="p-3 font-semibold border border-gray-300">Customer Name</td>
