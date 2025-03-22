@@ -89,112 +89,46 @@ const EditProductPage = () => {
     }));
   };
 
-//   const handleSpecificationChange = (e) => {
-//     const { name, type, checked, value } = e.target;
-//     const category = productData.category?.toLowerCase();
 
-//     setProductData((prevData) => {
-//         let updatedSpecifications = { ...prevData.specifications };
-//         const categorySpecs = updatedSpecifications[category] || {};
-
-
-//         if (!updatedSpecifications.pcCase) {
-//           updatedSpecifications.pcCase = {};  // Ensure it exists
-//       }
-//       updatedSpecifications.pcCase[name] = type === "checkbox" ? checked : value;
-
-
-//       if (!updatedSpecifications.cpuCooler) {
-//         updatedSpecifications.cpuCooler = {};  // Ensure it exists
-//     }
-//     updatedSpecifications.cpuCooler[name] = type === "checkbox" ? checked : value;
-//         if (category === 'monitor' && name === 'ports') {
-//             let updatedPorts = Array.isArray(categorySpecs.ports) ? [...categorySpecs.ports] : [];
-
-//             if (checked) {
-//                 if (!updatedPorts.includes(value)) {
-//                     updatedPorts.push(value);
-//                 }
-//             } else {
-//                 updatedPorts = updatedPorts.filter((port) => port !== value);
-//             }
-
-//             updatedSpecifications = {
-//                 ...updatedSpecifications,
-//                 [category]: {
-//                     ...categorySpecs,
-//                     ports: updatedPorts,
-//                 },
-//             };
-//         } else {
-//             updatedSpecifications = {
-//                 ...updatedSpecifications,
-//                 [category]: {
-//                     ...categorySpecs,
-//                     [name]: type === 'checkbox' ? checked : value,
-                    
-//                 },
-//             };
-//         }
-
-//         Object.keys(updatedSpecifications).forEach((key) => {
-//             if (Object.keys(updatedSpecifications[key]).length === 0) {
-//                 delete updatedSpecifications[key];
-//             }
-//         });
-
-//         return {
-//             ...prevData,
-//             specifications: updatedSpecifications,
-//         };
-//     });
-// };
-
-
-const handleSpecificationChange = (e) => {
-  const { name, type, checked, value } = e.target;
-  const category = productData.category?.toLowerCase();
-
-  if (!category) return; // Ensure category exists before updating
-
-  setProductData((prevData) => {
-    console.log("Category:", category);
-    console.log("Updating field:", name, "with value:", value);
-
-    let updatedSpecifications = { ...prevData.specifications };
-
-    // Ensure category exists before updating
-    if (!updatedSpecifications[category]) {
-      updatedSpecifications[category] = {};
-    }
-
-    // If category is "cpu cooler", update only its specifications
-    if (category === "pc case") {
-      updatedSpecifications.pcCase = {
-        ...(updatedSpecifications.pcCase || {}),
-        [name]: type === "checkbox" ? checked : value,
+  const handleSpecificationChange = (e) => {
+    const { name, type, checked, value } = e.target;
+    const category = productData.category?.toLowerCase();
+  
+    if (!category) return;
+  
+    setProductData((prevData) => {
+      let updatedSpecifications = { ...prevData.specifications };
+  
+      if (category === "prebuilt") {
+        updatedSpecifications["preBuilt"] = {
+          ...(updatedSpecifications["preBuilt"] || {}),
+          [name]: type === "checkbox" ? checked : value,
+        };
+      } else if (category === "pc case") {
+        updatedSpecifications["pcCase"] = {
+          ...(updatedSpecifications["pcCase"] || {}),
+          [name]: type === "checkbox" ? checked : value,
+        };
+      } else if (category === "cpu cooler") {
+        updatedSpecifications["cpuCooler"] = {
+          ...(updatedSpecifications["cpuCooler"] || {}),
+          [name]: type === "checkbox" ? checked : value,
+        };
+      } else {
+        // General case
+        updatedSpecifications[category] = {
+          ...(updatedSpecifications[category] || {}),
+          [name]: type === "checkbox" ? checked : value,
+        };
+      }
+  
+      return {
+        ...prevData,
+        specifications: updatedSpecifications,
       };
-    } else {
-      updatedSpecifications[category] = {
-        ...(updatedSpecifications[category] || {}),
-        [name]: type === "checkbox" ? checked : value,
-      };
-    }
-    if (category === "cpu cooler") {
-      updatedSpecifications["cpuCooler"] = {
-        ...(updatedSpecifications["cpuCooler"] || {}),
-        [name]: type === "checkbox" ? checked : value,
-      };
-    } else {
-      updatedSpecifications[category][name] = type === "checkbox" ? checked : value;
-    }
-
-    return {
-      ...prevData,
-      specifications: updatedSpecifications,
-    };
-  });
-};
+    });
+  };
+  
 
 
 
@@ -686,44 +620,7 @@ const handleConnectorChange = (e) => {
             </div>
         </>
     );
-  //   case 'cpu cooler':
-  // return (
-  //   <>
-  //     <div>
-  //       <label htmlFor="coolerType" className="block font-medium mb-2">
-  //         Cooler Type
-  //       </label>
-  //       <select
-  //         id="coolerType"
-  //         name="coolerType"
-  //         value={specifications.cpuCooler?.coolerType || ""}
-  //         onChange={handleSpecificationChange}
-  //         required
-  //         className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-  //       >
-  //         <option value="">Select Cooler Type</option>
-  //         <option value="Air">Air Cooler</option>
-  //         <option value="Liquid">Liquid Cooler</option>
-  //       </select>
-  //     </div>
-
-  //     {['fanSize', 'rpm', 'compatibility', 'dimensions', 'weight'].map((spec) => (
-  //       <div key={spec}>
-  //         <label htmlFor={spec} className="block font-medium mb-2">
-  //           {spec.charAt(0).toUpperCase() + spec.slice(1)}
-  //         </label>
-  //         <input
-  //           type="text"
-  //           id={spec}
-  //           name={spec}
-  //           value={specifications.cpuCooler?.[spec] || ""}
-  //           onChange={handleSpecificationChange}
-  //           className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-  //         />
-  //       </div>
-  //     ))}
-  //   </>
-  // );
+  
 
     case "cpu cooler":
   return (
@@ -750,18 +647,41 @@ const handleConnectorChange = (e) => {
             {spec.charAt(0).toUpperCase() + spec.slice(1)}
           </label>
           <input
-  type="text"
-  id={spec}
-  name={spec}
-  value={specifications.cpuCooler?.[spec] || ""}
-  onChange={handleSpecificationChange}
-  className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-/>
+            type="text"
+            id={spec}
+            name={spec}
+            value={specifications.cpuCooler?.[spec] || ""}
+            onChange={handleSpecificationChange}
+            className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
 
         </div>
       ))}
     </>
   );
+
+  case "preBuilt":
+  return (
+    <>
+      {["cpu", "gpu", "ram", "storage", "motherboard", "psu", "case"].map((spec) => (
+        <div key={spec}>
+          <label htmlFor={spec} className="block font-medium mb-2">
+            {spec.charAt(0).toUpperCase() + spec.slice(1)}
+          </label>
+          <input
+            type="text"
+            id={spec}
+            name={spec}
+            value={specifications["preBuilt"]?.[spec] || ""}
+            onChange={handleSpecificationChange}
+            placeholder={`Enter ${spec}`}
+            className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      ))}
+    </>
+  );
+
       default:
         return null;
     }

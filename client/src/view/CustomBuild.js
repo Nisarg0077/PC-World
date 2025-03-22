@@ -182,109 +182,131 @@ const handleSelect = (type, event) => {
         <h1 className="text-3xl font-bold text-center mb-6">{brand.toUpperCase()} Custom Build</h1>
 
       {/* CPU Selection */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold">Select Your {brand.toUpperCase()} CPU</h2>
-        <select className="w-full p-2 border rounded-md" onChange={(e) => handleSelect("cpu", e)}>
-          <option value="">Select CPU</option>
-          {cpus.map((cpu) => (
-            <option key={cpu._id} value={cpu._id}>
-              {cpu.name} - ₹{cpu.price}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Motherboard Selection (Appears After CPU is Selected) */}
-      {selectedParts.cpu && (
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold">Select a Compatible Motherboard</h2>
-          <select className="w-full p-2 border rounded-md" onChange={(e) => handleSelect("motherboard", e)}>
-            <option value="">Select Motherboard</option>
-            {components.motherboards.map((mobo) => (
-              <option key={mobo._id} value={mobo._id}>
-                {mobo.name} - ₹{mobo.price}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      {/* GPU Selection */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold">Select Your GPU</h2>
-        <select className="w-full p-2 border rounded-md" onChange={(e) => handleSelect("gpu", e)}>
-          <option value="">Select GPU</option>
-          {components.gpus.map((gpu) => (
-            <option key={gpu._id} value={gpu._id}>
-              {gpu.name} - ₹{gpu.price}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* RAM Selection */}
 <div className="mb-6">
-  <h2 className="text-xl font-semibold">Select Your RAM</h2>
-  <select className="w-full p-2 border rounded-md" onChange={(e) => handleSelect("ram", e)}>
-    <option value="">Select RAM</option>
-    {components.rams.map((ram) => (
-      <option key={ram._id} value={ram._id}>
-        {ram.name} - {ram.capacity}GB - ₹{ram.price}
-      </option>
-    ))}
+  <h2 className="text-xl font-semibold">Select Your {brand.toUpperCase()} CPU</h2>
+  <select className="w-full p-2 border rounded-md" onChange={(e) => handleSelect("cpu", e)}>
+    <option value="">Select CPU</option>
+    {cpus
+      .filter(cpu => cpu.stock > 0)
+      .map(cpu => (
+        <option key={cpu._id} value={cpu._id}>
+          {cpu.name} - ₹{cpu.price}
+        </option>
+      ))
+    }
   </select>
 </div>
 
+
+      {/* Motherboard Selection (Appears After CPU is Selected) */}
+      {selectedParts.cpu && (
+  <div className="mb-6">
+    <h2 className="text-xl font-semibold">Select a Compatible Motherboard</h2>
+    <select className="w-full p-2 border rounded-md" onChange={(e) => handleSelect("motherboard", e)}>
+      <option value="">Select Motherboard</option>
+      {components.motherboards
+        .filter((mobo) => mobo.stock > 0) // Only show in-stock motherboards
+        .map((mobo) => (
+          <option key={mobo._id} value={mobo._id}>
+            {mobo.name} - ₹{mobo.price}
+          </option>
+        ))}
+    </select>
+  </div>
+)}
+
+
+      {/* GPU Selection */}
+<div className="mb-6">
+  <h2 className="text-xl font-semibold">Select Your GPU</h2>
+  <select className="w-full p-2 border rounded-md" onChange={(e) => handleSelect("gpu", e)}>
+    <option value="">Select GPU</option>
+    {components.gpus
+      .filter(gpu => gpu.stock > 0)
+      .map(gpu => (
+        <option key={gpu._id} value={gpu._id}>
+          {gpu.name} - ₹{gpu.price}
+        </option>
+      ))
+    }
+  </select>
+</div>
+
+
+      {/* RAM Selection */}
+      <div className="mb-6">
+  <h2 className="text-xl font-semibold">Select Your RAM</h2>
+  <select className="w-full p-2 border rounded-md" onChange={(e) => handleSelect("ram", e)}>
+    <option value="">Select RAM</option>
+    {components.rams
+      .filter(ram => ram.stock > 0)
+      .map(ram => (
+        <option key={ram._id} value={ram._id}>
+          {ram.name} - {ram.capacity}GB - ₹{ram.price}
+        </option>
+      ))
+    }
+  </select>
+</div>
+
+{/* Storage Selection */}
 {/* Storage Selection */}
 <div className="mb-6">
   <h2 className="text-xl font-semibold">Select Your Storage</h2>
   <select className="w-full p-2 border rounded-md" onChange={(e) => handleSelect("storage", e)}>
     <option value="">Select Storage</option>
-    {components.storages.length > 0 ? (
-      components.storages.map((storage) => (
-        <option key={storage._id} value={storage._id}>
-          {storage.name} - {storage.specifications?.storage?.capacity}GB - {storage.specifications?.storage?.type} - ₹{storage.price}
-        </option>
-      ))
+    {components.storages.filter(storage => storage.stock > 0).length > 0 ? (
+      components.storages
+        .filter((storage) => storage.stock > 0)
+        .map((storage) => (
+          <option key={storage._id} value={storage._id}>
+            {storage.name} - {storage.specifications?.storage?.capacity}GB - {storage.specifications?.storage?.type} - ₹{storage.price}
+          </option>
+        ))
     ) : (
       <option disabled>No Storage Available</option>
     )}
   </select>
 </div>
 
-{/* PC Case Selection */}
 {/* PSU Selection */}
 <div className="mb-6">
   <h2 className="text-xl font-semibold">Select Your Power Supply Unit (PSU)</h2>
   <select className="w-full p-2 border rounded-md" onChange={(e) => handleSelect("psu", e)}>
     <option value="">Select PSU</option>
-    {components.psus.length > 0 ? (
-      components.psus.map((psu) => (
-        <option key={psu._id} value={psu._id}>
-          {psu.name} - {psu.wattage} - {psu.efficiency} - ₹{psu.price}
-        </option>
-      ))
+    {components.psus.filter(psu => psu.stock > 0).length > 0 ? (
+      components.psus
+        .filter((psu) => psu.stock > 0)
+        .map((psu) => (
+          <option key={psu._id} value={psu._id}>
+            {psu.name} - {psu.wattage} - {psu.efficiency} - ₹{psu.price}
+          </option>
+        ))
     ) : (
       <option disabled>No PSUs Available</option>
     )}
   </select>
 </div>
 
+{/* PC Case Selection */}
 <div className="mb-6">
   <h2 className="text-xl font-semibold">Select Your PC Case</h2>
   <select className="w-full p-2 border rounded-md" onChange={(e) => handleSelect("case", e)}>
     <option value="">Select PC Case</option>
-    {components.cases.length > 0 ? (
-      components.cases.map((pcCase) => (
-        <option key={pcCase._id} value={pcCase._id}>
-          {pcCase.name} - {pcCase.specifications?.case?.formFactor} - ₹{pcCase.price}
-        </option>
-      ))
+    {components.cases.filter(pcCase => pcCase.stock > 0).length > 0 ? (
+      components.cases
+        .filter((pcCase) => pcCase.stock > 0)
+        .map((pcCase) => (
+          <option key={pcCase._id} value={pcCase._id}>
+            {pcCase.name} - {pcCase.specifications?.case?.formFactor} - ₹{pcCase.price}
+          </option>
+        ))
     ) : (
       <option disabled>No PC Cases Available</option>
     )}
   </select>
 </div>
+
 
 
 

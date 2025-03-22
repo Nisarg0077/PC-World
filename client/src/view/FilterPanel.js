@@ -53,6 +53,15 @@ const FilterPanel = ({ categories, category, products, filteredParams, onFilterC
     caseFormFactor: filteredParams.caseFormFactor || "", // ✅ Form Factor (ATX, MicroATX, etc.)
     casePsuSupport: filteredParams.casePsuSupport || "", // ✅ PSU Support (Yes/No)
     caseSize: filteredParams.caseSize || "",
+    cpu: filteredParams.cpu  || "",
+    gpu: filteredParams.gpu  || "",
+     ram: filteredParams.ram  || "",
+     storage: filteredParams.storage  || "",
+     motherboard: filteredParams.motherboard  || "",
+     psu: filteredParams.psu  || "",
+     caseFilter: filteredParams.case  || "",
+     rating: filteredParams.rating || "",
+
 });
 
 const [maxProductPrice, setMaxProductPrice] = useState(1000000);
@@ -276,6 +285,22 @@ const [maxProductPrice, setMaxProductPrice] = useState(1000000);
         onChange={(e) => handleFilterChange("price", Number(e.target.value))}
         className="w-full"
       />
+
+      {/* Rating Filter */}
+<label className="block mt-4 text-sm font-medium">Rating</label>
+<select
+  className="w-full border p-2 rounded-md"
+  value={filters.rating || ""}
+  onChange={(e) => handleFilterChange("rating", e.target.value)}
+>
+  <option value="">All Ratings</option>
+  <option value="5">⭐⭐⭐⭐⭐</option>
+  <option value="4">⭐⭐⭐⭐ & Above</option>
+  <option value="3">⭐⭐⭐ & Above</option>
+  <option value="2">⭐⭐ & Above</option>
+  <option value="1">⭐ & Above</option>
+</select>
+
 
       {/* Brand Filter */}
       {filters.category && (
@@ -708,6 +733,60 @@ const [maxProductPrice, setMaxProductPrice] = useState(1000000);
     />
   </>
 )}
+
+
+
+
+
+{filters.category === "preBuilt" && (
+  <>
+    <FilterSelect
+      label="CPU"
+      value={filters.cpu}
+      options={getUniqueValues("preBuilt", "cpu")}
+      onChange={(e) => handleFilterChange("cpu", e.target.value)}
+    />
+    <FilterSelect
+      label="GPU"
+      value={filters.gpu}
+      options={getUniqueValues("preBuilt", "gpu")}
+      onChange={(e) => handleFilterChange("gpu", e.target.value)}
+    />
+    <FilterSelect
+      label="RAM"
+      value={filters.ram}
+      options={getUniqueValues("preBuilt", "ram")}
+      onChange={(e) => handleFilterChange("ram", e.target.value)}
+    />
+    <FilterSelect
+      label="Storage"
+      value={filters.storage}
+      options={getUniqueValues("preBuilt", "storage")}
+      onChange={(e) => handleFilterChange("storage", e.target.value)}
+    />
+    <FilterSelect
+      label="Motherboard"
+      value={filters.motherboard}
+      options={getUniqueValues("preBuilt", "motherboard")}
+      onChange={(e) => handleFilterChange("motherboard", e.target.value)}
+    />
+    <FilterSelect
+      label="PSU"
+      value={filters.psu}
+      options={getUniqueValues("preBuilt", "psu")}
+      onChange={(e) => handleFilterChange("psu", e.target.value)}
+    />
+    <FilterSelect
+  label="Case"
+  value={filters.caseFilter}
+  options={getUniqueValues("preBuilt", "case")}
+  onChange={(e) => handleFilterChange("caseFilter", e.target.value)}
+/>
+
+  </>
+)}
+
+
 
 
 

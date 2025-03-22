@@ -33,6 +33,7 @@ import AddMonitorProduct from './components/Products/AddMonitorProducts';
 import AddPcCaseProduct from './components/Products/AddPcCaseProduct';
 import AddCpuCoolerProduct from './components/Products/AddCpuCoolerProduct';
 import OrdersMgmt from './components/Orders/OrderMgmt';
+import AddPreBuiltPC from './components/Products/AddPreBuiltPC';
 function Layout() {
   const location = useLocation();
 
@@ -59,6 +60,7 @@ function Layout() {
         <Route path='/add-monitor' Component={AddMonitorProduct} />
         <Route path='/add-pccase' Component={AddPcCaseProduct} />
         <Route path='/add-cpucooler' Component={AddCpuCoolerProduct} />
+        <Route path='/add-prebuiltpc' Component={AddPreBuiltPC} />
         <Route path='/product-info' Component={ProductInfo} />
         <Route path='/Order' Component={OrdersMgmt} />
         <Route path='/vieworder' Component={viewOrder} />

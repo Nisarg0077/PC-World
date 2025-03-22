@@ -231,6 +231,21 @@ const navigate = useNavigate();
            
               </fieldset>
             </div>
+
+            
+            </div>
+            <div className='p-1'>
+
+            <fieldset className='border w-1/6 border-black p-3 bg-green-100'>
+
+<legend className='font-bold text-lg'>Add Pre-Built PC's:</legend>
+            <button
+                onClick={() => navigate('/add-prebuiltpc')}
+                className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-white hover:text-green-500 font-bold"
+              >
+                <i class="fa fa-plus" aria-hidden="true"></i> Pre-Built PC
+              </button>
+              </fieldset>
             </div>
           </div>
 

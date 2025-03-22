@@ -6,6 +6,8 @@ const User = require('./models/User');
 const Brand = require('./models/Brands');
 const Category = require('./models/Category');
 const Order = require("./models/Order");
+const Rating = require("./models/Rating");
+const Otp = require("./models/Otp");
 const cors = require('cors');
 const ProductType = require('./models/ProductType');
 const app = express();
@@ -36,7 +38,21 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
     process.exit(1);
   });
 
-
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    port: 465,
+    secure: true,
+    auth: {
+      user: 'nisarglimbachiya028@gmail.com',
+      pass: 'axeptrcseciqqdbf'
+    }
+  });
+  
+  // Verify connection at startup
+  transporter.verify((error) => {
+    if (error) console.error("❌ SMTP error:", error);
+    else console.log("✅ SMTP ready");
+  });
 
   // app.use('/images', express.static('images'));
   app.use('/images', express.static(path.join(__dirname, 'images')));
@@ -58,6 +74,7 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
 
 app.get('/', (req, res) => {
   res.send("Hello");
+  
 });
 
 app.post('/api/products', async (req, res) => {
@@ -112,19 +129,26 @@ app.get('/api/getproducts/:catname', async (req, res) => {
 
 
 
-
 app.post('/api/productInfo', async (req, res) => {
   try {
     const { pid } = req.body;
+    if (!pid) {
+      return res.status(400).json({ error: 'Product ID is required' });
+    }
+    
     const product = await Product.findById(pid);
-
+    
     if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
-
-    // Construct the full image URL based on the filename stored in the database
-    const baseUrl = `${req.protocol}://${req.get('host')}/images`; // Full URL for images
-    product.imageUrl = `${baseUrl}/${product.imageUrl}`; // Add the base URL to the filename
+    
+    product.views = (product.views || 0) + 1;
+    await product.save();
+    
+    
+    // ✅ Construct the full image URL based on the filename stored in the database
+    const baseUrl = `${req.protocol}://${req.get('host')}/images`;
+    product.imageUrl = `${baseUrl}/${product.imageUrl}`;
 
     res.json(product);
   } catch (error) {
@@ -132,6 +156,7 @@ app.post('/api/productInfo', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch product' });
   }
 });
+
 
 
 // GET /api/product/:id - Fetch a specific product by ID
@@ -146,6 +171,35 @@ app.get('/api/product/:pid', async (req, res) => {
   } catch (error) {
     console.error('Error fetching product:', error);
     res.status(500).json({ message: 'Failed to fetch product' });
+  }
+});
+
+
+app.get('/api/top-selling-products', async (req, res) => {
+  try {
+    const topProducts = await Product.find()
+      .sort({ orders: -1 })   // Sort by highest orderCount
+      .limit(5)                   // Limit to top 5 products
+      .select('name orders'); // Send only required fields
+
+    res.json(topProducts);
+  } catch (err) {
+    console.error('Error fetching top-selling products:', err);
+    res.status(500).json({ error: 'Failed to fetch top-selling products' });
+  }
+});
+
+app.get('/api/most-viewed-products', async (req, res) => {
+  try {
+    const mostViewed = await Product.find({})
+      .sort({ views: -1 })   // Sort by viewCount (highest first)
+      .limit(10)                 // Optional: Limit to top 10
+      .select('name views'); // Only return needed fields
+
+    res.json(mostViewed);
+  } catch (err) {
+    console.error('Error fetching most viewed products:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -543,99 +597,173 @@ app.post('/api/user/login', async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
-app.post("/api/register", upload.fields([{ name: 'aadharFront', maxCount: 1 }, { name: 'aadharBack', maxCount: 1 }]), async (req, res) => {
+// app.post("/api/register", upload.fields([{ name: 'aadharFront', maxCount: 1 }, { name: 'aadharBack', maxCount: 1 }]), async (req, res) => {
  
-  try {
-//     console.log('Processed Body:', JSON.stringify(req.body, null, 2));
-// console.log('Office Address:', req.body.officeAddress);
-// console.log('Residential Address:', req.body.address);
+//   try {
+// //     console.log('Processed Body:', JSON.stringify(req.body, null, 2));
+// // console.log('Office Address:', req.body.officeAddress);
+// // console.log('Residential Address:', req.body.address);
     
-    // if (!req.body.officeAddress) {
-    //   return res.status(400).json({ error: "Office address is required." });
-    // }
-    // // Check if residential address is provided
-    // if (!req.body.address) {
-    //   return res.status(400).json({ error: "Residential address is required." });
-    // }
+//     // if (!req.body.officeAddress) {
+//     //   return res.status(400).json({ error: "Office address is required." });
+//     // }
+//     // // Check if residential address is provided
+//     // if (!req.body.address) {
+//     //   return res.status(400).json({ error: "Residential address is required." });
+//     // }
+//     const newUser = new User({
+//       username: req.body.username,
+//       password: req.body.password,  // Now securely hashed
+//       firstName: req.body.firstName,
+//       lastName: req.body.lastName,
+//       dob: new Date(req.body.dob), // Ensure date format is correct
+//       gender: req.body.gender, // Ensure date format is correct
+//       phoneNumber: req.body.phoneNumber,
+//       designation: req.body.designation,
+//       jobProfile: req.body.jobProfile,
+//       orgName: req.body.orgName,
+//       officeAddress: {
+//         officeBuilding: req.body['officeAddress.officeBuilding'],
+//         officeStreet: req.body['officeAddress.officeStreet'],
+//         officeCity: req.body['officeAddress.officeCity'],
+//         officeState: req.body['officeAddress.officeState'],
+//         officePinCode: req.body['officeAddress.officePinCode']
+//       },
+//       email: req.body.email,
+      
+//       address: {
+//         building: req.body['address.building'],
+//         street: req.body['address.street'],
+//         city: req.body['address.city'],
+//         state: req.body['address.state'],
+//         pinCode: req.body['address.pinCode']
+//       },    
+//       aadharNumber: req.body.aadharNumber,
+//       aadharFront: req.files['aadharFront'] ? req.files['aadharFront'][0].filename : null,
+//       aadharBack: req.files['aadharBack'] ? req.files['aadharBack'][0].filename : null,
+//       role: 'client'
+//     });
+    
+
+//     await newUser.save();
+
+//     const transporter = nodemailer.createTransport({
+//       service: 'gmail',
+//       host: 'smtp.gmail.com',
+//       port: 465,
+//       auth: {
+//         user: 'nisarglimbachiya028@gmail.com', // Replace with your email
+//         pass: 'axeptrcseciqqdbf' // Replace with your email password or app password
+//       }
+//     });
+
+//     const mailOptions = {
+//       from: 'nisarglimbachiya028l@gmail.com',
+//       to: req.body.email, // Send email to the registered user
+//       subject: 'Welcome to Our PC-World!',
+//       html: ` <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; text-align: center;">
+//       <h1 style="color: #333;">Welcome, ${req.body.firstName}!</h1>
+//       <p style="font-size: 16px; color: #555;">Your registration was successful.</p>
+//       <p style="font-size: 16px; color: #333;"><strong>Username:</strong> ${req.body.username}</p>
+//       <p style="font-size: 16px; color: #555;">Thank you for registering with us.</p>
+//     </div>`
+//     };
+
+//     // Send the email
+//     transporter.sendMail(mailOptions, (error, info) => {
+//       if (error) {
+//         console.error('Error sending email:', error);
+//       } else {
+//         console.log('Email sent:', info.response);
+//       }
+//     });
+
+
+//     res.status(201).json({ message: "User registered successfully!" });
+
+//   } catch (error) {
+//     if (error.code === 11000) {
+//       res.status(409).json({ error: "Username, email, or Aadhar number already exists." });
+//     } else {
+//       console.error(error);
+//       res.status(500).json({ error: "Error registering user" });
+//     }
+//   }
+// });
+
+app.post("/api/register", async (req, res) => {
+  try {
+    // Check for existing email or username or phoneNumber
+    const existingUser = await User.findOne({
+      $or: [
+        { email: req.body.email },
+        { username: req.body.username },
+        { phoneNumber: req.body.phoneNumber }
+      ]
+    });
+
+    if (existingUser) {
+      return res.status(409).json({ message: "User with email, username, or phone number already exists." });
+    }
+
+    // Proceed with new user registration
     const newUser = new User({
       username: req.body.username,
-      password: req.body.password,  // Now securely hashed
+      password: req.body.password,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
-      dob: new Date(req.body.dob), // Ensure date format is correct
-      gender: req.body.gender, // Ensure date format is correct
+      dob: new Date(req.body.dob),
+      gender: req.body.gender,
       phoneNumber: req.body.phoneNumber,
-      designation: req.body.designation,
-      jobProfile: req.body.jobProfile,
-      orgName: req.body.orgName,
-      officeAddress: {
-        officeBuilding: req.body['officeAddress.officeBuilding'],
-        officeStreet: req.body['officeAddress.officeStreet'],
-        officeCity: req.body['officeAddress.officeCity'],
-        officeState: req.body['officeAddress.officeState'],
-        officePinCode: req.body['officeAddress.officePinCode']
-      },
       email: req.body.email,
-      
       address: {
-        building: req.body['address.building'],
-        street: req.body['address.street'],
-        city: req.body['address.city'],
-        state: req.body['address.state'],
-        pinCode: req.body['address.pinCode']
-      },    
-      aadharNumber: req.body.aadharNumber,
-      aadharFront: req.files['aadharFront'] ? req.files['aadharFront'][0].filename : null,
-      aadharBack: req.files['aadharBack'] ? req.files['aadharBack'][0].filename : null,
+        building: req.body.address['building'],
+        street: req.body.address['street'],
+        city: req.body.address['city'],
+        state: req.body.address['state'],
+        pinCode: req.body.address['pinCode']
+      },
       role: 'client'
     });
-    
 
     await newUser.save();
 
+    // Send Welcome Email
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       host: 'smtp.gmail.com',
       port: 465,
       auth: {
-        user: 'nisarglimbachiya028@gmail.com', // Replace with your email
-        pass: 'axeptrcseciqqdbf' // Replace with your email password or app password
+        user: 'nisarglimbachiya028@gmail.com',
+        pass: 'axeptrcseciqqdbf'
       }
     });
 
     const mailOptions = {
-      from: 'nisarglimbachiya028l@gmail.com',
-      to: req.body.email, // Send email to the registered user
+      from: 'nisarglimbachiya028@gmail.com',
+      to: req.body.email,
       subject: 'Welcome to Our PC-World!',
-      html: ` <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; text-align: center;">
-      <h1 style="color: #333;">Welcome, ${req.body.firstName}!</h1>
-      <p style="font-size: 16px; color: #555;">Your registration was successful.</p>
-      <p style="font-size: 16px; color: #333;"><strong>Username:</strong> ${req.body.username}</p>
-      <p style="font-size: 16px; color: #555;">Thank you for registering with us.</p>
-    </div>`
+      html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; text-align: center;">
+        <h1 style="color: #333;">Welcome, ${req.body.firstName}!</h1>
+        <p style="font-size: 16px; color: #555;">Your registration was successful.</p>
+        <p style="font-size: 16px; color: #333;"><strong>Username:</strong> ${req.body.username}</p>
+        <p style="font-size: 16px; color: #555;">Thank you for registering with us.</p>
+      </div>`
     };
 
-    // Send the email
     transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Error sending email:', error);
-      } else {
-        console.log('Email sent:', info.response);
-      }
+      if (error) console.error('Error sending email:', error);
+      else console.log('Email sent:', info.response);
     });
-
 
     res.status(201).json({ message: "User registered successfully!" });
 
   } catch (error) {
-    if (error.code === 11000) {
-      res.status(409).json({ error: "Username, email, or Aadhar number already exists." });
-    } else {
-      console.error(error);
-      res.status(500).json({ error: "Error registering user" });
-    }
+    console.error(error);
+    res.status(500).json({ error: "Error registering user" });
   }
 });
+
 
 
 app.post('/api/uploadAadhar', upload.fields([{ name: 'aadharFront', maxCount: 1 }, { name: 'aadharBack', maxCount: 1 }]), (req, res) => {
@@ -732,23 +860,65 @@ app.post('/api/client/user', async (req, res) => {
 
 
 
+// app.post("/api/cart/add", async (req, res) => {
+//   try {
+//     const { customerId, productId, name, price, quantity, imageUrl } = req.body;
+    
+    
+//     let cart = await Cart.findOne({ customer: customerId });
+
+//     if (!cart) {
+//       cart = new Cart({ customer: customerId, cartItems: [] });
+//     }
+
+//     const existingItem = cart.cartItems.find((item) => item.product.toString() === productId);
+
+//     if (existingItem) {
+//       existingItem.quantity += quantity;
+//     } else {
+//       cart.cartItems.push({ product: productId, name, price, quantity, imageUrl });
+//     }
+
+//     await cart.save();
+//     res.json({ message: "Product added to cart", cart });
+//   } catch (error) {
+//     console.error("Error adding to cart:", error);
+//     res.status(500).json({ message: "Failed to add product to cart" });
+//   }
+// });
+
+
 app.post("/api/cart/add", async (req, res) => {
   try {
-    const { customerId, productId, name, price, quantity, imageUrl } = req.body;
-    
-    
+    const { customerId, productId, quantity } = req.body; // Remove name, price, imageUrl
+
+    // Fetch product details from the database
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
     let cart = await Cart.findOne({ customer: customerId });
 
     if (!cart) {
       cart = new Cart({ customer: customerId, cartItems: [] });
     }
 
-    const existingItem = cart.cartItems.find((item) => item.product.toString() === productId);
+    const existingItem = cart.cartItems.find(
+      (item) => item.product.toString() === productId
+    );
 
     if (existingItem) {
       existingItem.quantity += quantity;
     } else {
-      cart.cartItems.push({ product: productId, name, price, quantity, imageUrl });
+      // Use product data from the database
+      cart.cartItems.push({
+        product: productId,
+        name: product.name,
+        price: product.price,
+        quantity,
+        imageUrl: product.imageUrl, // Correct imageUrl from the product
+      });
     }
 
     await cart.save();
@@ -763,7 +933,9 @@ app.post("/api/cart/add", async (req, res) => {
 // Fetch Cart by User ID
 app.get("/api/cart/:userId", async (req, res) => {
   try {
-    const cart = await Cart.findOne({ customer: req.params.userId }).populate("cartItems.product");
+    const cart = await Cart.findOne({ customer: req.params.userId }).populate(
+      "cartItems.product"
+    );;
 
     if (!cart) {
       return res.json({ cartItems: [] });
@@ -789,13 +961,39 @@ app.get("/api/cart/:userId", async (req, res) => {
 
 
 // Update Item Quantity
+// app.put("/api/cart/update/:userId/:productId", async (req, res) => {
+//   try {
+//     const { userId, productId } = req.params;
+//     const { quantity } = req.body;
+
+//     const cart = await Cart.findOneAndUpdate(
+//       { customer: userId, "cartItems.product": productId },
+//       { $set: { "cartItems.$.quantity": quantity } },
+//       { new: true }
+//     );
+
+//     if (!cart) return res.status(404).json({ message: "Cart or product not found" });
+
+//     res.json(cart);
+//   } catch (error) {
+//     res.status(500).json({ message: "Error updating item", error });
+//   }
+// });
 app.put("/api/cart/update/:userId/:productId", async (req, res) => {
   try {
     const { userId, productId } = req.params;
     const { quantity } = req.body;
 
+    // Validate IDs first
+    if (!mongoose.isValidObjectId(userId) || !mongoose.isValidObjectId(productId)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
+
     const cart = await Cart.findOneAndUpdate(
-      { customer: userId, "cartItems.product": productId },
+      { 
+        customer: new mongoose.Types.ObjectId(userId),
+        "cartItems.product": new mongoose.Types.ObjectId(productId)
+      },
       { $set: { "cartItems.$.quantity": quantity } },
       { new: true }
     );
@@ -804,26 +1002,89 @@ app.put("/api/cart/update/:userId/:productId", async (req, res) => {
 
     res.json(cart);
   } catch (error) {
-    res.status(500).json({ message: "Error updating item", error });
+    console.error("Update error:", error);
+    res.status(500).json({ 
+      message: "Error updating item",
+      error: error.message // Safer than sending full error
+    });
   }
 });
-
 // Remove Item
+// app.delete("/api/cart/remove/:userId/:productId", async (req, res) => {
+//   try {
+//     const { userId, productId } = req.params;
+
+//     const cart = await Cart.findOneAndUpdate(
+//       { customer: userId },
+//       { $pull: { cartItems: { product: productId } } },
+//       { new: true }
+//     );
+
+//     if (!cart) return res.status(404).json({ message: "Cart or product not found" });
+
+//     res.json(cart);
+//   } catch (error) {
+//     res.status(500).json({ message: "Error removing item", error });
+//   }
+// });
+
 app.delete("/api/cart/remove/:userId/:productId", async (req, res) => {
   try {
     const { userId, productId } = req.params;
 
+    // Validate ObjectId format first
+    if (!mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({ message: "Invalid user ID format" });
+    }
+    if (!mongoose.isValidObjectId(productId)) {
+      return res.status(400).json({ message: "Invalid product ID format" });
+    }
+
     const cart = await Cart.findOneAndUpdate(
-      { customer: userId },
-      { $pull: { cartItems: { product: productId } } },
+      { 
+        customer: new mongoose.Types.ObjectId(userId) 
+      },
+      { 
+        $pull: { 
+          cartItems: { 
+            product: new mongoose.Types.ObjectId(productId) 
+          } 
+        } 
+      },
       { new: true }
     );
 
-    if (!cart) return res.status(404).json({ message: "Cart or product not found" });
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
 
-    res.json(cart);
+    // Check if item was actually removed
+    const itemExists = cart.cartItems.some(item => 
+      item.product.equals(new mongoose.Types.ObjectId(productId))
+    );
+    if (itemExists) {
+      return res.status(404).json({ message: "Product not found in cart" });
+    }
+
+    res.json({
+      message: "Product removed successfully",
+      updatedCart: cart
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error removing item", error });
+    console.error("Remove item error:", error);
+    
+    // Handle specific MongoDB errors
+    if (error instanceof mongoose.Error.CastError) {
+      return res.status(400).json({ 
+        message: "Invalid ID format",
+        details: error.message
+      });
+    }
+
+    res.status(500).json({ 
+      message: "Error removing item",
+      error: error.message 
+    });
   }
 });
 
@@ -889,54 +1150,81 @@ app.get('/api/users', async (req, res) => {
 //   }
 // });
 
-app.put('/api/users/:userId', upload.fields([
-  { name: 'aadharFront', maxCount: 1 }, 
-  { name: 'aadharBack', maxCount: 1 }
-]), async (req, res) => {
+// app.put('/api/users/:userId', upload.fields([
+//   { name: 'aadharFront', maxCount: 1 }, 
+//   { name: 'aadharBack', maxCount: 1 }
+// ]), async (req, res) => {
+//   const { userId } = req.params;
+
+//   try {
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+
+//     // Handle nested address fields
+//     const addressFields = ['building', 'street', 'city', 'state', 'pinCode'];
+//     const officeAddressFields = ['officeBuilding', 'officeStreet', 'officeCity', 'officeState', 'officePinCode'];
+
+//     // Update regular fields
+//     Object.keys(req.body).forEach(key => {
+//       if (user[key] !== undefined && !key.startsWith('address.') && !key.startsWith('officeAddress.')) {
+//         user[key] = req.body[key];
+//       }
+//     });
+
+//     // Update address
+//     addressFields.forEach(field => {
+//       const key = `address.${field}`;
+//       if (req.body[key] !== undefined) {
+//         user.address[field] = req.body[key];
+//       }
+//     });
+
+//     // Update officeAddress
+//     officeAddressFields.forEach(field => {
+//       const key = `officeAddress.${field}`;
+//       if (req.body[key] !== undefined) {
+//         user.officeAddress[field] = req.body[key];
+//       }
+//     });
+
+//     // Handle file updates
+//     if (req.files) {
+//       if (req.files['aadharFront']) {
+//         user.aadharFront = req.files['aadharFront'][0].filename;
+//       }
+//       if (req.files['aadharBack']) {
+//         user.aadharBack = req.files['aadharBack'][0].filename;
+//       }
+//     }
+
+//     await user.save();
+//     res.status(200).json({ message: 'User updated successfully', user });
+//   } catch (err) {
+//     console.error("Error updating user:", err);
+//     res.status(500).json({ message: 'Error updating user data', error: err.message });
+//   }
+// });
+
+// ✅ Correct Update API - handles FormData, nested address
+app.put('/api/users/:userId', upload.none(), async (req, res) => {
   const { userId } = req.params;
+   // ✅ Now this will work
 
   try {
     const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
-    // Handle nested address fields
-    const addressFields = ['building', 'street', 'city', 'state', 'pinCode'];
-    const officeAddressFields = ['officeBuilding', 'officeStreet', 'officeCity', 'officeState', 'officePinCode'];
-
-    // Update regular fields
-    Object.keys(req.body).forEach(key => {
-      if (user[key] !== undefined && !key.startsWith('address.') && !key.startsWith('officeAddress.')) {
+    // Update logic
+    Object.keys(req.body).forEach((key) => {
+      if (key.startsWith('address.')) {
+        const field = key.split('.')[1];
+        user.address[field] = req.body[key];
+      } else {
         user[key] = req.body[key];
       }
     });
-
-    // Update address
-    addressFields.forEach(field => {
-      const key = `address.${field}`;
-      if (req.body[key] !== undefined) {
-        user.address[field] = req.body[key];
-      }
-    });
-
-    // Update officeAddress
-    officeAddressFields.forEach(field => {
-      const key = `officeAddress.${field}`;
-      if (req.body[key] !== undefined) {
-        user.officeAddress[field] = req.body[key];
-      }
-    });
-
-    // Handle file updates
-    if (req.files) {
-      if (req.files['aadharFront']) {
-        user.aadharFront = req.files['aadharFront'][0].filename;
-      }
-      if (req.files['aadharBack']) {
-        user.aadharBack = req.files['aadharBack'][0].filename;
-      }
-    }
 
     await user.save();
     res.status(200).json({ message: 'User updated successfully', user });
@@ -945,6 +1233,9 @@ app.put('/api/users/:userId', upload.fields([
     res.status(500).json({ message: 'Error updating user data', error: err.message });
   }
 });
+
+
+
 
 // DELETE API to delete a user by ID
 app.delete('/api/users/:id', async (req, res) => {
@@ -1051,16 +1342,17 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
 
 app.post('/api/feedback-in', async (req, res) => {
   try {
-    const { userId, productId, productTitle, title, description } = req.body;
+    const { userId, username, productId, productTitle, title, description } = req.body;
 
     // Validate input
-    if (!userId || !productId || !productTitle || !title || !description) {
+    if (!userId || !username || !productId || !productTitle || !title || !description) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
     // Create a new feedback document
     const newFeedback = new Feedback({
       userId,
+      username,
       productId,
       productTitle,
       title,
@@ -1088,6 +1380,19 @@ app.post('/api/feedbacks', async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 })
+
+app.get('/api/feedback/:productId', async (req, res) => {
+  try {
+    const feedbacks = await Feedback.find({
+      productId: req.params.productId,
+      isActive: true // Only approved feedbacks
+    }).populate('userId', 'name'); // Optional: populate user name if needed
+    res.json(feedbacks);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch feedbacks' });
+  }
+});
+
 
 
 app.get('/api/approved-feedbacks/:productId', async (req, res) => {
@@ -1327,12 +1632,54 @@ app.get("/api/user/address/:userId", async (req, res) => {
 
 app.post("/api/orderin", async (req, res) => {
   try {
-    const { userId, email, items, totalAmount, shippingAddress } = req.body;
+      console.log("Received order data:", req.body);
+  
+      const { userId, email, items, totalAmount, shippingAddress } = req.body;
+      if (!userId || !email || !items || !totalAmount || !shippingAddress) {
+        console.error("Missing required fields:", req.body);
+        return res.status(400).json({ error: "All fields are required" });
+      }
+  
+      // Check if all products exist
+      const missingProducts = [];
+      for (const item of items) {
+        const product = await Product.findById(item.productId);
+        if (!product) {
+          missingProducts.push(item.productId);
+        }
+      }
+  
+      if (missingProducts.length > 0) {
+        console.error("Products not found:", missingProducts);
+        return res.status(400).json({ error: "Some products not found", missingProducts });
+      }
+  
+      console.log("All products exist. Proceeding with order...");
 
-    if (!userId || !email || !items || !totalAmount || !shippingAddress) {
-      return res.status(400).json({ error: "All fields are required" });
+    // Check stock availability before placing the order
+    for (const item of items) {
+      const product = await Product.findById(item.productId);
+      if (!product) {
+        return res.status(404).json({ error: `Product with ID ${item.productId} not found` });
+      }
+      if (product.stock < item.quantity) {
+        return res.status(400).json({ error: `Insufficient stock for ${product.name}. Only ${product.stock} left.` });
+      }
     }
 
+    // Reduce stock based on quantity
+    for (const item of items) {
+      await Product.findByIdAndUpdate(
+        item.productId,
+        { $inc: {
+           stock: -item.quantity,
+           orders: item.quantity
+           } }, // Decrement stock
+        { new: true }
+      );
+    }
+
+    // Create new order
     const newOrder = new Order({
       userId,
       email,
@@ -1347,41 +1694,70 @@ app.post("/api/orderin", async (req, res) => {
     await newOrder.save();
     res.status(201).json({ message: "Order placed successfully", order: newOrder });
 
+    // Generate ordered items table for email
+    let itemsTable = `
+      <table border="1" style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th style="padding: 8px; background-color: #f2f2f2;">Product</th>
+            <th style="padding: 8px; background-color: #f2f2f2;">Quantity</th>
+            <th style="padding: 8px; background-color: #f2f2f2;">Price</th>
+          </tr>
+        </thead>
+        <tbody>`;
 
+    for (const item of items) {
+      const product = await Product.findById(item.productId);
+      itemsTable += `
+        <tr>
+          <td style="padding: 8px;">${product.name}</td>
+          <td style="padding: 8px; text-align: center;">${item.quantity}</td>
+          <td style="padding: 8px; text-align: center;">₹${(item.quantity * product.price).toLocaleString('en-IN')}</td>
+        </tr>`;
+    }
+
+    itemsTable += `</tbody></table>`;
+
+    // Send confirmation email
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       host: 'smtp.gmail.com',
       port: 465,
       auth: {
-        user: 'nisarglimbachiya028@gmail.com', // Replace with your email
-        pass: 'axeptrcseciqqdbf' // Replace with your email password or app password
+        user: 'nisarglimbachiya028@gmail.com',
+        pass: 'axeptrcseciqqdbf'
       }
     });
 
     const mailOptions = {
       from: 'nisarglimbachiya028@gmail.com',
-      to: newOrder.email, // Send email to the registered user
-      subject: 'LogIn successful at PC-World',
-      html: ` <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; text-align: center;">
-      <h1 style="color: #333;">Hi, ${newOrder.shippingAddress.fullName}!</h1>
-      <p style="font-size: 16px; color: #555;">Your order is placed successfully.</p>
-    </div>`
+      to: newOrder.email,
+      subject: 'Order Confirmation - PC World',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+          <h1 style="color: #333;">Hi, ${newOrder.shippingAddress.fullName}!</h1>
+          <p style="font-size: 16px; color: #555;">Your order has been placed successfully.</p>
+          <h2 style="color: #444;">Order Summary</h2>
+          ${itemsTable}
+          <p style="font-size: 18px;"><strong>Total Amount:</strong> ₹${totalAmount.toLocaleString('en-IN')}</p>
+          <p style="color: #666;">Your order will be delivered soon. Thank you for shopping at PC World!</p>
+        </div>`
     };
 
-    // Send the email
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error('Error sending email:', error);
       } else {
         console.log('Email sent:', info.response);
       }
-
     });
+
   } catch (error) {
     console.error("Error placing order:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 
 
@@ -1438,21 +1814,130 @@ app.get("/api/orders/:oid", async (req, res) => {
   }
 });
 
+// app.put("/api/orders/:id", async (req, res) => {
+//   try {
+//       const { orderStatus, paymentStatus } = req.body;
+
+//       const updatedOrder = await Order.findByIdAndUpdate(
+//           req.params.id,
+//           { orderStatus, paymentStatus },
+//           { new: true }
+//       );
+
+//       res.json(updatedOrder);
+
+      
+//       if (orderStatus === "canceled") {
+//         const transporter = nodemailer.createTransport({
+//           service: 'gmail',
+//           host: 'smtp.gmail.com',
+//           port: 465,
+//           auth: {
+//             user: 'nisarglimbachiya028@gmail.com',
+//             pass: 'axeptrcseciqqdbf'
+//           }
+//         });
+//         const mailOptions = {
+//           from: "nisarglimbachiya028@gmail.com",
+//           to: updatedOrder.email, // Ensure `userEmail` is stored in the order model
+//           subject: "Order Canceled",
+//           text: `Dear Customer, your order with ID ${updatedOrder._id} has been canceled.`,
+//         };
+  
+//         transporter.sendMail(mailOptions, (error, info) => {
+//           if (error) {
+//             console.error('Error sending email:', error);
+//           } else {
+//             console.log('Email sent:', info.response);
+//           }
+//         });
+//         console.log("Cancellation email sent.");
+//       }
+//   } catch (err) {
+//       res.status(500).json({ error: err.message });
+//   }
+// });
+
 app.put("/api/orders/:id", async (req, res) => {
   try {
-      const { orderStatus, paymentStatus } = req.body;
+    const { orderStatus, paymentStatus } = req.body;
 
-      const updatedOrder = await Order.findByIdAndUpdate(
-          req.params.id,
-          { orderStatus, paymentStatus },
-          { new: true }
-      );
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id,
+      { orderStatus, paymentStatus },
+      { new: true }
+    ).populate('items.productId'); // Populate product if it's a ref
 
-      res.json(updatedOrder);
+    if (!updatedOrder) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    // Send response FIRST
+    res.json(updatedOrder);
+
+    // Handle email ASYNCHRONOUSLY (after response)
+    if (updatedOrder.orderStatus === "Cancelled" && updatedOrder.email) {
+      console.log("📩 Sending email to:", updatedOrder.email);
+
+      if (!Array.isArray(updatedOrder.items) || updatedOrder.items.length === 0) {
+        console.error("❌ No items found in the order.");
+        return;
+      }
+      const productDetails = updatedOrder.items.map(item => {
+        return `
+          Product: ${item.productId?.name || item.name}
+          Quantity: ${item.quantity}
+          Price: $${(item.price / 100).toFixed(2)}
+          ------------------------------
+        `;
+      }).join('\n');
+
+      const mailOptions = {
+        from: 'PC-World <nisarglimbachiya028@gmail.com>',
+        to: updatedOrder.email,
+        subject: "Order Canceled",
+        text: `
+          Your order (ID: ${updatedOrder._id}) has been canceled.
+          
+          Ordered Products:
+          ${productDetails}
+          
+          Total Amount: ₹${(updatedOrder.totalAmount).toFixed(2)}
+          
+          We're sorry to see you go! If this was a mistake, please contact support.
+        `,
+        html: `
+          <p>Your order (ID: <strong>${updatedOrder._id}</strong>) has been canceled.</p>
+          <h3>Order Details:</h3>
+          <ul>
+            ${updatedOrder.items.map(item => `
+              <li>
+                ${item.product?.name || item.name || 'N/A'} - 
+                Qty: ${item.quantity} - 
+                ₹${(item.price).toFixed(2)}
+              </li>
+            `).join('')}
+          </ul>
+          <p><strong>Total Amount:</strong> ₹${(updatedOrder.totalAmount).toFixed(2)}</p>
+        `
+      };
+
+      try {
+        await transporter.sendMail(mailOptions);
+        console.log("✅ Email sent with product details");
+      } catch (emailError) {
+        console.error("❌ Email failed:", emailError);
+      }
+    }
   } catch (err) {
+    console.error("❌ Server error:", err);
+    // Avoid sending response if already sent
+    if (!res.headersSent) {
       res.status(500).json({ error: err.message });
+    }
   }
 });
+
 
 // ✅ Delete an order
 app.delete("/api/orders/:id", async (req, res) => {
@@ -1490,6 +1975,19 @@ app.get("/api/orders/user/:userId", async (req, res) => {
   }
 });
 
+
+app.put('/api/user/address/:userId', async (req, res) => {
+  const { userId } = req.params;
+  const address = req.body;
+  try {
+    const user = await User.findByIdAndUpdate(userId, { address }, { new: true });
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.status(200).json({ message: "Address updated", address: user.address });
+  } catch (err) {
+    console.error("Update Error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 
 ///custom build
@@ -1583,18 +2081,66 @@ app.get("/api/products/psu", async (req, res) => {
 });
 
 
+
+app.post('/api/submit-rating', async (req, res) => {
+  const { productId, userId, rating } = req.body;
+
+  if (!productId || !userId || !rating) {
+    return res.status(400).json({ success: false, message: 'Missing fields' });
+  }
+
+ 
+
+  try {
+    // Check product existence
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
+
+    // Check if user already rated
+    let userRating = await Rating.findOne({ productId, userId });
+    if (userRating) {
+      userRating.rating = rating;
+      await userRating.save();
+    } else {
+      userRating = new Rating({ productId, userId, rating });
+      await userRating.save();
+    }
+
+    // Calculate new average rating
+    const allRatings = await Rating.find({ productId });
+    const totalRating = allRatings.reduce((sum, r) => sum + r.rating, 0);
+    const avgRating = totalRating / allRatings.length;
+
+    // Update product's averageRating with 1 decimal
+    product.averageRating = Number(avgRating.toFixed(1));
+    await product.save();
+
+    res.json({
+      success: true,
+      message: 'Rating submitted successfully',
+      averageRating: product.averageRating
+    });
+
+  } catch (err) {
+    console.error('Rating submission failed:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+
+
 app.get("/api/user/aadhar/:userId", async (req, res) => {
   try {
       const { userId } = req.params;
       
       // ✅ Fetch user with Aadhaar details from User model
-      const user = await User.findById(userId).select("aadharNumber aadharFront aadharBack");
+      const user = await User.findById(userId).select("username aadharNumber aadharFront aadharBack");
 
       if (!user) {
           return res.status(404).json({ success: false, message: "User not found." });
       }
 
-      if (!user.aadharNumber || !user.aadharFront || !user.aadharBack) {
+      if (!user.username ||!user.aadharNumber || !user.aadharFront || !user.aadharBack) {
           return res.status(404).json({ success: false, message: "Aadhaar details not found for this user." });
       }
 
@@ -1602,9 +2148,10 @@ app.get("/api/user/aadhar/:userId", async (req, res) => {
       res.status(200).json({
           success: true,
           aadhaar: {
-              aadharNumber: user.aadharNumber,
-              aadharFront: user.aadharFront,
-              aadharBack: user.aadharBack
+            username: user.username,
+            aadharNumber: user.aadharNumber,
+            aadharFront: user.aadharFront,
+            aadharBack: user.aadharBack
           }
       });
 
@@ -1613,6 +2160,57 @@ app.get("/api/user/aadhar/:userId", async (req, res) => {
       res.status(500).json({ success: false, message: "Server error." });
   }
 });
+
+
+const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
+
+app.post('/api/send-otp', async (req, res) => {
+  const { email } = req.body;
+
+  const otp = generateOTP();
+
+  // Save OTP to DB with timestamp (auto-expiry after 2 mins due to schema)
+  await Otp.create({ email, otp });
+
+  // Send Email using Nodemailer
+  await transporter.sendMail({
+    from: 'nisarglimbachiya028@gmail.com',
+    to: email,
+    subject: 'Your OTP Code',
+    text: `Your OTP Code is: ${otp}. It is valid for 2 minutes.`,
+  });
+
+  res.json({ message: 'OTP sent to your email' });
+});
+
+
+app.post('/api/verify-otp', async (req, res) => {
+  const { email, otp } = req.body;
+
+  // Find OTP record
+  const record = await Otp.findOne({ email, otp });
+
+  if (!record) {
+    return res.status(400).json({ message: 'Invalid or expired OTP' });
+  }
+
+  // ✅ Calculate time difference in milliseconds
+  const now = new Date();
+  const otpCreatedAt = new Date(record.createdAt);
+  const diffMs = now - otpCreatedAt;
+
+  // ✅ Check if more than 2 minutes (120000 ms)
+  if (diffMs > 120000) {
+    // Optional: delete expired OTP manually
+    await Otp.deleteOne({ _id: record._id });
+    return res.status(400).json({ message: 'OTP Expired' });
+  }
+
+  // ✅ OTP is valid
+  await Otp.deleteOne({ _id: record._id }); // Optional: Clean up
+  res.json({ message: 'OTP Verified Successfully!' });
+});
+
 
 
 

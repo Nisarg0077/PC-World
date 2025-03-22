@@ -29,7 +29,7 @@ const OrderSchema = new mongoose.Schema({
     state: { type: String, trim: true, required: true },
     pinCode: { type: String, trim: true, required: true },
   }, // Shipping details
-  createdAt: { type: Date, default: Date.now },
+  orderedAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model("Order", OrderSchema);

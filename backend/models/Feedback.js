@@ -6,6 +6,10 @@ const FeedbackSchema = new mongoose.Schema({
     ref: "User",
     required: true
   },
+  username: {
+    type: String,
+    required: true
+  },
   productId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
