@@ -8,7 +8,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { selectedProducts = [], checkoutType, product: singleProduct, customBuild } = location.state || {};
+  const { selectedProducts = [], checkoutType, product: singleProduct, customBuild, isCustomBuild  } = location.state || {};
 
   const [cartItems, setCartItems] = useState(state?.cartItems || []);
   const [user, setUser] = useState(null);
@@ -29,6 +29,9 @@ const Checkout = () => {
       const userData = JSON.parse(storedUser);
       setUser(userData);
       fetchUserAddress(userData.id);
+      console.log(checkoutType);
+      console.log(isCustomBuild);
+      
       
     } else {
       setError("No user found. Please log in.");
@@ -81,56 +84,69 @@ const Checkout = () => {
   })();
 
   const handlePlaceOrder = async () => {
-    if (!user || !shippingAddress || totalPrice === 0) {
-      alert("Please login to Checkout.");
-      return;
-    }
+  if (!user || !shippingAddress || totalPrice === 0) {
+    alert("Please login to Checkout.");
+    return;
+  }
 
-    const orderItems = displayItems.map((item) => {
-      const productId = item.product?._id || item?._id || "";
-      if (!productId) return null;
-      return {
-        productId,
-        name: item?.name || item?.product?.name || "Unknown",
-        price: item?.price || item?.product?.price || 0,
-        quantity: item?.quantity || 1,
-        imageUrl: getImageUrl(item),
-      };
-    }).filter(Boolean);
-
-    const orderData = {
-      userId: user?._id || user?.id || "",
-      email: user?.email || "",
-      items: orderItems,
-      totalAmount: totalPrice,
-      shippingAddress: {
-        fullName: `${user?.firstName} ${user?.lastName}`,
-        phone: shippingAddress?.phone || "N/A",
-        building: shippingAddress?.building || "N/A",
-        street: shippingAddress?.street || "N/A",
-        city: shippingAddress?.city || "N/A",
-        state: shippingAddress?.state || "N/A",
-        pinCode: shippingAddress?.pinCode || "N/A",
-      },
+  const orderItems = displayItems.map((item) => {
+    const productId = item.product?._id || item?._id || "";
+    if (!productId) return null;
+    return {
+      productId,
+      name: item?.name || item?.product?.name || "Unknown",
+      price: item?.price || item?.product?.price || 0,
+      quantity: item?.quantity || 1,
+      imageUrl: getImageUrl(item),
     };
+  }).filter(Boolean);
 
-    try {
-      const response = await axios.post("http://localhost:5000/api/orderin", orderData);
-      if (response.status === 201) {
-        alert("🎉 Order placed successfully!");
-        if (displayItems.length === orderData.length) {
-          await axios.delete(`http://localhost:5000/api/cart/clear/${user?._id || user?.id || ""}`);
-          clearCart();
-        }
-        window.dispatchEvent(new Event("cartUpdated"));
-        navigate("/");
-      }
-    } catch (error) {
-      setError("Failed to place order. Please try again.");
-    }
+  const orderData = {
+    userId: user?._id || user?.id || "",
+    email: user?.email || "",
+    items: orderItems,
+    isCustomBuild: isCustomBuild || false,
+    totalAmount: totalPrice,
+    shippingAddress: {
+      fullName: `${user?.firstName} ${user?.lastName}`,
+      phone: shippingAddress?.phone || "N/A",
+      building: shippingAddress?.building || "N/A",
+      street: shippingAddress?.street || "N/A",
+      city: shippingAddress?.city || "N/A",
+      state: shippingAddress?.state || "N/A",
+      pinCode: shippingAddress?.pinCode || "N/A",
+    },
   };
 
- 
+  console.log(orderData.isCustomBuild);
+  
+
+  try {
+    const response = await axios.post("http://localhost:5000/api/orderin", orderData);
+    if (response.status === 201) {
+      alert("🎉 Order placed successfully!");
+    
+      
+      // ✅ Only clear cart if checkout is from cart
+      if (checkoutType === "cart" && (user?._id || user?.id)) {
+        try {
+          await axios.delete(`http://localhost:5000/api/cart/clear/${user?._id || user?.id}`);
+          clearCart(); // Clear frontend cart context
+          console.log("✅ Cart cleared after checkout");
+        } catch (clearErr) {
+          console.error("❌ Failed to clear cart:", clearErr);
+        }
+      }
+
+      window.dispatchEvent(new Event("cartUpdated"));
+      navigate("/orders");
+    }
+  } catch (error) {
+    console.error("❌ Error placing order:", error);
+    setError("Failed to place order. Please try again.");
+  }
+};
+
 
 
   const handleUpdateAddress = async () => {

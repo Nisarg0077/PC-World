@@ -164,7 +164,9 @@ const handleSelect = (type, event) => {
     navigate('/checkout', {
         state: { 
           checkoutType: 'customBuild',
-          selectedProducts: selectedProducts 
+          selectedProducts: selectedProducts,
+          isCustomBuild: true
+
         }
       });
   };

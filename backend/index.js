@@ -1088,22 +1088,55 @@ app.delete("/api/cart/remove/:userId/:productId", async (req, res) => {
   }
 });
 
-// Clear Cart
+// // Clear Cart
+// app.delete("/api/cart/clear/:userId", async (req, res) => {
+//   try {
+//     const cart = await Cart.findOneAndUpdate(
+//       { customer: new mongoose.Types.ObjectId(req.params.userId) },
+//       { $set: { cartItems: [] } },
+//       { new: true }
+//     );
+
+//     if (!cart) return res.status(404).json({ message: "Cart not found" });
+
+//     res.json({ message: "Cart cleared", cart });
+//   } catch (error) {
+//     res.status(500).json({ message: "Error clearing cart", error });
+//   }
+// });
+
+// Clear Cart API
 app.delete("/api/cart/clear/:userId", async (req, res) => {
   try {
+    const { userId } = req.params;
+    console.log(userId);
+    
+    // Validate userId as ObjectId
+    if (!mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({ message: "Invalid user ID format" });
+    }
+
+    // Clear the cart items for the user
     const cart = await Cart.findOneAndUpdate(
-      { customer: req.params.userId },
+      { customer: new mongoose.Types.ObjectId(userId) },
       { $set: { cartItems: [] } },
       { new: true }
     );
 
-    if (!cart) return res.status(404).json({ message: "Cart not found" });
+    if (!cart) {
+      console.log(`❌ Cart not found for user: ${userId}`);
+      return res.status(404).json({ message: "Cart not found" });
+    }
 
+    console.log(`✅ Cart cleared for user: ${userId}`);
     res.json({ message: "Cart cleared", cart });
+
   } catch (error) {
-    res.status(500).json({ message: "Error clearing cart", error });
+    console.error("❌ Error clearing cart:", error);
+    res.status(500).json({ message: "Error clearing cart", error: error.message });
   }
 });
+
 
 app.get('/api/users', async (req, res) => {
   try {
@@ -1632,9 +1665,9 @@ app.get("/api/user/address/:userId", async (req, res) => {
 
 app.post("/api/orderin", async (req, res) => {
   try {
-      console.log("Received order data:", req.body);
+      // console.log("Received order data:", req.body);
   
-      const { userId, email, items, totalAmount, shippingAddress } = req.body;
+      const { userId, email, isCustomBuild, items, totalAmount, shippingAddress } = req.body;
       if (!userId || !email || !items || !totalAmount || !shippingAddress) {
         console.error("Missing required fields:", req.body);
         return res.status(400).json({ error: "All fields are required" });
@@ -1654,7 +1687,7 @@ app.post("/api/orderin", async (req, res) => {
         return res.status(400).json({ error: "Some products not found", missingProducts });
       }
   
-      console.log("All products exist. Proceeding with order...");
+      // console.log("All products exist. Proceeding with order...");
 
     // Check stock availability before placing the order
     for (const item of items) {
@@ -1683,6 +1716,7 @@ app.post("/api/orderin", async (req, res) => {
     const newOrder = new Order({
       userId,
       email,
+      isCustomBuild: isCustomBuild,
       items,
       totalAmount,
       shippingAddress,
