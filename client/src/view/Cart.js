@@ -102,7 +102,7 @@ const Cart = () => {
   };
   const handleCheckout = () => {
     console.log(cart.cartItems)
-    navigate("/checkout", { state: { cartItems: cart.cartItems } });
+    navigate("/checkout", { state: { cartItems: cart.cartItems, checkoutType: 'cart' } });
   };
 
   const handleClearCart = async () => {

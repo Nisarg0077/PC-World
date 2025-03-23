@@ -190,7 +190,8 @@ export const ViewProduct = () => {
                     navigate('/checkout', {
                       state: { 
                         checkoutType: 'singleProduct',
-                        product: product // Pass full product object
+                        product: product,
+                        isCustomBuild: false
                       }
                     });
                     
