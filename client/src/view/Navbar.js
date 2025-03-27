@@ -44,7 +44,7 @@ export default function Navbar() {
 
         {/* Desktop Menu */}
         <ul className="hidden md:flex space-x-8 items-center text-white text-lg">
-          {["Home", "Shop Now", "About Us"].map((item, index) => (
+          {["Home", "Shop Now", "About Us", "Contact Us"].map((item, index) => (
             <li key={index} className="hover:bg-violet-700 h-fit p-2 rounded-md">
               <Link to={item === "Home" ? "/" : `/${item.toLowerCase().replace(/\s/g, "")}`} className="hover:text-yellow-300 transition duration-200 font-semibold">
                 {item}
@@ -52,8 +52,8 @@ export default function Navbar() {
             </li>
           ))}
 
-<li className="hover:bg-violet-700 h-fit p-2 rounded-md">
-              <Link to='/custompc' className="hover:text-yellow-300 transition duration-200 font-semibold">
+<li className="hover:bg-violet-700 h-fit p-2 rounded-md bg-red-500 bg-opacity-80">
+              <Link to='/custompc' className="hover:text-yellow-300  transition duration-200 font-semibold">
               Custom PC
               </Link>
             </li>

@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const OrderSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Reference to User
   email: {type: String, required: true},
+  isCustomBuild: { type: Boolean, default: false },
   items: [
     {
       productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true }, // Reference to Product
@@ -29,7 +30,7 @@ const OrderSchema = new mongoose.Schema({
     state: { type: String, trim: true, required: true },
     pinCode: { type: String, trim: true, required: true },
   }, // Shipping details
-  createdAt: { type: Date, default: Date.now },
+  orderedAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model("Order", OrderSchema);

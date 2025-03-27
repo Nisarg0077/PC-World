@@ -10,11 +10,15 @@ const Cart = () => {
   const { state, dispatch } = useCart();
   const navigate = useNavigate();
 
+
+  
+  
   // Fetch user from session storage
   useEffect(() => {
     const storedUser = sessionStorage.getItem("clientUser");
     if (!storedUser) {
       navigate("/login");
+      
       return;
     }
     setUser(JSON.parse(storedUser));
@@ -23,6 +27,7 @@ const Cart = () => {
   // Fetch cart when user is available
   useEffect(() => {
     if (user) fetchCart(user.id);
+    console.log(cart);
   }, [user]);
 
   // Listen for cart updates
@@ -57,7 +62,8 @@ const Cart = () => {
 
     setCart((prevCart) => {
       const updatedCartItems = prevCart.cartItems.map((item) =>
-        item.product === productId ? { ...item, quantity: newQuantity } : item
+        item.product === productId ? { ...item, quantity: newQuantity } : item,
+      console.log(productId._id)
       );
 
       dispatch({
@@ -96,7 +102,7 @@ const Cart = () => {
   };
   const handleCheckout = () => {
     console.log(cart.cartItems)
-    navigate("/checkout", { state: { cartItems: cart.cartItems } });
+    navigate("/checkout", { state: { cartItems: cart.cartItems, checkoutType: 'cart' } });
   };
 
   const handleClearCart = async () => {
@@ -136,22 +142,15 @@ const Cart = () => {
                   {cart?.cartItems?.map((item) => (
                     <tr key={item.product._id} className="text-center">
                       <td className="border px-2 sm:px-4 py-2">
-                        <img
-                          className="w-12 sm:w-20 mx-auto"
-                          src={item.product.imageUrl}
-                          alt={item.product.name}
-                        />
-                      </td>
-                      <td className="border px-2 sm:px-4 py-2 text-sm sm:text-base font-bold">
-                        {item.product.name}
-                      </td>
-                      <td className="border px-2 sm:px-4 py-2 text-sm sm:text-base">
-                        ₹{(item.product.price).toLocaleString('en-IN')}
-                      </td>
+                        <img className="w-12 sm:w-20 mx-auto" src={`http://localhost:5000/images/`+item.imageUrl} alt={item.name} />
+                        </td>
+<td>{item.name}</td>
+<td>₹{new Intl.NumberFormat().format(item.price)}</td>
+
                       <td className="border px-2 sm:px-4 py-2 text-sm sm:text-base">
                         <div className="flex items-center justify-center">
                           <button
-                            onClick={() => handleUpdateQuantity(item.product._id, item.quantity - 1)}
+                           onClick={() => handleUpdateQuantity(item.product._id, item.quantity - 1)}
                             className="px-1 pb-1 rounded-xl mx-1 bg-gradient-to-r from-red-400 to-red-600 text-white text-xl font-bold"
                           >
                             -
@@ -166,7 +165,7 @@ const Cart = () => {
                         </div>
                       </td>
                       <td className="border px-2 sm:px-4 py-2 text-sm sm:text-base">
-                        ₹{(item.product.price * item.quantity).toLocaleString('en-IN')}
+                        ₹{new Intl.NumberFormat().format((item.price * item.quantity))}
                       </td>
                       <td className="border px-2 sm:px-4 py-2 text-sm sm:text-base">
                         <button
@@ -186,6 +185,7 @@ const Cart = () => {
               <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-0">
                 Total: ₹
                 {Intl.NumberFormat('en-IN').format(cart?.cartItems?.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2))}
+
               </h3>
 
               <div className="flex gap-4">

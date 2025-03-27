@@ -59,6 +59,12 @@ const UserOrders = () => {
     };
 
     const handleCancelOrder = async (id) => {
+        const confirmCancel = window.confirm("Are you sure you want to cancel this order?");
+        if (!confirmCancel) {
+            // User pressed Cancel
+            return;
+        }
+    
         try {
             const response = await axios.put(`http://localhost:5000/api/orders/${id}`, {
                 orderStatus: "Cancelled",
@@ -70,28 +76,34 @@ const UserOrders = () => {
                         order._id === id ? { ...order, orderStatus: "Cancelled" } : order
                     )
                 );
-                console.log("Order cancelled successfully:", response.data);
+                console.log("✅ Order cancelled successfully:", response.data);
+                alert("✅ Order cancelled successfully!");
             } else {
-                console.error("Failed to cancel order:", response);
+                console.error("❌ Failed to cancel order:", response);
+                alert("❌ Failed to cancel order.");
             }
         } catch (error) {
-            console.error("Error canceling order:", error);
+            console.error("❌ Error cancelling order:", error);
+            alert("❌ Error occurred while cancelling the order.");
         }
     };
+    
     
       
 
     return (
         <div className="bg-gray-100 min-h-screen p-6 flex flex-col items-center">
             <h2 className="text-3xl font-semibold text-gray-800 mb-6">My Orders</h2>
-            <button onClick={() => navigate('/')} className="float-right bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2 text-white font-bold rounded-md">back</button>
+            <button onClick={() => navigate('/')} className="float-right bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2 mb-4 text-white font-bold rounded-md">back</button>
 
-            {orders.length > 0 ? (
+            {[...orders].reverse().length > 0 ? (
                 <div className="w-full max-w-4xl space-y-4">
-                    {orders.map(order => (
+                    {[...orders].reverse().map(order => (
                         <div key={order._id} className="bg-white p-4 shadow-md rounded-lg">
                             <div className="flex justify-between items-center border-b pb-2 mb-2">
+                                <p className="text-gray-600 font-bold">Order Date: {new Date(order.orderedAt).toLocaleDateString()}</p>
                                 <p className="text-gray-600">Order ID: <span className="font-semibold">{order._id}</span></p>
+
                                 <span className={`px-3 py-1 rounded-lg text-lg font-bold`}>
                                     Status: <strong className={getStatusClass(order.orderStatus)}>   
                                     {order.orderStatus}
@@ -118,17 +130,20 @@ const UserOrders = () => {
                             </div>
 
                             <div className="mt-3 flex justify-between">
-                                <p className="text-gray-700 font-bold text-lg">Total: ₹{order.totalAmount.toLocaleString('en-IN')}</p>
-                                <p className="text-gray-600 text-lg font-bold getPaymentStatusClass">Payment: <strong className={ getPaymentStatusClass(order.paymentStatus)}>{order.paymentStatus}</strong></p>
+    <p className="text-gray-700 font-bold text-lg">Total: ₹{order.totalAmount.toLocaleString('en-IN')}</p>
+    <p className="text-gray-600 text-lg font-bold">Payment: <strong className={getPaymentStatusClass(order.paymentStatus)}>{order.paymentStatus}</strong></p>
+</div>
 
-                            </div>
-                            <button
-  type="button"
-  onClick={() => handleCancelOrder(order._id)} // ✅ Correct, now it runs only on click
-  className="mt-4 w-full bg-red-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-red-700 transition duration-200"
->
-  Cancel Order
-</button>
+{order.orderStatus !== 'Cancelled' && order.orderStatus !== 'Delivered' && order.paymentStatus !== 'paid' && (
+    <button
+        type="button"
+        onClick={() => handleCancelOrder(order._id)}
+        className="mt-4 w-full bg-red-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-red-700 transition duration-200"
+    >
+        Cancel Order
+    </button>
+)}
+
 
 
                         </div>

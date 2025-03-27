@@ -5,41 +5,24 @@ import { toast, ToastContainer } from 'react-toastify';
 
 const EditProfile = () => {
   const [user, setUser] = useState({
-      username: "",
-      firstName: "",
-      lastName: "",
-      dob: "",
-      gender: "",
-      phoneNumber: "",
-      designation: "",
-      jobProfile: "",
-      orgName: "",
-      officeAddress:{
-        officeBuilding: "", // Separated office address fields
-        officeStreet: "",
-        officeCity: "",
-        officeState: "",
-        officePinCode: "",
-      },
-      email: "",
-      address: {
-        building: "", // Separated residential address fields
-        street: "",
-        city: "",
-        state: "",
-        pinCode: "",
-      },
-      aadharNumber: "",
-      aadharFront: null, // Changed aadhar to aadharFront and back
-      aadharBack: null,
-      password: "",
-      confirmPassword: "",
-      role: 'client',
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    dob: "",
+    role: 'client',
+    gender: "",
+    address: {
+      building: "",
+      street: "",
+      city: "",
+      state: "",
+      pinCode: "",
+    },
+    username: "",
+    password: "",
   });
 
-
-  const [aadharFrontFile, setAadharFrontFile] = useState(null);
-  const [aadharBackFile, setAadharBackFile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -69,7 +52,6 @@ const EditProfile = () => {
             ...data,
             dob: data.dob ? new Date(data.dob).toISOString().split("T")[0] : "",
             address: data.address || {},
-            officeAddress: data.officeAddress || {},
           };
   
           setUser(userData);
@@ -99,63 +81,118 @@ const EditProfile = () => {
     }
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    const fieldName = e.target.name;
-    
-    if (fieldName === 'aadharFront') {
-      setAadharFrontFile(file);
-    } else if (fieldName === 'aadharBack') {
-      setAadharBackFile(file);
-    }
-  };
+  
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setIsLoading(true);
+  
+  //   try {
+  //     const formData = new FormData();
+      
+  //     // Append user data including existing Aadhar references
+  //     const { _id, __v, ...userData } = user;
+  //     Object.entries(userData).forEach(([key, value]) => {
+  //       if (typeof value === 'object') {
+  //         Object.entries(value).forEach(([subKey, subValue]) => {
+  //           formData.append(`${key}.${subKey}`, subValue);
+  //         });
+  //       } else {
+  //         formData.append(key, value);
+  //       }
+  //     });
+
+
+  //     if (formData.address) {
+  //       Object.entries(formData.address).forEach(([key, value]) => {
+  //         formData.append(`address.${key}`, value);
+  //       });
+  //     }
+      
+
+  //     setFormData({
+  //       firstName: "",
+  //       lastName: "",
+  //       email: "",
+  //       phoneNumber: "",
+  //       dob: "",
+  //       role: 'client',
+  //       gender: "",
+  //       address: {
+  //         building: "",
+  //         street: "",
+  //         city: "",
+  //         state: "",
+  //         pinCode: "",
+  //       },
+  //       username: "",
+  //       password: "",
+  //     });
+      
+  
+  //     // Only overwrite Aadhar fields if new files are selected
+     
+  
+  //     const response = await axios.put(
+  //       `http://localhost:5000/api/users/${uid}`,
+  //       formData
+  //     );
+
+  //     console.log(formData);
+      
+  
+  //     // Update session storage
+  //     const sessionData = JSON.parse(sessionStorage.getItem("ClientUser"));
+  //     const updatedSessionData = { ...sessionData, ...response.data };
+  //     sessionStorage.setItem("clientUser", JSON.stringify(updatedSessionData));
+  
+  //     toast.success('Profile updated successfully');
+  //     navigate('/userProfile');
+  //   } catch (error) {
+  //     console.error("Update error:", error);
+  //     toast.error(error.response?.data?.message || 'Update failed');
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
   
     try {
-      const formData = new FormData();
-      
-      // Append user data including existing Aadhar references
+      const formDataToSend = new FormData();
+  
+      // Exclude _id and __v if they exist
       const { _id, __v, ...userData } = user;
+  
+      // Append all fields including nested address
       Object.entries(userData).forEach(([key, value]) => {
-        if (typeof value === 'object') {
+        if (typeof value === 'object' && value !== null) {
           Object.entries(value).forEach(([subKey, subValue]) => {
-            formData.append(`${key}.${subKey}`, subValue);
+            formDataToSend.append(`${key}.${subKey}`, subValue);
           });
         } else {
-          formData.append(key, value);
+          formDataToSend.append(key, value);
         }
       });
   
-      // Only overwrite Aadhar fields if new files are selected
-      if (aadharFrontFile) {
-        formData.set('aadharFront', aadharFrontFile);
-      } else {
-        // Extract just the filename from the URL
-        const aadharFrontName = user.aadharFront?.split('http://localhost:5000/images/').pop() || '';
-        formData.set('aadharFront', aadharFrontName);
-      }
+  
+      const response = await axios.put(`http://localhost:5000/api/users/${uid}`, formDataToSend, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       
-      if (aadharBackFile) {
-        formData.set('aadharBack', aadharBackFile);
-      } else {
-        // Extract just the filename from the URL
-        const aadharBackName = user.aadharBack?.split('http://localhost:5000/images/').pop() || '';
-        formData.set('aadharBack', aadharBackName);
-      }
   
-      const response = await axios.put(
-        `http://localhost:5000/api/users/${uid}`,
-        formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      );
-  
-      // Update session storage
-      const sessionData = JSON.parse(sessionStorage.getItem("ClientUser"));
-      const updatedSessionData = { ...sessionData, ...response.data };
-      sessionStorage.setItem("clientUser", JSON.stringify(updatedSessionData));
+      // ✅ Update sessionStorage with new user data
+      sessionStorage.setItem("clientUser", JSON.stringify({
+        id: user._id,
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+      }));
   
       toast.success('Profile updated successfully');
       navigate('/userProfile');
@@ -166,6 +203,7 @@ const EditProfile = () => {
       setIsLoading(false);
     }
   };
+  
 
   if (isLoading) return <div className="text-center py-4">Loading...</div>;
   if (error) return <div className="text-center py-4 text-red-500">{error}</div>;
@@ -279,82 +317,7 @@ const EditProfile = () => {
         </div>
       </div>
 
-      {/* Employment Details */}
-      <div className="space-y-4 border rounded-lg p-4 mb-6">
-        <h3 className="text-xl font-semibold mb-4 text-purple-800">Employment Details</h3>
-        <div className="space-y-4">
-          <input
-            type="text"
-            name="designation"
-            value={user.designation}
-            onChange={handleInputChange}
-            placeholder="Designation"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-          <input
-            type="text"
-            name="jobProfile"
-            value={user.jobProfile}
-            onChange={handleInputChange}
-            placeholder="Job Profile"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-          <input
-            type="text"
-            name="orgName"
-            value={user.orgName}
-            onChange={handleInputChange}
-            placeholder="Organization Name"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-          
-          <div className="space-y-4 border-t pt-4">
-            <h4 className="text-sm font-medium mb-2 text-purple-800">Office Address</h4>
-            <input
-              type="text"
-              name="officeAddress.officeBuilding"
-              value={user.officeAddress.officeBuilding}
-              onChange={handleInputChange}
-              placeholder="Office Building"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <input
-              type="text"
-              name="officeAddress.officeStreet"
-              value={user.officeAddress.officeStreet}
-              onChange={handleInputChange}
-              placeholder="Office Street"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <input
-                type="text"
-                name="officeAddress.officeCity"
-                value={user.officeAddress.officeCity}
-                onChange={handleInputChange}
-                placeholder="Office City"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              <input
-                type="text"
-                name="officeAddress.officeState"
-                value={user.officeAddress.officeState}
-                onChange={handleInputChange}
-                placeholder="Office State"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              <input
-                type="text"
-                name="officeAddress.officePinCode"
-                value={user.officeAddress.officePinCode}
-                onChange={handleInputChange}
-                placeholder="Office Pin Code"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      
 
       {/* Account Information */}
       <div className="space-y-4 border rounded-lg p-4 mb-6">
@@ -382,45 +345,11 @@ const EditProfile = () => {
               pattern="[0-9]{10}"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Aadhar Number</label>
-            <input
-              type="text"
-              name="aadharNumber"
-              value={user.aadharNumber}
-              onChange={handleInputChange}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+          
         </div>
       </div>
 
-      {/* Aadhar Documents */}
-      <div className="space-y-4 border rounded-lg p-4">
-        <h3 className="text-xl font-semibold mb-4 text-purple-800">Aadhar Documents</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Aadhar Front</label>
-            <input
-              type="file"
-              name="aadharFront"
-              onChange={handleFileChange}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-              accept="image/*,.pdf"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Aadhar Back</label>
-            <input
-              type="file"
-              name="aadharBack"
-              onChange={handleFileChange}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-              accept="image/*,.pdf"
-            />
-          </div>
-        </div>
-      </div>
+     
 
       <div className="flex justify-between items-center gap-4 mt-6">
   <button 

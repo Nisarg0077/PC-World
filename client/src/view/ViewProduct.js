@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import fetchProductInfo from "../components/Back_ViewProduct";
+// import fetchProductInfo from "../components/Back_ViewProduct";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ClipLoader } from "react-spinners"; // For loading spinner
 import { useNavigate, useLocation } from "react-router-dom";
 import queryString from 'query-string';
+import { FaStar, FaRegStar } from "react-icons/fa";
 
 export const ViewProduct = () => {
   const [product, setProduct] = useState(null);
@@ -13,6 +14,10 @@ export const ViewProduct = () => {
   const [loading, setLoading] = useState(true);
   const [feedbackTitle, setFeedbackTitle] = useState("");
   const [feedbackDesc, setFeedbackDesc] = useState("");
+  const [feedbacks, setFeedbacks] = useState([]);
+
+  const [rating, setRating] = useState(0); // User's rating input
+
   const location = useLocation();
   const navigate = useNavigate();
   // const [filteredData, setFilteredData] = useState([]);
@@ -44,8 +49,19 @@ export const ViewProduct = () => {
         const params = new URLSearchParams(window.location.search);
         const pid = params.get("pid");
         if (pid) {
-          const info = await fetchProductInfo(pid);
-          setProduct(info);
+          try {
+            const response = await axios.post('http://localhost:5000/api/productInfo', { pid });
+            // return response.data;
+            setProduct(response.data);
+
+
+
+            const feedbackResponse = await axios.get(`http://localhost:5000/api/feedback/${pid}`);
+        setFeedbacks(feedbackResponse.data);
+          } catch (error) {
+            console.error('Failed to fetch product info');
+            return [];
+          }
         }
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -73,7 +89,7 @@ export const ViewProduct = () => {
       name: product.name,
       price: product.price,
       quantity: 1,
-      imageUrl: product.image || product.imageUrl.replace("http://localhost:5000/images/", ""),
+      imageUrl: product.image || product.imageUrl,
     };
 
     try {
@@ -92,11 +108,14 @@ export const ViewProduct = () => {
 
     const feedbackData = {
       userId: user.id,
+      username: user.username,
       productId: product._id,
       productTitle: product.name,
       title: feedbackTitle,
       description: feedbackDesc,
     };
+
+    console.log(feedbackData)
 
     try {
       await axios.post("http://localhost:5000/api/feedback-in", feedbackData);
@@ -138,6 +157,16 @@ export const ViewProduct = () => {
               <div className="flex-1">
                 <h1 className="text-4xl font-bold text-gray-900 mb-4">{product.name}</h1>
                 <p className="text-gray-700 text-lg mb-6">{product.description}</p>
+                <p className="flex items-center mb-4">
+  {Array.from({ length: 5 }, (_, index) =>
+    index < Math.round(product.averageRating || 0) ? (
+      <FaStar key={index} className="text-yellow-500" />
+    ) : (
+      <FaRegStar key={index} className="text-yellow-500" />
+    )
+  )}
+  <span className="ml-2 text-gray-700">({product.averageRating?.toFixed(1) || 0} / 5)</span>
+</p>
                 <p className="text-3xl font-semibold text-blue-600 mb-6">₹{product.price.toLocaleString('en-IN')}</p>
                 <div className="space-y-4 mb-6">
                   <p className="text-gray-600">
@@ -161,7 +190,8 @@ export const ViewProduct = () => {
                     navigate('/checkout', {
                       state: { 
                         checkoutType: 'singleProduct',
-                        product: product // Pass full product object
+                        product: product,
+                        isCustomBuild: false
                       }
                     });
                     
@@ -215,6 +245,48 @@ export const ViewProduct = () => {
 
       {user ? (
         <section className="container mx-auto px-4 py-4">
+
+
+<div className="bg-white flex flex-col justify-center items-center shadow-2xl rounded-lg p-6 mx-auto mt-6">
+  <h2 className="text-lg font-semibold mb-4 text-center">Rate this Product</h2>
+  <div className="flex space-x-2">
+    {Array.from({ length: 5 }, (_, index) => (
+      <button
+        key={index}
+        onClick={() => setRating(index + 1)}
+        className={`text-3xl ${index < rating ? 'text-yellow-500' : 'text-gray-400'}`}
+      >
+        ★
+      </button>
+    ))}
+  </div>
+  <button
+    onClick={async () => {
+      if (rating === 0) {
+        toast.error("Please select a rating!");
+        return;
+      }
+      try {
+        await axios.post("http://localhost:5000/api/submit-rating", {
+          productId: product._id,
+          userId: user.id,
+          rating,
+        });
+        toast.success("Thank you for rating!");
+      } catch (error) {
+        console.error("Rating failed", error);
+        toast.error("Failed to submit rating");
+      }
+    }}
+    className="mt-4 bg-yellow-500 text-white px-6 py-2 rounded-lg hover:bg-yellow-600"
+  >
+    Submit Rating
+  </button>
+</div>
+
+
+
+
           <div className="bg-white flex flex-col justify-center items-center shadow-2xl rounded-lg p-6 mx-auto">
             <h2 className="text-lg font-semibold mb-4 text-center">Feedback</h2>
 
@@ -248,6 +320,29 @@ export const ViewProduct = () => {
           <h2 className="text-center text-lg font-semibold">Login to give Feedback</h2>
         </div>
       )}
+
+
+
+<section className="container mx-auto px-4 py-8">
+  <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">User Feedbacks</h2>
+  
+  {feedbacks.length > 0 ? (
+    <div className="space-y-6">
+      {feedbacks.map((fb) => (
+        <div 
+          key={fb._id} 
+          className="bg-gradient-to-r from-violet-50 to-indigo-50 border border-indigo-200 rounded-xl p-6 shadow-md hover:shadow-xl transition duration-300"
+        >
+          <h3 className="text-2xl font-semibold text-indigo-700 mb-2">{fb.title}</h3>
+          <p className="text-gray-700 text-lg mb-4">{fb.description}</p>
+          <p className="text-sm text-gray-500 italic">— {fb.username || 'Anonymous'}</p>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p className="text-center text-gray-600 text-lg">No feedbacks yet.</p>
+  )}
+</section>
 
 
     </div>

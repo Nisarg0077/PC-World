@@ -92,7 +92,7 @@ const ClinetProfile = () => {
                   <span className="font-semibold">Email:</span> {user?.email}
                 </p>
                 <p className="text-lg text-gray-700">
-                  <span className="font-semibold">Phone:</span> {user?.phoneNumber}
+                  <span className="font-semibold">Phone:</span> +91{user?.phoneNumber}
                 </p>
               </div>
             </div>
@@ -112,32 +112,7 @@ const ClinetProfile = () => {
                 <p className="text-lg text-gray-700">No address available.</p>
               )}
             </div>
-            <div className="mt-6">
-              <h3 className="text-xl font-semibold text-gray-800">Office Address</h3>
-              {user?.officeAddress? (
-                <>
-                  <p className="text-lg text-gray-700">{user.officeAddress.officeBuilding},</p>
-                  <p className="text-lg text-gray-700">{user.officeAddress.officeStreet},</p>
-                  <p className="text-lg text-gray-700">
-                    {user.officeAddress.officeCity}, {user.officeAddress.officeState} - {user.officeAddress.officePinCode}
-                  </p>
-                </>
-              ) : (
-                <p className="text-lg text-gray-700">No address available.</p>
-              )}
-            </div>
-            <div className="mt-6">
-              <h3 className="text-xl font-semibold text-gray-800">Aadhar Card Information</h3>
-
-            <p className="text-lg text-gray-700 ">Aadhar Number: <span>{user.aadharNumber}</span></p>
-
-
-            <h3 className="text-xl font-semibold text-gray-800 mt-2">Aadhar Card Images</h3>
-            <img className="w-2/5 my-2" src={`${user.aadharFront}`} alt={user.aadharFront} />
-            <img className="w-2/5 my-2" src={`${user.aadharBack}`} alt={user.aadharBack} />
-      
-             
-            </div>
+            
 
             {/* Account Info */}
             <div className="mt-6">
