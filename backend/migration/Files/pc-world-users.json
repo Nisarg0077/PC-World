@@ -1,60 +1,84 @@
-[{
-  "_id":"64c91706c681852b41000001",
-  "username": "john_doe",
-  "password": "john_doe",
-  "role": "client",
-  "firstName": "John",
-  "lastName": "Doe",
-  "email": "john.doe@example.com",
-  "phone": "+1 555 123 4567",
-  "address": {
-    "street": "123 Main St",
-    "city": "Anytown",
-    "state": "CA",
-    "zip": "12345",
-    "_id":"678fa35f00f0319a1336f4a9"
+[
+  {
+      "_id": "64c91706c681852b41000001",
+      "username": "john_doe",
+      "password": "john_doe",
+      "role": "client",
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john.doe@example.com",
+      "phone": "+1 555 123 4567",
+      "address": {
+          "street": "123 Main St",
+          "city": "Anytown",
+          "state": "CA",
+          "zip": "12345"
+      },
+      "isActive": true,
+      "createdAt": "2024-07-27T10:30:00.000Z",
+      "updatedAt": "2024-07-27T10:30:00.000Z"
   },
-  "createdAt":"2024-07-27T10:30:00.000Z",
-  "updatedAt":"2024-07-27T10:30:00.000Z",
-  "__v": 0
-},
-{
-  "_id": "64c91706c681852b41000002",
-  "username": "nisarg",
-  "password": "123",
-  "role": "admin",
-  "firstName": "Nisarg",
-  "lastName": "Limbachiya",
-  "email": "nisarg@example.com",
-  "phone": "+1 555 987 6543",
-  "address": {
-    "street": "456 Oak Ave",
-    "city": "Othertown",
-    "state": "NY",
-    "zip": "56789",
-    "_id":"678fa35f00f0319a1336f4ab"
+  {
+      "_id": "64c91706c681852b41000002",
+      "username": "nisarg",
+      "password": "123",
+      "role": "admin",
+      "firstName": "Nisarg",
+      "lastName": "Limbachiya",
+      "email": "nisarg@example.com",
+      "phone": "+1 555 987 6543",
+      "address": {
+          "street": "456 Oak Ave",
+          "city": "Othertown",
+          "state": "NY",
+          "zip": "56789"
+      },
+      "department": "IT",
+      "isActive": true,
+      "createdAt": "2024-07-28T15:15:00.000Z",
+      "updatedAt": "2024-07-28T15:15:00.000Z"
   },
-  "createdAt":"2024-07-28T15:15:00.000Z",
-  "updatedAt":"2024-07-28T15:15:00.000Z",
-  "__v": 0
-},
-{
-  "_id": "64c91706c681852b41000003",
-  "username": "admin_user",
-  "password": "admin_user",
-  "role": "admin",
-  "firstName": "Admin",
-  "lastName": "User",
-  "email": "admin@example.com",
-  "phone": "+1 555 555 5555",
-  "address": {
-    "street": "789 Elm St",
-    "city": "Bigtown",
-    "state": "TX",
-    "zip": "98765",
-    "_id":"678fa35f00f0319a1336f4ad"
+  {
+      "_id": "64c91706c681852b41000003",
+      "username": "admin_user",
+      "password": "admin_user",
+      "role": "admin",
+      "firstName": "Admin",
+      "lastName": "User",
+      "email": "admin@example.com",
+      "phone": "+1 555 555 5555",
+      "address": {
+          "street": "789 Elm St",
+          "city": "Bigtown",
+          "state": "TX",
+          "zip": "98765"
+      },
+      "department": "HR",
+      "isActive": true,
+      "createdAt": "2024-07-25T09:00:00.000Z",
+      "updatedAt": "2024-07-25T09:00:00.000Z"
   },
-  "createdAt": "2024-07-25T09:00:00.000Z",
-  "updatedAt":"2024-07-25T09:00:00.000Z",
-  "__v": 0
-}]
+  {
+    "_id": "64c91706c681852b41000004",
+    "username": "inactive_user",
+    "password": "inactive_password",
+    "role": "client",
+    "department": "Sales",
+    "firstName": "Inactive",
+    "lastName": "User",
+    "email": "inactive.user@example.com",
+    "phone": "+1 555 987 1234",
+    "address": {
+      "street": "101 Low St",
+      "city": "InactiveCity",
+      "state": "NY",
+      "zip": "56700",
+      "_id": "678fa35f00f0319a1336f4ae"
+    },
+    "isActive": false,
+    "createdAt": "2024-07-27T10:30:00.000Z",
+    "updatedAt": "2024-07-27T10:30:00.000Z",
+    "__v": 0
+  }
+  
+]

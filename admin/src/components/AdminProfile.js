@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import axios from "axios";
 
@@ -46,16 +45,11 @@ const AdminProfile = () => {
 
   return (
     <div className="h-screen flex flex-col bg-gray-100">
-      {/* Navbar */}
-      <header className="sticky top-0 z-50 bg-white shadow-md">
-        <Navbar />
-      </header>
+   
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-64 bg-white border-r shadow-md hidden md:block">
           <Sidebar />
-        </aside>
 
         {/* Main Content */}
         <main className="flex-grow p-6 overflow-y-auto">
@@ -64,12 +58,21 @@ const AdminProfile = () => {
 
             <div className="flex items-center space-x-6">
               {/* Profile Image Placeholder */}
-              <div className="w-24 h-24 rounded-full border-4 border-blue-500 flex items-center justify-center bg-gray-200">
-                <span className="text-3xl font-bold text-gray-600">
-                  {user?.firstName?.charAt(0).toUpperCase()}
-                </span>
-              </div>
-
+              <div className="w-24 h-24 rounded-full border-2 border-blue-500 flex items-center justify-center bg-gray-200">
+              {user.profilePicture ? (
+                  <img
+                    src={`http://localhost:5000/images/${user.profilePicture}`} // Ensure the correct path
+                    alt="Profile"
+                    className="w-24 h-24 object-cover rounded-full"
+                    />
+              
+                ) : (
+                 
+                  <span className="text-md font-bold text-gray-600">
+                    {user?.firstName?.charAt(0).toUpperCase()}
+                  </span>
+                )}
+                </div>
               {/* Profile Details */}
               <div className="flex-1">
                 <p className="text-lg text-gray-700">
@@ -85,6 +88,9 @@ const AdminProfile = () => {
                   <span className="font-semibold">Role:</span> {user?.role}
                 </p>
                 <p className="text-lg text-gray-700">
+                  <span className="font-semibold">department:</span> {user?.department}
+                </p>
+                <p className="text-lg text-gray-700">
                   <span className="font-semibold">Phone:</span> {user?.phone}
                 </p>
               </div>
@@ -93,19 +99,21 @@ const AdminProfile = () => {
             {/* Address Section */}
             <div className="mt-6">
               <h3 className="text-xl font-semibold text-gray-800">Address</h3>
-              <p className="text-lg text-gray-700">{user?.address?.street}</p>
-              <p className="text-lg text-gray-700">
-                {user?.address?.city}, {user?.address?.state} - {user?.address?.zip}
-              </p>
+              {user?.address?.[0] ? (
+                <>
+                  <p className="text-lg text-gray-700">{user.address[0].street}</p>
+                  <p className="text-lg text-gray-700">
+                    {user.address[0].city}, {user.address[0].state} - {user.address[0].zip}
+                  </p>
+                </>
+              ) : (
+                <p className="text-lg text-gray-700">No address available.</p>
+              )}
             </div>
 
             {/* Account Info */}
             <div className="mt-6">
   <h3 className="text-xl font-semibold text-gray-800">Account Information</h3>
-  <p className="text-lg text-gray-700">
-    <span className="font-semibold">Created At: </span> 
-    {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
-  </p>
   <p className="text-lg text-gray-700">
     <span className="font-semibold">Last Updated: </span> 
     {user?.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : "N/A"}
@@ -114,9 +122,9 @@ const AdminProfile = () => {
 
             {/* Action Buttons */}
             <div className="mt-6 flex space-x-4">
-              <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+              {/* <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
                 Edit Profile
-              </button>
+              </button> */}
               <button className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
                 Logout
               </button>

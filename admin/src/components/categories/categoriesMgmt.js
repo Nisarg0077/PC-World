@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Navbar from '../Navbar';
+
 import Sidebar from '../Sidebar';
 import axios from 'axios';
 
@@ -70,16 +70,11 @@ const Categories = () => {
 
   return (
     <div className="h-screen flex flex-col">
-      {/* Sticky Navbar */}
-      <header className="sticky top-0 z-50">
-        <Navbar />
-      </header>
 
-      <div className="flex flex-1 overflow-hidden">
+
+      <div className="flex flex-1">
         {/* Sticky Sidebar */}
-        <aside className="sticky top-0 h-full">
-          <Sidebar />
-        </aside>
+        <Sidebar />
 
         {/* Main Content */}
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
@@ -90,7 +85,7 @@ const Categories = () => {
                 onClick={handleAddCategory}
                 className="bg-green-500 text-white px-2 py-2 mx-1 rounded hover:bg-green-600"
               >
-                Add Category
+                <i class="fa fa-plus" aria-hidden="true"></i> Category
               </button>
             </div>
           </div>
@@ -121,19 +116,19 @@ const Categories = () => {
                   <tr key={category._id} className="text-center">
                     <td className="border px-4 py-2">{index + 1}</td>
                     <td className="border px-4 py-2">{category.name}</td>
-                    <td className="border px-4 py-2 w-7/12">{category.description}</td>
+                    <td className="border px-4 py-2 w-9/12">{category.description}</td>
                     <td className="border px-4 py-2 space-x-2">
                       <button
                         onClick={() => handleEdit(category._id)}
                         className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                       >
-                        Edit
+                        <i class="fa fa-pencil" aria-hidden="true"></i>
                       </button>
                       <button
                         onClick={() => handleDelete(category._id)}
                         className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                       >
-                        Delete
+                        <i class="fa fa-trash-o" aria-hidden="true"></i>
                       </button>
                     </td>
                   </tr>

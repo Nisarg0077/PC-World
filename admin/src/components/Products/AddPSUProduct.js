@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../Navbar";
 import Sidebar from "../Sidebar";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -42,7 +41,7 @@ const AddPSUProduct = () => {
 
   const fetchBrands = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/api/brands");
+      const response = await axios.get("http://localhost:5000/api/brands");
       setBrands(response.data);
     } catch (error) {
       toast.error("Failed to fetch brands");
@@ -135,21 +134,22 @@ const AddPSUProduct = () => {
         },
       });
       setImage(null);
+      navigate('/products');
     } catch (error) {
       toast.error("Failed to add PSU product.");
     }
   };
+  const handleBack = () => {
+    navigate(`/products`);
+  }
+
 
   return (
     <div className="h-screen flex flex-col">
       <ToastContainer />
-      <header className="sticky top-0 z-50">
-        <Navbar />
-      </header>
+
       <div className="flex flex-1 overflow-hidden">
-        <aside className="sticky top-0 h-full">
-          <Sidebar />
-        </aside>
+        <Sidebar />
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
           <h1 className="text-2xl font-bold mb-4">Add PSU Product</h1>
           <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4">
@@ -250,6 +250,13 @@ const AddPSUProduct = () => {
             <button type="submit" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
               Add PSU Product
             </button>
+            <button
+      type="button"
+      onClick={handleBack}
+      className="bg-gray-300 ml-4 text-gray-700 px-6 py-2 rounded hover:bg-gray-400"
+    >
+      Back
+    </button>
           </form>
         </main>
       </div>

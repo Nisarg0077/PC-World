@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import axios from "axios";
-import Navbar from "../Navbar";
 import Sidebar from "../Sidebar";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,9 +13,20 @@ const AddBrandForm = () => {
     description: "",
   });
 
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState("");
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setBrandData({ ...brandData, [name]: value });
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file)); // Show image preview
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -26,8 +36,26 @@ const AddBrandForm = () => {
       return;
     }
 
+    let imageUrl = brandData.logoUrl; // Keep existing or default URL
+
+    if (image) {
+      try {
+        const formData = new FormData();
+        formData.append("image", image);
+
+        const uploadResponse = await axios.post("http://localhost:5000/api/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        imageUrl = uploadResponse.data.imageUrl; // Get uploaded image URL
+      } catch (error) {
+        toast.error("Failed to upload image. Try again!");
+        return;
+      }
+    }
+
     try {
-      await axios.post("http://localhost:5000/api/brands", brandData);
+      await axios.post("http://localhost:5000/api/brands", { ...brandData, logoUrl: imageUrl });
       toast.success("Brand added successfully!");
 
       // Reset form
@@ -38,6 +66,8 @@ const AddBrandForm = () => {
         logoUrl: "",
         description: "",
       });
+      setImage(null);
+      setPreview("");
     } catch (error) {
       toast.error("Failed to add brand. Try again!");
     }
@@ -46,30 +76,20 @@ const AddBrandForm = () => {
   return (
     <div className="h-screen flex flex-col">
       <ToastContainer />
-      <header className="sticky top-0 z-50">
-        <Navbar />
-      </header>
+
 
       <div className="flex flex-1 overflow-hidden">
-        <aside className="sticky top-0 h-full">
-          <Sidebar />
-        </aside>
+        <Sidebar />
 
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
           <h1 className="text-2xl font-bold mb-4">Add Brand</h1>
 
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white p-6 rounded-lg shadow-md space-y-4"
-          >
+          <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4">
             {/* Name */}
             <div>
-              <label htmlFor="name" className="block font-medium mb-2">
-                Brand Name
-              </label>
+              <label className="block font-medium mb-2">Brand Name</label>
               <input
                 type="text"
-                id="name"
                 name="name"
                 value={brandData.name}
                 onChange={handleChange}
@@ -81,12 +101,9 @@ const AddBrandForm = () => {
 
             {/* Country */}
             <div>
-              <label htmlFor="country" className="block font-medium mb-2">
-                Country
-              </label>
+              <label className="block font-medium mb-2">Country</label>
               <input
                 type="text"
-                id="country"
                 name="country"
                 value={brandData.country}
                 onChange={handleChange}
@@ -98,12 +115,9 @@ const AddBrandForm = () => {
 
             {/* Founded Year */}
             <div>
-              <label htmlFor="foundedYear" className="block font-medium mb-2">
-                Founded Year
-              </label>
+              <label className="block font-medium mb-2">Founded Year</label>
               <input
                 type="number"
-                id="foundedYear"
                 name="foundedYear"
                 value={brandData.foundedYear}
                 onChange={handleChange}
@@ -112,29 +126,29 @@ const AddBrandForm = () => {
               />
             </div>
 
-            {/* Logo URL */}
+            {/* Image Upload */}
             <div>
-              <label htmlFor="logoUrl" className="block font-medium mb-2">
-                Logo URL
-              </label>
+              <label className="block font-medium mb-2">Upload Logo</label>
               <input
-                type="text"
-                id="logoUrl"
-                name="logoUrl"
-                value={brandData.logoUrl}
-                onChange={handleChange}
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
                 className="border rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter logo URL (optional)"
               />
             </div>
 
+            {/* Image Preview */}
+            {preview && (
+              <div className="mt-4">
+                <label className="block font-medium mb-2">Image Preview</label>
+                <img src={preview} alt="Brand Logo" className="w-24 h-24 rounded border" />
+              </div>
+            )}
+
             {/* Description */}
             <div>
-              <label htmlFor="description" className="block font-medium mb-2">
-                Description
-              </label>
+              <label className="block font-medium mb-2">Description</label>
               <textarea
-                id="description"
                 name="description"
                 value={brandData.description}
                 onChange={handleChange}
@@ -145,10 +159,7 @@ const AddBrandForm = () => {
             </div>
 
             {/* Submit Button */}
-            <button
-              type="submit"
-              className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
-            >
+            <button type="submit" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
               Add Brand
             </button>
           </form>

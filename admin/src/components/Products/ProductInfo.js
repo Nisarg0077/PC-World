@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Navbar from '../Navbar';
 import Sidebar from '../Sidebar';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -33,13 +32,9 @@ const ProductInfo = () => {
   return (
     <div className="h-screen flex flex-col">
       <ToastContainer />
-      <header className="sticky top-0 z-50">
-        <Navbar />
-      </header>
+
       <div className="flex flex-1 overflow-hidden">
-        <aside className="sticky top-0 h-full">
-          <Sidebar />
-        </aside>
+        <Sidebar />
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
           {product ? (
             <div className="bg-white shadow-md rounded-lg p-6">
