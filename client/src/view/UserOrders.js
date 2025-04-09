@@ -103,6 +103,7 @@ const UserOrders = () => {
                             <div className="flex justify-between items-center border-b pb-2 mb-2">
                                 <p className="text-gray-600 font-bold">Order Date: {new Date(order.orderedAt).toLocaleDateString()}</p>
                                 <p className="text-gray-600">Order ID: <span className="font-semibold">{order._id}</span></p>
+                                <p className={`p-1 ${order.isCustomBuild ? "text-white bg-yellow-500" : "text-white bg-green-500"}`}>{order.isCustomBuild ? "Custom Build" : "Normal Order"}</p>
 
                                 <span className={`px-3 py-1 rounded-lg text-lg font-bold`}>
                                     Status: <strong className={getStatusClass(order.orderStatus)}>   
@@ -130,7 +131,10 @@ const UserOrders = () => {
                             </div>
 
                             <div className="mt-3 flex justify-between">
-    <p className="text-gray-700 font-bold text-lg">Total: ₹{order.totalAmount.toLocaleString('en-IN')}</p>
+                            <p className="text-gray-700 font-bold text-lg"> Total: ₹{order.originalTotal.toLocaleString('en-IN')}</p>
+<p className="text-gray-700 font-bold text-lg">Discount: {order.discountPercent.toLocaleString('en-IN')}%</p>
+<p className="text-gray-700 font-bold text-lg">Final Amount: ₹{order.finalTotal.toLocaleString('en-IN')}</p>
+
     <p className="text-gray-600 text-lg font-bold">Payment: <strong className={getPaymentStatusClass(order.paymentStatus)}>{order.paymentStatus}</strong></p>
 </div>
 
