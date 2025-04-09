@@ -9,9 +9,9 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex bg-gray-900 sticky left-0 z-40 ">
       <div
-        className={`bg-gray-900 h-screen text-white transition-all duration-300 ${isSidebarOpen ? "w-64" : "w-16"}`}
+        className={`bg-gray-900 sticky h-full text-white transition-all duration-300 ${isSidebarOpen ? "w-64" : "w-16"}`}
       >
         <button
           onClick={toggleSidebar}
@@ -29,15 +29,31 @@ const Sidebar = () => {
             href="/"
             className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
           >
-            <i className={`fas ${isSidebarOpen ? "fa-tachometer-alt" : "fa-chart-bar"}`}></i>
+            <i className={`fas ${isSidebarOpen ? "fa-tachometer-alt" : "fa-tachometer-alt"}`}></i>
             {isSidebarOpen && <span className="ml-3">Dashboard</span>}
           </a>
           <a
             href="/users"
             className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
           >
-            <i className={`fas ${isSidebarOpen ? "fa-users" : "fa-user-friends"}`}></i>
-            {isSidebarOpen && <span className="ml-3">Users</span>}
+            <i className={`fas ${isSidebarOpen ? "fa-users" : "fa-users"}`}></i>
+            {isSidebarOpen && <span className="ml-3">Users Management</span>}
+          </a>
+          <a
+            href="/categories"
+            className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
+          >
+            <i className={`fs ${isSidebarOpen ? "fa-solid fa-layer-group" : "fa-solid fa-layer-group"}`}></i>
+            {/* <i class="fa-brands fa-product-hunt"></i> */}
+            {isSidebarOpen && <span className="ml-3">Category Management</span>}
+          </a>
+          <a
+            href="/brands"
+            className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
+          >
+            <i className={`fs ${isSidebarOpen ? "fa-solid fa-layer-group" : "fa-solid fa-layer-group"}`}></i>
+            {/* <i class="fa-brands fa-product-hunt"></i> */}
+            {isSidebarOpen && <span className="ml-3">Brands Management</span>}
           </a>
           <a
             href="/products"
@@ -48,13 +64,29 @@ const Sidebar = () => {
             {isSidebarOpen && <span className="ml-3">Products Management</span>}
           </a>
           <a
+            href="/Order"
+            className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
+          >
+            <i className={`fs ${isSidebarOpen ? "fa-brands fa fa-first-order" : "fa-brands fa fa-first-order"}`}></i>
+            {/* <i class="fa-brands fa-product-hunt"></i> */}
+            {isSidebarOpen && <span className="ml-3">Order Management</span>}
+          </a>
+          <a
+            href="/feedback"
+            className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
+          >
+            <i className={`fs ${isSidebarOpen ? "fa-solid fa-comments" : "fa-solid fa-comments"}`}></i>
+            {/* <i class="fa-brands fa-product-hunt"></i> */}
+            {isSidebarOpen && <span className="ml-3">feedback Management</span>}
+          </a>
+          {/* <a
             href="/settings"
             className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
           >
             <i className={`fas ${isSidebarOpen ? "fa-cogs" : "fa-cog"}`}></i>
             {isSidebarOpen && <span className="ml-3">Settings</span>}
-          </a>
-          <a
+          </a> */}
+          {/* <a
             href="/reports"
             className="flex items-center p-4 hover:bg-gray-700 rounded-md transition duration-200"
           >
@@ -68,7 +100,7 @@ const Sidebar = () => {
           >
             <i className={`fas ${isSidebarOpen ? "fa-sign-out-alt" : "fa-door-open"}`}></i>
             {isSidebarOpen && <span className="ml-3">Logout</span>}
-          </a>
+          </a> */}
         </nav>
       </div>
     </div>

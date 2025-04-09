@@ -1,20 +1,50 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const orderItemSchema = new mongoose.Schema({
-    product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-    name: String,
-    price: Number,
-    quantity: Number,
-  });
+const OrderSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Reference to User
+  email: {type: String, required: true},
+  isCustomBuild: { type: Boolean, default: false },
+  items: [
+    {
+      productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true }, // Reference to Product
+      name: { type: String, required: true }, // Product name for redundancy
+      price: { type: Number, required: true }, // Product price at time of order
+      quantity: { type: Number, required: true, min: 1 }, // Quantity ordered
+      imageUrl: { type: String, required: true }, // Product name for redundancy
+    },
+  ],
+  // totalAmount: { type: Number, required: true }, // Total order amount
+  originalTotal: {
+    type: Number,
+    required: true
+  },
+  discountPercent: {
+    type: Number,
+     // optional if no coupon used
+    default: 0
+  },
+  finalTotal: {
+    type: Number,
+    required: true
+  },
   
-  const orderSchema = new mongoose.Schema({
-    orderNumber: { type: String, unique: true },
-    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    orderDate: { type: Date, default: Date.now },
-    status: { type: String, enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'], default: 'pending' },
-    totalPrice: Number,
-    shippingAddress: addressSchema,
-    orderItems: [orderItemSchema],
-  });
-  
-  module.exports = mongoose.model('Order', orderSchema);
+  paymentMethod: { type: String, enum: ["COD"], default: "COD" }, // Only COD payment method
+  paymentStatus: { type: String, enum: ["Pending", "Paid"], default: "Pending" }, // Payment status
+  orderStatus: {
+    type: String,
+    enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],
+    default: "Pending",
+  }, // Order status
+  shippingAddress: {
+    fullName: { type: String, required: true },
+    phone: { type: String, required: true },
+    building: { type: String, trim: true, required: true },
+    street: { type: String, trim: true, required: true },
+    city: { type: String, trim: true, required: true },
+    state: { type: String, trim: true, required: true },
+    pinCode: { type: String, trim: true, required: true },
+  }, // Shipping details
+  orderedAt: { type: Date, default: Date.now },
+});
+
+module.exports = mongoose.model("Order", OrderSchema);

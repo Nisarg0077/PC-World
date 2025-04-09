@@ -42,4 +42,13 @@
   "logoUrl": "https://example.com/logos/samsung.png",
   "createdAt": "2023-01-01T00:00:00Z",
   "updatedAt": "2023-01-01T00:00:00Z"
+},{
+  "_id": "5f4e6b12c3f8a2361b238a56",
+  "name": "ASUS",
+  "description": "A global leader in computer hardware and consumer electronics, known for its motherboards, graphics cards, and gaming laptops.",
+  "country": "Taiwan",
+  "logoUrl": "https://example.com/logos/asus.png",
+  "createdAt": "2023-01-01T00:00:00.000+00:00",
+  "updatedAt": "2023-01-01T00:00:00.000+00:00",
+  "__v": 0
 }]
