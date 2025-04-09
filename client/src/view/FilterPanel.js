@@ -82,6 +82,7 @@ const [maxProductPrice, setMaxProductPrice] = useState(1000000);
         category: value,
         price: maxProductPrice,
         brand: "",
+        rating: "",
         cores: "",
         threads: "",
         baseClock: "",

@@ -256,7 +256,7 @@ const OrdersMgmt = () => {
                                             {users[order.userId?._id] || "Loading..."}
                                         </td>
                                         <td className="p-3 border border-gray-300">{order.shippingAddress.fullName}</td>
-                                        <td className="p-3 border border-gray-300">₹{order.totalAmount.toLocaleString('en-IN')}</td>
+                                        <td className="p-3 border border-gray-300">₹{order.finalTotal.toLocaleString('en-IN')}</td>
 
                                         <td className="p-3 border border-gray-300">
                                             <select

@@ -8,6 +8,7 @@ const Category = require('./models/Category');
 const Order = require("./models/Order");
 const Rating = require("./models/Rating");
 const Otp = require("./models/Otp");
+const Coupon = require("./models/Coupon");
 const cors = require('cors');
 const ProductType = require('./models/ProductType');
 const app = express();
@@ -1667,8 +1668,27 @@ app.post("/api/orderin", async (req, res) => {
   try {
       // console.log("Received order data:", req.body);
   
-      const { userId, email, isCustomBuild, items, totalAmount, shippingAddress } = req.body;
-      if (!userId || !email || !items || !totalAmount || !shippingAddress) {
+      const { userId,
+        email,
+        isCustomBuild,
+        items,
+        originalTotal,
+        discountPercent,
+        finalTotal, shippingAddress } = req.body;
+      // if (!userId || !email || !items || !originalTotal || !discountPercent || !finalTotal || !shippingAddress) {
+      //   console.error("Missing required fields:", req.body);
+      //   return res.status(400).json({ error: "All fields are required" });
+      // }
+      if (
+        !userId ||
+        !email ||
+        !items ||
+        originalTotal === undefined ||
+        discountPercent === undefined ||
+        finalTotal === undefined ||
+        !shippingAddress
+      ) {
+      
         console.error("Missing required fields:", req.body);
         return res.status(400).json({ error: "All fields are required" });
       }
@@ -1718,7 +1738,9 @@ app.post("/api/orderin", async (req, res) => {
       email,
       isCustomBuild: isCustomBuild,
       items,
-      totalAmount,
+      originalTotal,
+      discountPercent,
+      finalTotal,
       shippingAddress,
       paymentMethod: "COD",
       paymentStatus: "Pending",
@@ -1726,6 +1748,7 @@ app.post("/api/orderin", async (req, res) => {
     });
 
     await newOrder.save();
+    
     res.status(201).json({ message: "Order placed successfully", order: newOrder });
 
     // Generate ordered items table for email
@@ -1773,7 +1796,10 @@ app.post("/api/orderin", async (req, res) => {
           <p style="font-size: 16px; color: #555;">Your order has been placed successfully.</p>
           <h2 style="color: #444;">Order Summary</h2>
           ${itemsTable}
-          <p style="font-size: 18px;"><strong>Total Amount:</strong> ₹${totalAmount.toLocaleString('en-IN')}</p>
+          <p style="font-size: 18px;"><strong>Total Amount:</strong> ₹${originalTotal.toLocaleString('en-IN')}</p>
+          <p><strong>Discount:</strong> ${discountPercent}%</p>
+          <p><strong>Final Amount:</strong> ₹${finalTotal.toLocaleString('en-IN')}</p>
+
           <p style="color: #666;">Your order will be delivered soon. Thank you for shopping at PC World!</p>
         </div>`
     };
@@ -1936,9 +1962,12 @@ app.put("/api/orders/:id", async (req, res) => {
           Ordered Products:
           ${productDetails}
           
-          Total Amount: ₹${(updatedOrder.totalAmount).toFixed(2)}
           
+          <p style="font-size: 18px;"><strong>Total Amount:</strong> ₹${originalTotal.toLocaleString('en-IN')}</p>
+          <p><strong>Discount:</strong> ${discountPercent}%</p>
+          <p><strong>Final Amount:</strong> ₹${finalTotal.toLocaleString('en-IN')}</p>
           We're sorry to see you go! If this was a mistake, please contact support.
+
         `,
         html: `
           <p>Your order (ID: <strong>${updatedOrder._id}</strong>) has been canceled.</p>
@@ -2029,7 +2058,7 @@ app.put('/api/user/address/:userId', async (req, res) => {
 app.get("/api/products/cpu/:brand", async (req, res) => {
   try {
     const { brand } = req.params;
-    // console.log(brand)
+    
     const cpus = await Product.find({ category: "cpu", brand: brand });
     res.json(cpus);
   } catch (error) {
@@ -2246,6 +2275,147 @@ app.post('/api/verify-otp', async (req, res) => {
 });
 
 
+
+
+
+// app.post('/api/createCoupon', async (req, res) => {
+//   const { code, discountPercentage, assignedTo, expiryDate } = req.body;
+//   console.log(assignedTo)
+//   try {
+//     const newCoupon = new Coupon({
+//       code,
+//       discountPercentage,
+//       assignedTo,
+//       expiryDate,
+//     });
+//     await newCoupon.save();
+//     res.status(201).json({ message: 'Coupon created and assigned!' });
+//   } catch (err) {
+//     res.status(500).json({ message: 'Failed to create coupon', error: err.message });
+//   }
+// });
+
+
+app.post('/api/createCoupon', async (req, res) => {
+  const { code, discountPercentage, userId, expiryDate } = req.body;
+
+  console.log('Received userId:', userId);
+  console.log('Full Body:', req.body);
+
+  try {
+    const newCoupon = new Coupon({
+      code,
+      discountPercentage,
+      assignedTo: userId, // ✅ Correct assignment here
+      expiryDate,
+    });
+
+    await newCoupon.save();
+    res.status(201).json({ message: 'Coupon created and assigned!' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to create coupon', error: err.message });
+  }
+});
+
+
+app.post("/api/coupons/validate", async (req, res) => {
+  const { code, userId } = req.body;
+
+  if (!code || !userId) {
+    return res.status(400).json({ valid: false, message: "Coupon code and user ID are required." });
+  }
+
+  try {
+    const coupon = await Coupon.findOne({ code: code.trim().toUpperCase() });
+
+    if (!coupon) {
+      return res.status(404).json({ valid: false, message: "Coupon not found." });
+    }
+
+    // Check expiry
+    if (coupon.expiryDate && new Date(coupon.expiryDate) < new Date()) {
+      return res.status(400).json({ valid: false, message: "Coupon has expired." });
+    }
+
+    // Check if coupon is assigned to this user
+    const isUserEligible =
+      !coupon.assignedTo || coupon.assignedTo.toString() === userId.toString();
+
+    if (!isUserEligible) {
+      return res.status(403).json({ valid: false, message: "You are not eligible for this coupon." });
+    }
+
+    // Optional: Check if coupon is already used
+    if (coupon.isUsed) {
+      return res.status(400).json({ valid: false, message: "Coupon has already been used." });
+    }
+
+    return res.status(200).json({
+      valid: true,
+      coupon: {
+        _id: coupon._id,
+        code: coupon.code,
+        discountPercentage: coupon.discountPercentage,
+      },
+    });
+  } catch (err) {
+    console.error("❌ Error validating coupon:", err);
+    res.status(500).json({ valid: false, message: "Internal server error." });
+  }
+});
+
+
+app.put('/api/coupons/mark-used/:couponId', async (req, res) => {
+  try {
+    const { couponId } = req.params;
+    console.log(couponId)
+    const updated = await Coupon.findByIdAndUpdate(
+      couponId,
+      { isUsed: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: "Coupon not found" });
+    }
+
+    res.status(200).json({ message: "Coupon marked as used", coupon: updated });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+app.get("/api/coupons/user/:userId", async (req, res) => {
+  const { userId } = req.params;
+  const today = new Date();
+  try {
+    await Coupon.deleteMany({
+      assignedTo: userId,
+      expiryDate: { $lt: today },
+    });
+
+    // Step 2: Fetch non-expired coupons
+    const coupons = await Coupon.find({
+      assignedTo: userId,
+      expiryDate: { $gte: today },
+    });
+
+
+    res.status(200).json(coupons);
+  } catch (err) {
+    console.error("❌ Error fetching user coupons:", err);
+    res.status(500).json({ success: false, message: "Server error while fetching coupons." });
+  }
+});
+
+app.get('/api/coupons', async (req, res) => {
+  try {
+  
+    const coupon = await Coupon.find();
+    res.json(coupon);
+  } catch (err) {
+    res.status(500).json({ message: 'Error creating coupon' });
+  }
+});
 
 
 app.get('/mgrt/prod', (req, res) => {
