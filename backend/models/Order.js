@@ -13,7 +13,21 @@ const OrderSchema = new mongoose.Schema({
       imageUrl: { type: String, required: true }, // Product name for redundancy
     },
   ],
-  totalAmount: { type: Number, required: true }, // Total order amount
+  // totalAmount: { type: Number, required: true }, // Total order amount
+  originalTotal: {
+    type: Number,
+    required: true
+  },
+  discountPercent: {
+    type: Number,
+     // optional if no coupon used
+    default: 0
+  },
+  finalTotal: {
+    type: Number,
+    required: true
+  },
+  
   paymentMethod: { type: String, enum: ["COD"], default: "COD" }, // Only COD payment method
   paymentStatus: { type: String, enum: ["Pending", "Paid"], default: "Pending" }, // Payment status
   orderStatus: {

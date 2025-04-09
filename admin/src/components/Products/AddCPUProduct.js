@@ -138,7 +138,7 @@ const AddCPUProduct = () => {
     <div className="h-screen flex flex-col">
       <ToastContainer />
       
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 ">
         <Sidebar />
         <main className="flex-grow bg-gray-100 p-6 overflow-y-auto">
           <h1 className="text-2xl font-bold mb-4">Add CPU Product</h1>

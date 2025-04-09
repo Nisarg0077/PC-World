@@ -16,6 +16,8 @@ const CustomBuild = () => {
     cases: [],
   });
 
+  console.log(cpus)
+
   const [selectedParts, setSelectedParts] = useState({
     cpu: "",
     motherboard: "",
@@ -26,10 +28,10 @@ const CustomBuild = () => {
     case: "",
   });
 
-  console.log(selectedParts);
-  console.log(components);
+  // console.log(selectedParts);
+  // console.log(components);
   
-
+console.log(brand)
   const navigate = useNavigate();
 
   // Fetch CPUs first

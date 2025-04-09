@@ -87,7 +87,7 @@ const ViewOrder = () => {
                                 <td className="p-3 border border-gray-300">{oid}</td>
                             </tr>
                             <tr>
-                                <td className="p-3 font-semibold border border-gray-300">Customer Name</td>
+                                <td className="p-3 font-semibold border border-gray-300">Customer username</td>
                                 <td className="p-3 border border-gray-300">{user?.username || "N/A"}</td>
                             </tr>
                             <tr>
@@ -156,11 +156,20 @@ const ViewOrder = () => {
                             </tr>
 
                             {/* ✅ Total Amount */}
-                            <tr>
+                            {/* <tr>
                                 <td className="p-3 font-semibold border border-gray-300">Total Amount</td>
                                 <td className="p-3 border border-gray-300 font-medium">
                                     ₹{(order.totalAmount || 0).toLocaleString('en-IN')}
                                 </td>
+                            </tr> */}
+                            <tr>
+                                <td className="p-3 font-semibold border border-gray-300">Total Amount</td>
+                                <td className="p-3 border border-gray-300 font-medium">
+                                <p className="text-gray-700 font-bold text-lg"> Total: ₹{order.originalTotal.toLocaleString('en-IN')}</p>
+<p className="text-gray-700 font-bold text-lg">Discount: {order.discountPercent.toLocaleString('en-IN')}%</p>
+<p className="text-gray-700 font-bold text-lg">Final Amount: ₹{order.finalTotal.toLocaleString('en-IN')}</p>
+                                </td>
+
                             </tr>
                         </tbody>
                     </table>
@@ -186,3 +195,5 @@ const ViewOrder = () => {
 };
 
 export default ViewOrder;
+
+

@@ -78,8 +78,8 @@ const ShopNow = () => {
      storage: filteredParams.storage  || "",
      motherboard: filteredParams.motherboard  || "",
      psu: filteredParams.psu  || "",
-     caseFilter: filteredParams.case  || ""
-
+     caseFilter: filteredParams.case  || "",
+     rating: filteredParams.rating || ""
   }));
   
   // console.log("Filters State:", filters);

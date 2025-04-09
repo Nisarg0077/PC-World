@@ -11,6 +11,15 @@ const Checkout = () => {
   const { selectedProducts = [], checkoutType, product: singleProduct, customBuild, isCustomBuild  } = location.state || {};
 
   const [cartItems, setCartItems] = useState(state?.cartItems || []);
+  const [availableCoupons, setAvailableCoupons] = useState([]);
+const [appliedCoupon, setAppliedCoupon] = useState(null);
+
+
+// const [discountedTotal, setDiscountedTotal] = useState(totalPrice);
+const [couponCode, setCouponCode] = useState("");
+const [discountPercent, setDiscountPercent] = useState(0);
+const [couponId, setCouponId] = useState("");
+
   const [user, setUser] = useState(null);
   const [shippingAddress, setShippingAddress] = useState(null);
   const [error, setError] = useState(null);
@@ -28,6 +37,7 @@ const Checkout = () => {
     if (storedUser) {
       const userData = JSON.parse(storedUser);
       setUser(userData);
+      fetchUserCoupons(userData.id);
       fetchUserAddress(userData.id);
       console.log(checkoutType);
       console.log(isCustomBuild);
@@ -51,7 +61,19 @@ const Checkout = () => {
     }
   };
 
- ;
+
+
+ const fetchUserCoupons = async (userId) => {
+  try {
+    const res = await axios.get(`http://localhost:5000/api/coupons/user/${userId}`);
+    setAvailableCoupons(res.data || []);
+    
+    console.log(res.data)
+  } catch (error) {
+    console.error("❌ Failed to fetch coupons:", error);
+  }
+};
+
 
 
   const fetchUserAddress = async (userId) => {
@@ -77,17 +99,44 @@ const Checkout = () => {
 
   const displayItems = getItemsToDisplay();
 
+  // const totalPrice = (() => {
+  //   if (customBuild) return Object.values(customBuild.components).reduce((total, item) => total + (item?.price || 0), 0);
+  //   if (checkoutType === "singleProduct") return singleProduct?.price || 0;
+  //   return displayItems.reduce((total, item) => total + (item?.price || 0) * (item?.quantity || 1), 0);
+  // })();
+
   const totalPrice = (() => {
-    if (customBuild) return Object.values(customBuild.components).reduce((total, item) => total + (item?.price || 0), 0);
-    if (checkoutType === "singleProduct") return singleProduct?.price || 0;
-    return displayItems.reduce((total, item) => total + (item?.price || 0) * (item?.quantity || 1), 0);
+    if (customBuild) {
+      return Object.values(customBuild.components).reduce(
+        (total, item) => total + (item?.price || 0),
+        0
+      );
+    }
+  
+    if (checkoutType === "singleProduct") {
+      return singleProduct?.price || 0;
+    }
+  
+    return displayItems.reduce(
+      (total, item) => total + (item?.price || 0) * (item?.quantity || 1),
+      0
+    );
   })();
+
+  const [discountedTotal, setDiscountedTotal] = useState(totalPrice);
+  
+
+  
 
   const handlePlaceOrder = async () => {
   if (!user || !shippingAddress || totalPrice === 0) {
     alert("Please login to Checkout.");
     return;
   }
+
+  
+  
+  
 
   const orderItems = displayItems.map((item) => {
     const productId = item.product?._id || item?._id || "";
@@ -106,7 +155,10 @@ const Checkout = () => {
     email: user?.email || "",
     items: orderItems,
     isCustomBuild: isCustomBuild || false,
-    totalAmount: totalPrice,
+    // totalAmount: totalPrice,
+    originalTotal: totalPrice,     
+    discountPercent: discountPercent || 0, 
+    finalTotal: discountedTotal,
     shippingAddress: {
       fullName: `${user?.firstName} ${user?.lastName}`,
       phone: shippingAddress?.phone || "N/A",
@@ -119,10 +171,15 @@ const Checkout = () => {
   };
 
   console.log(orderData.isCustomBuild);
+
+
+  
   
 
+  console.log("Submitting order", orderData);
   try {
     const response = await axios.post("http://localhost:5000/api/orderin", orderData);
+
     if (response.status === 201) {
       alert("🎉 Order placed successfully!");
     
@@ -131,6 +188,10 @@ const Checkout = () => {
       if (checkoutType === "cart" && (user?._id || user?.id)) {
         try {
           await axios.delete(`http://localhost:5000/api/cart/clear/${user?._id || user?.id}`);
+          
+               
+             
+  
           clearCart(); // Clear frontend cart context
           console.log("✅ Cart cleared after checkout");
         } catch (clearErr) {
@@ -146,6 +207,43 @@ const Checkout = () => {
     setError("Failed to place order. Please try again.");
   }
 };
+
+const applyCoupon = async (code) => {
+  try {
+    const { data } = await axios.post('http://localhost:5000/api/coupons/validate', {
+   
+      code,
+      userId: user._id || user.id,
+    });
+
+    if (data.valid) {
+      setAppliedCoupon(data.coupon);
+
+      const discountPercentage = data.coupon.discountPercentage || 0;
+      const discount = (totalPrice * discountPercentage) / 100;
+      const newTotal = Math.max(totalPrice - discount, 0);
+
+      setDiscountedTotal(newTotal);
+      setDiscountPercent(discountPercentage);
+      
+      
+      
+      await axios.put(`http://localhost:5000/api/coupons/mark-used/${data.coupon._id}`);
+      alert('✅ Coupon applied successfully!');
+    } else {
+      setAppliedCoupon(null);
+      setDiscountedTotal(totalPrice);
+      alert(data.message || '❌ Invalid or expired coupon');
+    }
+  } catch (error) {
+    console.error('❌ Error applying coupon:', error);
+    setAppliedCoupon(null);
+    setDiscountedTotal(totalPrice);
+    alert('❌ Error applying coupon');
+  }
+};
+
+
 
 
 
@@ -215,7 +313,94 @@ const Checkout = () => {
         )) : <p className="text-center text-gray-500">No products in checkout</p>}
       </div>
 
-      <div className="text-2xl font-semibold text-gray-900 mb-4">Total Price: ₹{totalPrice.toLocaleString("en-IN")}</div>
+      {/* {availableCoupons.length > 0 && (
+  <div className="mt-6 p-4 bg-white rounded-md shadow">
+  <h4 className="text-lg font-semibold mb-2">Apply Coupon</h4>
+  <div className="flex items-center space-x-3">
+    <input
+      type="text"
+      value={couponCode}
+      onChange={(e) => setCouponCode(e.target.value)}
+      placeholder="Enter coupon code"
+      className="px-3 py-2 border border-gray-300 rounded"
+    />
+    <button
+      onClick={applyCoupon}
+      className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+    >
+      Apply
+    </button>
+  </div>
+  {appliedCoupon && (
+    <p className="mt-2 text-green-600">Applied: {appliedCoupon.code} - {appliedCoupon.discountType === "percentage" ? `${appliedCoupon.discountValue}%` : `₹${appliedCoupon.discountValue}`} off</p>
+  )}
+</div>
+
+)}
+ */}
+
+
+{availableCoupons.filter(coupon => !coupon.isUsed).length > 0 && (
+  <div className="mt-6 p-4 bg-white rounded-md shadow">
+    <h4 className="text-lg font-semibold mb-4">Available Coupons</h4>
+    <div className="space-y-3">
+      {availableCoupons
+        .filter(coupon => !coupon.isUsed)
+        .map((coupon, index) => (
+          <div
+            key={index}
+            className="flex items-center justify-between p-3 border border-gray-200 rounded-md bg-gray-50"
+          >
+            <div>
+              <p className="text-blue-800 font-semibold">
+                {coupon.code} - {coupon.discountPercentage}%
+              </p>
+              <p className="text-sm text-gray-500">
+                Valid till {new Date(coupon.expiryDate).toLocaleDateString()}
+              </p>
+            </div>
+
+            {/* <button
+              onClick={() => applyCoupon(coupon.code)}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
+              Apply
+            </button> */}
+            {appliedCoupon?.code !== coupon.code && (
+  <button
+    onClick={() => applyCoupon(coupon.code)}
+    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+  >
+    Apply
+  </button>
+)}
+
+
+          </div>
+        ))}
+    </div>
+
+    {appliedCoupon && (
+      <p className="mt-4 text-green-600">
+        ✅ Applied: <strong>{appliedCoupon.code}</strong> -{" "}
+        {appliedCoupon.discountPercentage}%
+      </p>
+    )}
+  </div>
+)}
+
+
+      {/* <div className="text-2xl font-semibold text-gray-900 mb-4">Total Price: ₹{totalPrice.toLocaleString("en-IN")}</div> */}
+      <div className="text-xl font-semibold text-gray-900 mb-4">
+  {appliedCoupon ? (
+    <>
+      <div>Original: <span className="line-through text-gray-500">₹{totalPrice.toLocaleString()}</span></div>
+      <div>Discounted Total: ₹{discountedTotal.toLocaleString("en-IN")}</div>
+    </>
+  ) : (
+    <div>Total Price: ₹{totalPrice.toLocaleString("en-IN")}</div>
+  )}
+</div>
 
       <button onClick={handlePlaceOrder} className="w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700">Place Order (COD)</button>
 
