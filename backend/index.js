@@ -25,7 +25,7 @@ const path = require('path');
 const nodemailer = require("nodemailer");
 process.setMaxListeners(15);
 
-const uri = 'mongodb://127.0.0.1:27017/pc-world'; 
+const uri = 'mongodb+srv://Nisarg:nGHOST@cluster0.jbcs6zb.mongodb.net/pc-world'; 
 
 app.use(cors({ origin: "*" }));
 app.use(express.json());
